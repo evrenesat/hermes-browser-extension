@@ -41,7 +41,7 @@ test('connection state still decides whether Connect is needed; the pop-up only 
   assert.match(bind, /event\.target === els\.connectPanel\) dismissConnectDialog\(\)/, 'the backdrop closes it');
   assert.match(bind, /if \(nowNeeded && !needed\) \{\s*connectDialogDismissed = false;/, 'a dropped connection or dead token brings it back');
   assert.match(bind, /if \(onboardingFlow\?\.isOpen\) onboardingFlow\.render\(\);/, "setup's Connect step follows the live state");
-  assert.match(bind, /els\.sendButton\?\.addEventListener\('click', \(event\) => \{\s*if \(isConnected\(\) \|\| isRemoteWsMode\(\)\) return;\s*event\.preventDefault\(\);\s*openConnectDialog\(\);/, '"Connect first" opens it');
+  assert.match(bind, /for \(const button of \[els\.sendButton, els\.inlineSendButton\]\) \{\s*button\?\.addEventListener\('click', \(event\) => \{\s*if \(isConnected\(\) \|\| isRemoteWsMode\(\)\) return;\s*event\.preventDefault\(\);\s*openConnectDialog\(\);/, '"Connect first" opens it');
 });
 
 test('a send while unpaired opens the pop-up instead of focusing a hidden button', () => {

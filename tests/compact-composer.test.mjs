@@ -41,15 +41,11 @@ test('the model chip shows the short name and keeps effort in its accessible nam
 
 test('Commands is an icon button beside Hermes Control, with its popup anchored to the row', () => {
   const commands = html.match(/<button id="commandMenuButton"[\s\S]*?<\/button>/)?.[0] || '';
-  assert.match(commands, /class="composer-commands-button"/);
-  assert.match(commands, /data-icon="terminal"/);
-  assert.match(actions, /<span class="composer-commands">\s*<button id="commandMenuButton"[\s\S]*?<\/span>/);
+  assert.match(commands, /class="composer-icon composer-slash"/);
+  assert.match(commands, /data-icon="slash"/);
+  assert.match(html, /<div class="composer-input-wrap"[\s\S]*?id="commandMenuButton"[\s\S]*?id="modelMenuButton"/, 'the slash button sits in the composer tool row before the model chip');
   // The popup itself lives in the shell, outside the dock, so the dock's backdrop filter cannot clip or re-anchor it.
   assert.match(html, /<\/footer>\s*<section id="skillMenu"[\s\S]*?<section id="quickMoreMenu"[\s\S]*?<\/main>/);
-  assert.ok(
-    actions.indexOf('id="commandMenuButton"') < actions.indexOf('id="browserControlMenuButton"'),
-    'Commands sits directly before Hermes Control',
-  );
 });
 
 test('the context readout lives in Settings, under Sessions & Context', () => {

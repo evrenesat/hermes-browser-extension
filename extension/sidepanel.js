@@ -6785,11 +6785,13 @@ function dismissConnectDialog() {
 function bindConnectDialog() {
   if (!els.connectPanel) return;
   els.connectPanelCloseButton?.addEventListener('click', dismissConnectDialog);
-  els.sendButton?.addEventListener('click', (event) => {
-    if (isConnected() || isRemoteWsMode()) return;
-    event.preventDefault();
-    openConnectDialog();
-  }, { capture: true });
+  for (const button of [els.sendButton, els.inlineSendButton]) {
+    button?.addEventListener('click', (event) => {
+      if (isConnected() || isRemoteWsMode()) return;
+      event.preventDefault();
+      openConnectDialog();
+    }, { capture: true });
+  }
   // A click on the dimmed backdrop, outside the card, closes it too.
   els.connectPanel.addEventListener('click', (event) => {
     if (event.target === els.connectPanel) dismissConnectDialog();
@@ -6827,6 +6829,12 @@ function bindConnectDialog() {
     needed = nowNeeded;
     if (onboardingFlow?.isOpen) onboardingFlow.render();
   }).observe(els.connectPanel, { attributes: true, attributeFilter: ['hidden', 'disabled'], subtree: true, childList: true, characterData: true });
+}
+
+function addShortcutHint(button, keys) {
+  if (!button) return;
+  const base = (button.getAttribute('aria-label') || button.title || '').trim();
+  if (base) button.title = `${base} (${keys})`;
 }
 
 function setComposerButtonState(button, state = {}) {
@@ -6909,9 +6917,12 @@ function updateComposerBusyState() {
   setComposerButtonState(els.stopButton, state.controls.stop);
   setComposerButtonState(els.queueButton, state.controls.queue);
   setComposerButtonState(els.steerButton, state.controls.steer);
+  addShortcutHint(els.inlineSendButton, 'Enter');
+  addShortcutHint(els.stopButton, 'Esc');
   if (startupBlocking) {
     [els.inlineSendButton, els.stopButton, els.queueButton, els.steerButton, els.voiceButton].filter(Boolean).forEach((button) => { button.disabled = true; });
   }
+  if (!startupBlocking && !isConnected() && els.inlineSendButton) els.inlineSendButton.disabled = false;
   els.composerDropZone?.classList.toggle('busy-draft', state.busyDraft);
   els.composerDropZone?.classList.toggle('can-steer', state.busyDraft && !state.controls.steer.hidden);
   if (els.sendButton) {
@@ -30849,6 +30860,25 @@ function bindEvents() {
     openOnboarding({ rerun: true });
   });
   els.firstPromptChip?.addEventListener('click', useFirstPrompt);
+  els.firstPromptChips?.addEventListener('click', (event) => {
+    const prompt = event.target.closest?.('[data-prompt]')?.dataset.prompt;
+    if (!prompt || !els.input) return;
+    els.input.value = prompt;
+    els.input.dispatchEvent(new Event('input', { bubbles: true }));
+    hideFirstPrompt();
+    els.input.focus();
+  });
+  if (els.messages && els.firstPromptChips && typeof MutationObserver === 'function') {
+    const syncEmptyChips = () => {
+      const empty = !els.messages.querySelector('.message-row') && !messages.length;
+      const blocked = document.body.classList.contains('startup-active') || document.body.classList.contains('onboarding-active');
+      els.firstPromptChips.hidden = !empty || blocked || Boolean(els.input?.value);
+    };
+    new MutationObserver(syncEmptyChips).observe(els.messages, { childList: true });
+    new MutationObserver(syncEmptyChips).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    els.input?.addEventListener('input', syncEmptyChips);
+    syncEmptyChips();
+  }
   els.composer?.addEventListener('submit', hideFirstPrompt, { capture: true });
   bindConnectDialog();
   els.browserControlScopeInput?.addEventListener('change', () => {
@@ -31114,6 +31144,27 @@ function bindEvents() {
       if (first?.dataset.command) {
         event.preventDefault();
         replaceActiveSkillToken(first.dataset.command);
+        return;
+      }
+    }
+    if (event.key === 'Escape' && !event.isComposing) {
+      if (els.quickMoreMenu && !els.quickMoreMenu.hidden) {
+        event.preventDefault();
+        setQuickCommandMenuOpen(false);
+        return;
+      }
+      if (els.skillMenu.hidden && els.stopButton && !els.stopButton.hidden && !els.stopButton.disabled) {
+        event.preventDefault();
+        els.stopButton.click();
+        return;
+      }
+    }
+    if (event.key === 'ArrowUp' && !event.isComposing && !event.shiftKey && !event.altKey && !event.metaKey && !event.ctrlKey
+      && !els.input.value && !viewedSessionIsRunning() && els.skillMenu.hidden) {
+      const edit = [...els.messages.querySelectorAll('.message-row[data-role="user"] .message-action-edit')].pop();
+      if (edit) {
+        event.preventDefault();
+        edit.click();
         return;
       }
     }

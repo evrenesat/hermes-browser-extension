@@ -1463,6 +1463,8 @@ export default Object.freeze({
   "ui.selecting.the.safest.wake.listener": "Selecting the safest wake listener…",
   "ui.selection": "Selection",
   "ui.send.comments": "Send comments",
+  "ui.explain.selection": "Explain selection",
+  "ui.key.points": "Key points",
   "ui.self.hosted.api.or.dashboard.api.can.use.trusted.lan.http.dashb.152b7f4c": "Self-hosted API or dashboard. API can use trusted LAN http; dashboard uses https.",
   "ui.send": "Send",
   "ui.send.it.when.the.current.hermes.run.finishes": "Send it when the current Hermes run finishes.",

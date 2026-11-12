@@ -1,1 +1,688 @@
-/* Calm UI: chat surfaces. See docs/design/ui-revamp.md. Loaded after sidepanel-calm.css. */
+/* Calm UI: chat surfaces (conversation + composer). See docs/design/ui-revamp.md.
+   Loaded after sidepanel-calm.css. Sections: 1 thread, 2 user/assistant messages,
+   3 markdown, 4 tool activity + reasoning, 5 receipts/cards/system, 6 hover actions,
+   7 day divider + jump, 8 bottom dock + context line, 9 composer, 10 notices. */
+
+/* ------------------------------------------------------------------ */
+/* 1. Thread                                                           */
+/* ------------------------------------------------------------------ */
+html .messages { gap: 6px; padding: 0 4px 12px; }
+html .message-row { margin: 0; }
+html .message-row[data-role="user"] { margin-top: 10px; }
+html .message-row[data-role="user"]:first-child { margin-top: 0; }
+html .message-row.is-run-continuation { margin-top: 0; }
+
+html .message {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  color: var(--calm-text);
+}
+html .message:focus-visible { outline: 2px solid var(--calm-accent); outline-offset: 2px; border-radius: var(--calm-radius-card); }
+
+/* ------------------------------------------------------------------ */
+/* 2. User and assistant messages                                      */
+/* ------------------------------------------------------------------ */
+html .message-row[data-role="user"] > .message.user,
+html .message-row > .message.user {
+  align-self: flex-end;
+  max-width: 85%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 12px 12px 4px 12px;
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  box-shadow: none;
+}
+html[data-hermes-mode="light"] .message-row > .message.user { background: var(--calm-surface); box-shadow: inset 0 0 0 1px var(--calm-border); }
+html .message.user .message-role { display: none; }
+html .message-row.has-run-next > .message.user,
+html .message-row.has-run-next > .message.assistant { border-radius: 12px; }
+html .message.user .message-content { font-size: calc(13px * var(--hermes-text-zoom, 1)); line-height: 1.5; }
+
+html .message-row > .message.assistant,
+html[data-message-layout="user-bubble"] .message-row:not(.room-message) > .message.assistant {
+  align-self: stretch;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--calm-text);
+}
+/* No "Hermes" eyebrow for a normal chat; a bot or room identity stays as a small label. */
+html .message.assistant .message-role:not(:has(.room-avatar)) { display: none; }
+html .message-row.room-message > .message.assistant {
+  padding: 0 0 0 10px;
+  border-left: 2px solid color-mix(in srgb, var(--bot-bar, var(--calm-border-strong)) 70%, transparent);
+  background: transparent;
+  box-shadow: none;
+}
+html .message-row.room-message .message-role,
+html .message.assistant .message-role:has(.room-avatar) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 4px;
+  font: 600 calc(11px * var(--hermes-text-zoom, 1))/1.2 var(--calm-font-ui);
+  color: var(--bot-ink, var(--calm-muted));
+  opacity: 1;
+}
+html .message-row.room-message .room-avatar,
+html .message.assistant .message-role .room-avatar { width: 16px; height: 16px; flex: 0 0 16px; border-radius: 5px; }
+html .message-row.room-message.is-run-continuation .message-role { display: none; }
+
+html .message-content {
+  font-family: var(--calm-font-ui);
+  font-size: calc(13px * var(--hermes-text-zoom, 1));
+  line-height: 1.55;
+}
+
+/* Steering rows stay quiet: a dashed pending bubble, a muted "arrow" tag once landed. */
+html .message.steer-pending-row { border: 1px dashed var(--calm-border-strong); box-shadow: none; }
+html .message.steer-sent { border-left: 0; border-radius: 12px 12px 4px 12px; }
+html .message.steer-sent .message-role,
+html .message.steer-pending-row .message-role {
+  display: block;
+  margin: 0 0 2px;
+  font: 500 calc(11px * var(--hermes-text-zoom, 1))/1.2 var(--calm-font-ui);
+  color: var(--calm-muted);
+}
+
+/* System / notice / error messages: one muted line-card, danger tint for errors. */
+html .message.system {
+  padding: 6px 10px;
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  color: var(--calm-muted);
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+}
+html .message.system .message-role { display: none; }
+html .message.assistant.is-error,
+html .message.assistant.error,
+html .message.error {
+  padding: 8px 12px;
+  border: 1px solid color-mix(in srgb, var(--calm-danger) 40%, transparent);
+  border-radius: var(--calm-radius-card);
+  background: color-mix(in srgb, var(--calm-danger) 8%, var(--calm-bg));
+  color: var(--calm-text);
+}
+html .message-row.is-live > .message { opacity: 1; }
+
+/* ------------------------------------------------------------------ */
+/* 3. Markdown                                                         */
+/* ------------------------------------------------------------------ */
+html .message-content :is(h1, h2, h3, h4, h5, h6) { margin: 1em 0 0.35em; font-weight: 600; line-height: 1.3; color: inherit; }
+html .message-content :is(h1, h2, h3, h4, h5, h6):first-child { margin-top: 0; }
+html .message-content p { margin: 0 0 0.6em; }
+html .message-content p:last-child { margin-bottom: 0; }
+html .message-content :is(ul, ol) { margin: 0 0 0.6em; padding-left: 1.4em; display: block; }
+html .message-content li { padding-left: 0.1em; margin: 0.1em 0; }
+html .message-content li > :is(ul, ol) { margin: 0.1em 0 0; }
+html .message-content li > p { margin: 0; }
+html .message-content strong { font-weight: 600; }
+html .message-content a { color: var(--calm-accent); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--calm-accent) 40%, transparent); }
+html .message-content a:hover { text-decoration-color: currentColor; }
+html .message-content hr { border: 0; border-top: 1px solid var(--calm-border); margin: 1em 0; opacity: 1; }
+html .message-content blockquote {
+  margin: 0.6em 0;
+  padding: 0 0 0 0.8em;
+  border-left: 2px solid var(--calm-border-strong);
+  color: var(--calm-muted);
+  opacity: 1;
+}
+html .message-content code {
+  padding: 0.1em 0.35em;
+  border: 0;
+  border-radius: 4px;
+  background: var(--calm-surface-2);
+  font-family: var(--calm-font-mono);
+  font-size: 12px;
+}
+html .message.user .message-content code { background: color-mix(in srgb, var(--calm-text) 10%, transparent); }
+
+html .message-content pre {
+  margin: 0;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--calm-font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+html .message-content pre code { padding: 0; background: transparent; font-size: inherit; }
+html .md-code {
+  position: relative;
+  margin: 0.7em 0;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  overflow: hidden;
+}
+html .md-code::before {
+  content: attr(data-lang);
+  display: block;
+  min-height: 28px;
+  padding: 0 40px 0 12px;
+  line-height: 28px;
+  border-bottom: 1px solid var(--calm-border);
+  font: 500 11px/28px var(--calm-font-ui);
+  color: var(--calm-muted);
+}
+html .md-code:not([data-lang])::before { display: none; }
+html .md-code:not([data-lang]) > .md-code-copy { top: 6px; background: var(--calm-surface); }
+html .md-code > pre { margin: 0; padding-right: 12px; }
+html .md-code-copy {
+  inset: 3px 4px auto auto;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  min-height: 22px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-muted);
+}
+html .md-code-copy:hover, html .md-code-copy.copied { background: var(--calm-surface-2); color: var(--calm-text); border: 0; }
+html .md-code-copy svg { width: 14px; height: 14px; }
+
+html .md-table-wrap { margin: 0.7em 0; border: 1px solid var(--calm-border); border-radius: var(--calm-radius-card); }
+html .message-content table { min-width: 0; font-size: 12px; }
+html .message-content :is(th, td) { padding: 6px 8px; border-bottom: 1px solid var(--calm-border); }
+html .message-content tr:last-child :is(th, td) { border-bottom: 0; }
+html .message-content th { background: var(--calm-surface); font-weight: 600; color: var(--calm-muted); }
+html .md-task.checked { color: var(--calm-accent); }
+
+/* ------------------------------------------------------------------ */
+/* 4. Tool activity and reasoning                                      */
+/* ------------------------------------------------------------------ */
+html .message-tool-activity { margin-top: 4px; }
+html .tool-call-group { font-size: calc(12px * var(--hermes-text-zoom, 1)); color: var(--calm-muted); }
+html .tool-call-group > summary,
+html .tool-call-entry > summary { padding: 3px 0; gap: 6px; border-radius: var(--calm-radius-control); }
+html .tool-call-group > summary:hover { color: var(--calm-text); }
+html .tool-call-group > summary::before,
+html .tool-call-entry > summary::before { color: var(--calm-muted); font-size: 14px; transition: transform var(--calm-ease); }
+html .tool-call-group-title { color: inherit; font-weight: 500; }
+html .tool-call-group-state,
+html .tool-call-status,
+html .tool-call-group-time { color: var(--calm-muted); font-size: 12px; opacity: 0.85; }
+html .tool-call-group-time::before { margin-right: 6px; }
+html .tool-call-list { padding: 2px 0 4px 14px; margin: 2px 0 0 4px; border-left: 1px solid var(--calm-border); max-height: min(42vh, 320px); }
+html .tool-call-entry > summary { color: var(--calm-text); font-size: 12px; }
+html .tool-call-entry > summary > span:first-of-type { font-family: var(--calm-font-mono); font-size: 11.5px; }
+html .tool-call-entry pre {
+  margin: 2px 0 6px 14px;
+  padding: 8px 10px;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-surface);
+  font-family: var(--calm-font-mono);
+  font-size: 11.5px;
+  color: var(--calm-text);
+}
+
+/* Live tool card collapses to one quiet line. */
+html .tool-activity {
+  min-height: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--calm-muted);
+  overflow: visible;
+}
+html .tool-activity::before { display: none; }
+html .tool-activity-head { gap: 6px; font-size: calc(12px * var(--hermes-text-zoom, 1)); }
+html .tool-activity-label, html .tool-activity-name, html .tool-activity-preview { color: var(--calm-muted); font-family: var(--calm-font-ui); font-size: 12px; text-transform: none; letter-spacing: normal; }
+html .tool-activity-name { color: var(--calm-text); }
+html .tool-activity-preview { font-family: var(--calm-font-mono); font-size: 11.5px; }
+html .tool-activity-meter i { background: var(--calm-accent); }
+
+html .message-reasoning {
+  margin: 0 0 6px;
+  padding: 0;
+  border: 0;
+  color: var(--calm-muted);
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+}
+html .message-reasoning > summary { color: var(--calm-muted); font-size: 12px; padding: 2px 0; }
+html .message-reasoning > summary:hover { color: var(--calm-text); }
+html .message-reasoning-body {
+  margin: 4px 0 0 4px;
+  padding-left: 10px;
+  border-left: 1px solid var(--calm-border-strong);
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  line-height: 1.5;
+}
+html .thinking-indicator { color: var(--calm-muted); font-size: calc(12px * var(--hermes-text-zoom, 1)); }
+html .live-thinking-slot { margin-bottom: 4px; }
+
+/* ------------------------------------------------------------------ */
+/* 5. Receipts, cards, attachments                                     */
+/* ------------------------------------------------------------------ */
+html .context-receipt {
+  margin-top: 4px;
+  padding-top: 0;
+  border-top: 0;
+  color: var(--calm-muted);
+  font-size: calc(11px * var(--hermes-text-zoom, 1));
+}
+html .context-receipt summary { color: var(--calm-muted); font-size: 11px; }
+html .context-receipt summary:hover { color: var(--calm-text); }
+html .context-receipt dl { margin: 6px 0 2px; gap: 3px 10px; grid-template-columns: minmax(80px, 0.8fr) minmax(0, 1.2fr); }
+html .context-receipt dt { color: var(--calm-muted); }
+html .context-receipt dd { color: var(--calm-text); }
+
+html .artifact-card {
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  box-shadow: none;
+}
+html .artifact-card-kind { border-radius: var(--calm-radius-control); border-color: var(--calm-border-strong); background: var(--calm-surface-2); color: var(--calm-muted); box-shadow: none; }
+html .artifact-card-copy small, html .artifact-card-note { color: var(--calm-muted); opacity: 1; font-family: var(--calm-font-ui); }
+html .artifact-card-actions button { min-height: 24px; padding: 2px 8px; font-size: 12px; border-radius: var(--calm-radius-control); background: var(--calm-surface-2); border-color: transparent; color: var(--calm-text); }
+html .artifact-card-actions .artifact-card-action-primary { background: var(--calm-accent); color: var(--calm-accent-fg); }
+html .user-message-image-open, html .attachment-thumb { border-radius: var(--calm-radius-control); }
+html .message-content img { border-radius: var(--calm-radius-card); }
+
+/* Streaming cursor / live caret: quiet accent bar. */
+html .message-content .streaming-cursor,
+html .message-content [data-streaming-cursor] { background: var(--calm-accent); border-radius: 1px; }
+
+/* ------------------------------------------------------------------ */
+/* 6. Hover actions                                                    */
+/* ------------------------------------------------------------------ */
+html .message-row > .message-rail,
+html .message-row[data-actions="left"] > .message-rail {
+  position: absolute;
+  top: 100%;
+  margin: -3px 0 0;
+  z-index: 3;
+  min-height: 0;
+  height: 24px;
+  padding: 0 2px;
+  gap: 0;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-bg);
+  color: var(--calm-muted);
+  font: 500 11px/1 var(--calm-font-ui);
+  order: 0;
+  inset-inline: auto;
+}
+html .message-row[data-role="user"] > .message-rail { inset-inline-end: 0; }
+html .message-row[data-role="assistant"] > .message-rail { inset-inline-start: 0; }
+html .message-row > .message-rail:has(> :nth-child(n+1)) { box-shadow: 0 0 0 1px var(--calm-border); }
+html .message-row[data-actions="left"] { flex-direction: column; }
+html .message-time, html .message-duration { padding: 0 6px 0 4px; color: var(--calm-muted); }
+html .message-action {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-muted);
+}
+html .message-action:hover, html .message-action:focus-visible { background: var(--calm-surface-2); color: var(--calm-text); box-shadow: none; }
+html .message-action:focus-visible { outline: 2px solid var(--calm-accent); outline-offset: 1px; }
+html .message-action-icon { width: 14px; height: 14px; stroke-width: 1.5; }
+html .message-action.is-copied { color: var(--calm-ok); }
+html .message-action.is-copy-failed { color: var(--calm-danger); }
+html .message-row.is-being-read > .message { outline: 1px solid var(--calm-border-strong); outline-offset: 4px; border-radius: var(--calm-radius-card); }
+html .message-restore-popover { border: 1px solid var(--calm-border); border-radius: var(--calm-radius-card); background: var(--calm-surface); box-shadow: var(--calm-shadow-popover); color: var(--calm-text); }
+html .message-editor-input { border-radius: var(--calm-radius-card); background: var(--calm-surface); }
+html .message-editor-cancel, html .message-editor-send,
+html .message-restore-cancel, html .message-restore-confirm { min-height: var(--calm-control-h); border-radius: var(--calm-radius-control); border-color: transparent; }
+html .message-editor-send, html .message-restore-confirm { background: var(--calm-accent); color: var(--calm-accent-fg); }
+
+/* ------------------------------------------------------------------ */
+/* 7. Day divider and jump-to-latest                                   */
+/* ------------------------------------------------------------------ */
+html .message-day-divider { justify-content: center; margin: 8px 0 2px; color: var(--calm-muted); font-size: 11px; font-weight: 500; }
+html .message-day-divider::before, html .message-day-divider::after { display: none; }
+
+html .jump-to-latest {
+  inset-block-end: calc(100% + 8px);
+  inline-size: 28px;
+  min-inline-size: 28px;
+  block-size: 28px;
+  min-block-size: 28px;
+  padding: 0;
+  gap: 0;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-pill);
+  background: var(--calm-surface);
+  color: var(--calm-text);
+  box-shadow: var(--calm-shadow-popover);
+}
+html .jump-to-latest:hover:not(:disabled) { background: var(--calm-surface-2); }
+html .jump-to-latest svg { transform: none; inline-size: 16px; block-size: 16px; fill: none !important; }
+html .jump-to-latest-label { display: none; }
+
+/* ------------------------------------------------------------------ */
+/* 8. Bottom dock and context line                                     */
+/* ------------------------------------------------------------------ */
+html .bottom-dock {
+  padding: 4px var(--calm-gutter) var(--calm-gutter);
+  border-top: 0;
+  background: var(--calm-bg);
+  backdrop-filter: none;
+  gap: 0;
+}
+html .composer { padding: 0; border: 0; border-radius: 0; background: transparent; }
+
+/* The small grab bar above the composer still toggles the status stack; make it faint. */
+html .status-stack-toggle { top: -12px; width: 48px; height: 10px; }
+html .status-stack-toggle::before { width: 24px; height: 3px; background: var(--calm-border-strong); opacity: 0; }
+html .bottom-dock:hover .status-stack-toggle::before { opacity: 0.6; }
+html .status-stack-toggle:hover::before, html .status-stack-toggle:focus-visible::before { width: 32px; height: 3px; background: var(--calm-muted); opacity: 1; }
+
+html .composer-header { margin: 0 0 6px; gap: 4px; overflow: visible; justify-content: flex-start; }
+html .composer-header .context-chip {
+  flex: 0 1 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  max-width: 100%;
+  min-height: 22px;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--calm-radius-pill);
+  background: transparent;
+  color: var(--calm-muted);
+  font-size: calc(11px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+}
+html .composer-header .context-chip { padding-left: 0; }
+html .composer-header .context-chip:hover:not(:disabled) { background: var(--calm-surface-2); color: var(--calm-text); }
+html .context-chip strong { color: var(--calm-muted); opacity: 0.8; font-weight: 400; }
+html .composer-header .context-scope-button {
+  flex: 0 1 auto;
+  margin-left: 0;
+  max-width: 52%;
+  min-height: 22px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-muted);
+  box-shadow: none;
+  font-size: calc(11px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+}
+html .composer-header .context-scope-button:hover, html .composer-header .context-scope-button.active { background: var(--calm-surface-2); color: var(--calm-text); border: 0; }
+html .context-preview {
+  margin: 0 0 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  color: var(--calm-muted);
+  box-shadow: none;
+}
+html .context-explicit-capture { border: 1px solid var(--calm-border); border-radius: var(--calm-radius-card); background: var(--calm-surface); color: var(--calm-text); }
+html .context-explicit-capture:hover { background: var(--calm-surface-2); }
+html .context-explicit-capture-dismiss:hover { border-color: transparent; background: var(--calm-surface-2); color: var(--calm-text); }
+html .context-scope-menu { border-radius: var(--calm-radius-card); }
+
+/* ------------------------------------------------------------------ */
+/* 9. Composer: one container, textarea over a 28px tool row            */
+/* ------------------------------------------------------------------ */
+html .composer-input-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 8px 6px;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-composer);
+  background: var(--calm-surface);
+  transition: border-color var(--calm-ease), box-shadow var(--calm-ease);
+}
+html .composer-input-wrap:hover { border-color: var(--calm-border-strong); }
+html .composer-input-wrap:focus-within {
+  border-color: var(--calm-accent);
+  box-shadow: 0 0 0 3px var(--calm-accent-soft);
+}
+html .composer-input-wrap.dragging { border-color: var(--calm-accent); box-shadow: 0 0 0 3px var(--calm-accent-soft); }
+html .composer-input-wrap::before { display: none; }
+html .composer-resize { display: none; }
+html .drop-overlay { border-radius: var(--calm-radius-composer); border: 1px dashed var(--calm-accent); background: color-mix(in srgb, var(--calm-bg) 92%, transparent); color: var(--calm-text); font-size: 12px; }
+
+html .composer-input-wrap > textarea,
+html .composer-input-wrap #promptInput {
+  order: 0;
+  flex: 1 1 100%;
+  width: 100%;
+  min-height: 22px;
+  max-height: calc(13px * 1.5 * 8 + 6px);
+  padding: 2px 4px 6px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+  resize: none;
+  font-size: calc(13px * var(--hermes-text-zoom, 1));
+  line-height: 1.5;
+  color: var(--calm-text);
+}
+html .composer-input-wrap > textarea:hover,
+html .composer-input-wrap > textarea:focus,
+html .composer-input-wrap > textarea:focus-visible { border: 0; box-shadow: none; outline: none; background: transparent; }
+
+/* Tool row items share one 28px ghost-button recipe. */
+html .composer-input-wrap :is(.composer-icon, .composer-plus, .composer-model-chip, .composer-context-ring) {
+  position: static;
+  inset: auto;
+  z-index: auto;
+  flex: 0 0 auto;
+  block-size: var(--calm-control-h);
+  min-block-size: var(--calm-control-h);
+  margin: 0;
+  box-shadow: none;
+}
+html .composer-input-wrap :is(.composer-icon, .composer-plus) {
+  inline-size: var(--calm-control-h);
+  min-inline-size: var(--calm-control-h);
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-muted);
+  font-size: 12px;
+}
+html .composer-input-wrap :is(.composer-icon, .composer-plus)[hidden] { display: none; }
+html .composer-input-wrap :is(.composer-icon, .composer-plus):hover:not(:disabled),
+html .composer-input-wrap :is(.composer-icon, .composer-plus).active,
+html .composer-input-wrap .composer-plus[aria-expanded="true"],
+html .composer-input-wrap .composer-slash[aria-expanded="true"] {
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  border: 0;
+}
+html .composer-input-wrap :is(.composer-icon, .composer-plus):focus-visible { outline: 2px solid var(--calm-accent); outline-offset: 1px; }
+html .composer-input-wrap :is(.composer-icon, .composer-plus):disabled { opacity: 0.4; }
+html .composer-input-wrap :is(.composer-icon, .composer-plus) svg { inline-size: 16px; block-size: 16px; display: block; }
+
+/* Order: [attach] [/] [model] ... [ring] [wake] [live] [mic] [steer] [queue] [stop|send] */
+html .composer-input-wrap .composer-plus { order: 1; }
+html .composer-input-wrap .composer-slash { order: 2; }
+html .composer-input-wrap .composer-model-chip { order: 3; }
+html .composer-input-wrap .composer-context-ring { order: 5; margin-inline-start: auto; }
+html .composer-input-wrap .composer-wake { order: 6; }
+html .composer-input-wrap .composer-live { order: 7; }
+html .composer-input-wrap .composer-mic { order: 8; }
+html .composer-input-wrap .composer-steer { order: 9; }
+html .composer-input-wrap .composer-queue { order: 10; }
+html .composer-input-wrap .composer-stop { order: 11; }
+html .composer-input-wrap .composer-send { order: 12; }
+html .composer-input-wrap :is(#dropOverlay, #attachMenu) { order: 20; }
+
+html .composer-input-wrap .composer-model-chip {
+  inline-size: auto;
+  min-inline-size: 0;
+  max-inline-size: calc(100% - 190px);
+  padding: 0 6px 0 8px;
+  gap: 4px;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-muted);
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+}
+html .composer-input-wrap .composer-model-chip:hover,
+html .composer-input-wrap .composer-model-chip[aria-expanded="true"] { background: var(--calm-surface-2); color: var(--calm-text); border: 0; }
+html .composer-model-caret { inline-size: 5px; block-size: 5px; margin: 0 2px 0 0; border-width: 0 1.5px 1.5px 0; transform: translateY(-1px) rotate(45deg); }
+
+html .composer-input-wrap .composer-context-ring {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px;
+  border-radius: var(--calm-radius-control);
+  color: var(--calm-muted);
+  font-size: calc(11px * var(--hermes-text-zoom, 1));
+}
+html .composer-input-wrap .composer-context-ring:hover, html .composer-input-wrap .composer-context-ring[aria-expanded="true"] { background: var(--calm-surface-2); color: var(--calm-text); }
+html .composer-context-ring::before {
+  background: conic-gradient(var(--context-ring-color, var(--calm-accent)) calc(var(--context-pct, 0) * 1%), var(--calm-border-strong) 0);
+}
+html .composer-context-ring[data-level="warn"] { --context-ring-color: var(--calm-warn); }
+html .composer-context-ring[data-level="full"] { --context-ring-color: var(--calm-danger); }
+
+html .composer-input-wrap .composer-mic.recording { color: var(--calm-danger); background: color-mix(in srgb, var(--calm-danger) 12%, transparent); }
+html .composer-input-wrap .composer-wake.listening { color: var(--calm-accent); background: var(--calm-accent-soft); box-shadow: none; animation: none; }
+html .composer-input-wrap .composer-wake.paused { color: var(--calm-muted); opacity: 0.6; }
+html .composer-input-wrap .composer-wake.unavailable { color: var(--calm-danger); }
+html .composer-input-wrap.busy-draft .composer-wake,
+html .composer-input-wrap.busy-draft .composer-mic { display: none; }
+
+/* Send and Stop: 28px round accent icon buttons. */
+html .composer-input-wrap :is(.composer-send, .composer-stop) {
+  border-radius: var(--calm-radius-pill);
+  background: var(--calm-accent);
+  color: var(--calm-accent-fg);
+  margin-inline-start: 2px;
+}
+html .composer-input-wrap :is(.composer-send, .composer-stop):hover:not(:disabled) {
+  background: color-mix(in srgb, var(--calm-accent) 85%, var(--calm-text) 15%);
+  color: var(--calm-accent-fg);
+}
+html .composer-input-wrap .composer-send:disabled { background: var(--calm-surface-2); color: var(--calm-muted); opacity: 1; }
+html .composer-input-wrap .composer-stop { font-size: 0; }
+html .composer-input-wrap .composer-stop:not([hidden]) { display: inline-flex; align-items: center; justify-content: center; }
+html .composer-input-wrap .composer-stop::before { content: ""; display: block; inline-size: 10px; block-size: 10px; border-radius: 2px; background: currentColor; }
+html .composer-input-wrap :is(.composer-queue, .composer-steer) { color: var(--calm-accent); }
+html .composer-input-wrap :is(.composer-queue, .composer-steer):hover:not(:disabled) { background: var(--calm-accent-soft); color: var(--calm-accent); }
+
+html .composer-input-wrap .attach-menu { bottom: calc(100% + 6px); left: 0; }
+
+/* The old second row (Ask Hermes + >_) is gone: send lives in the tool row, quick
+   commands behind the "/" button. #sendButton stays in the DOM for the script. */
+html .composer-actions #sendButton { display: none; }
+html .composer-actions { margin-top: 6px; gap: 6px; flex-wrap: wrap; }
+html .composer-actions:not(:has(> :not([hidden]):not(#sendButton))) { display: none; }
+html .composer-actions .secondary,
+html .composer-actions .browser-control-launcher,
+html .composer-actions .active-profile-indicator {
+  min-height: var(--calm-control-h);
+  border-radius: var(--calm-radius-control);
+  border-color: transparent;
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  font-size: 12px;
+}
+
+html .attachment-list { margin: 0 0 6px; gap: 4px; }
+html .attachment-pill { border: 0; border-radius: var(--calm-radius-pill); background: var(--calm-surface-2); color: var(--calm-text); padding: 2px 4px 2px 8px; }
+html .attachment-pill.image { padding: 2px 4px 2px 2px; }
+html .attachment-pill button { color: var(--calm-muted); border-radius: var(--calm-radius-pill); }
+html .attachment-pill button:hover { background: var(--calm-border); color: var(--calm-text); }
+html .attachment-excerpt-notice { color: var(--calm-muted); }
+
+html .voice-activity {
+  min-height: 24px;
+  margin: 0 0 6px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--calm-radius-pill);
+  background: var(--calm-surface);
+  color: var(--calm-muted);
+}
+html .voice-activity.recording { color: var(--calm-danger); }
+
+/* ------------------------------------------------------------------ */
+/* 10. Notices and stacks above/below the composer                     */
+/* ------------------------------------------------------------------ */
+html :is(.session-ownership-notice, .queue-notice, .run-control-recovery, .agent-prompt-card, .page-comment-tray, .task-stack, .page-annotation-panel, .group-thread-active-banner, .bot-chat-earlier) {
+  margin: 0 0 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--calm-border);
+  border-left-width: 1px;
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  color: var(--calm-text);
+  box-shadow: none;
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  line-height: 1.4;
+}
+html :is(.session-ownership-notice, .queue-notice, .run-control-recovery, .agent-prompt-card, .page-comment-tray, .task-stack, .page-annotation-panel, .group-thread-active-banner, .bot-chat-earlier, .voice-activity, .context-preview)[hidden] { display: none; }
+html .task-stack { padding: 0; overflow: hidden; }
+html .queue-notice, html .gateway-queue-notice { margin: 6px 0 0; }
+html .run-control-recovery { border-color: color-mix(in srgb, var(--calm-warn) 45%, var(--calm-border)); background: color-mix(in srgb, var(--calm-warn) 8%, var(--calm-surface)); }
+html .session-ownership-notice { gap: 6px; }
+html .session-ownership-kicker { color: var(--calm-muted); font-size: 11px; font-weight: 600; text-transform: none; }
+html .session-ownership-copy strong { font-size: 13px; font-weight: 600; }
+html .session-ownership-copy > span:last-child { color: var(--calm-muted); font-size: 12px; }
+html :is(.session-ownership-actions, .queue-notice-actions, .run-control-recovery div) button {
+  min-height: 24px;
+  padding: 2px 8px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  font-size: 12px;
+}
+html .session-ownership-actions button[data-session-ownership-action="new-browser"],
+html .session-ownership-actions button:first-child:not(.secondary) { background: var(--calm-accent); color: var(--calm-accent-fg); border: 0; }
+html .queue-notice-actions button[data-queued-action="delete"] { color: var(--calm-danger); border: 0; }
+html .task-stack-toggle { padding: 6px 10px; gap: 8px; }
+html .task-stack-title { color: var(--calm-text); font-size: 11px; font-weight: 600; text-transform: none; letter-spacing: normal; }
+html .task-stack-summary { color: var(--calm-muted); font-size: 11px; }
+html .task-stack-progress { background: var(--calm-surface-2); border-radius: var(--calm-radius-pill); }
+html .task-stack-progress i { background: var(--calm-accent); }
+html .task-stack-item.in_progress { background: var(--calm-accent-soft); }
+html .task-stack-item.completed .task-stack-index, html .task-stack-item.completed .task-stack-status { color: var(--calm-ok); }
+html .group-working-line { color: var(--calm-muted); font-size: 12px; }
+html .first-prompt-chip { border: 1px solid var(--calm-border); border-radius: var(--calm-radius-pill); background: var(--calm-surface); color: var(--calm-text); font-size: 12px; }
+html .first-prompt-chip:hover { background: var(--calm-surface-2); }
+
+@media (pointer: coarse) {
+  html .composer-input-wrap :is(.composer-icon, .composer-plus) { inline-size: 36px; min-inline-size: 36px; }
+  html .composer-input-wrap :is(.composer-icon, .composer-plus, .composer-model-chip, .composer-context-ring) { block-size: 36px; min-block-size: 36px; }
+  html .message-row > .message-rail { height: 32px; }
+  html .message-action { width: 32px; height: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html .jump-to-latest, html .message-row.is-entering { animation: none; }
+}
+
+/* Empty-chat suggestions: quiet chips just above the composer. */
+html .first-prompt-chips { padding: 0 0 8px; gap: 6px; }
+html .first-prompt-chip { min-height: 26px; padding: 0 10px; font-weight: 500; }
+html .first-prompt-chip:hover, html .first-prompt-chip:focus-visible { background: var(--calm-surface-2); color: var(--calm-text); border-color: var(--calm-border-strong); }
