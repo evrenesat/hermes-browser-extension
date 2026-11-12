@@ -58,9 +58,9 @@
         <div id="sessionMenuList" class="session-menu-list"></div>
         <div id="projectsPanel" class="session-menu-list projects-panel" aria-live="off" hidden></div>
         <footer id="sessionRecentsFooter">
-          <button id="createSessionButton" class="secondary" type="button" data-i18n="session.new_extension_session">＋ New Hermes Browser Extension Session</button>
+          <button id="createSessionButton" class="secondary" type="button" ><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg><span data-i18n="session.new_extension_session">New session</span></button>
           <button id="refreshSessionsButton" class="secondary" type="button">
-            <span id="sessionRefreshIcon" class="session-refresh-icon" aria-hidden="true">↻</span>
+            <svg id="sessionRefreshIcon" class="session-refresh-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="refresh"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
             <span id="refreshSessionsLabel">Refresh Sessions</span>
           </button>
         </footer>
@@ -547,18 +547,19 @@
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="compass"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
             </button>
             <section id="attachMenu" class="attach-menu" role="dialog" aria-label="Attach context" hidden data-i18n-aria-label="ui.attach.context">
-              <p class="attach-menu-heading" data-i18n="ui.attach">Attach</p>
-              <button type="button" data-attach="files" data-i18n="ui.files">▧ Files...</button>
-              <button type="button" data-attach="folder" data-i18n="ui.folder">▰ Folder...</button>
-              <button type="button" data-attach="images" data-i18n="ui.images">▧ Images...</button>
-              <button type="button" data-attach="paste-image" data-i18n="ui.paste.image">▣ Paste image</button>
-              <button type="button" data-attach="url" data-i18n="ui.url">↗ URL...</button>
-              <button type="button" data-attach="tab-screenshot" data-i18n="ui.tab.screenshot">▣ Tab screenshot</button>
-              <button type="button" data-attach="pick-element" data-i18n="ui.pick.page.element">◈ Pick page element</button>
-              <button type="button" data-attach="comment-page" id="commentPageAttachButton"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="comment-text"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M13 8H7"/><path d="M17 12H7"/></svg><span data-i18n="ui.comment.on.page">Comment on page</span></button>
-              <button type="button" data-attach="clear-pick" id="clearPickAttachButton" hidden data-i18n="ui.clear.picked.element">✕ Clear picked element</button>
+              <button type="button" data-attach="files"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="file"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg><span data-i18n="ui.files">Files...</span></button>
+              <button type="button" data-attach="folder"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="folder"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg><span data-i18n="ui.folder">Folder...</span></button>
+              <button type="button" data-attach="images"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="image"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg><span data-i18n="ui.images">Images...</span></button>
+              <button type="button" data-attach="paste-image"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="clipboard"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg><span data-i18n="ui.paste.image">Paste image</span></button>
               <hr />
-              <button type="button" data-snippet="Summarize the attached context and call out the important takeaways." data-i18n="ui.prompt.snippets">▤ Prompt snippets...</button>
+              <button type="button" data-attach="url"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span data-i18n="ui.url">URL...</span></button>
+              <button type="button" data-attach="tab-screenshot"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="camera"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg><span data-i18n="ui.tab.screenshot">Tab screenshot</span></button>
+              <hr />
+              <button type="button" data-attach="pick-element"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="crosshair"><circle cx="12" cy="12" r="10"/><path d="M22 12h-4"/><path d="M6 12H2"/><path d="M12 6V2"/><path d="M12 22v-4"/></svg><span data-i18n="ui.pick.page.element">Pick page element</span></button>
+              <button type="button" data-attach="comment-page" id="commentPageAttachButton"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="comment-text"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M13 8H7"/><path d="M17 12H7"/></svg><span data-i18n="ui.comment.on.page">Comment on page</span></button>
+              <button type="button" data-attach="clear-pick" id="clearPickAttachButton" hidden><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg><span data-i18n="ui.clear.picked.element">Clear picked element</span></button>
+              <hr />
+              <button type="button" data-snippet="Summarize the attached context and call out the important takeaways."><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="text-quote"><path d="M17 6H3"/><path d="M21 12H8"/><path d="M21 18H8"/><path d="M3 12v6"/></svg><span data-i18n="ui.prompt.snippets">Prompt snippets...</span></button>
             </section>
           </div>
           <div id="attachmentList" class="attachment-list" hidden></div>
@@ -637,15 +638,15 @@
           <div id="modelMenuList" class="model-menu-list"></div>
           <section id="modelOptionsList" class="model-options-list" aria-label="Model runtime options" data-i18n-aria-label="ui.model.runtime.options"></section>
           <footer>
-            <button id="refreshModelsButton" class="secondary" type="button" title="Refresh model catalog" aria-busy="false" data-i18n-title="ui.refresh.model.catalog" data-i18n-runtime>↻ Refresh Models</button>
-            <button id="editModelsButton" class="secondary" type="button" data-i18n="ui.edit.models">⚙ Edit Models...</button>
+            <button id="refreshModelsButton" class="secondary" type="button" title="Refresh model catalog" aria-busy="false" data-i18n-title="ui.refresh.model.catalog" data-i18n-runtime>Refresh models</button>
+            <button id="editModelsButton" class="secondary" type="button" data-i18n="ui.edit.models">Edit Models...</button>
           </footer>
           <p id="modelRefreshStatus" class="model-refresh-status" role="status" aria-live="polite" hidden></p>
         </section>
 
         <section id="contextPopover" class="context-popover" role="dialog" aria-label="Context window details" hidden data-i18n-aria-label="ui.context.window.details">
           <header>
-            <span data-i18n="ui.context.window">CONTEXT WINDOW</span>
+            <span data-i18n="ui.context.window">Context window</span>
             <button id="contextRefreshButton" class="context-refresh-button" type="button" aria-label="Refresh context" title="Refresh context" data-i18n-runtime>
               <svg class="refresh-glyph" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="refresh"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
             </button>

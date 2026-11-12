@@ -13,3 +13,11 @@
 - Legacy stylesheets no longer set uppercase, letter-spacing or display/mono faces on UI chrome (mono kept for code and IDs); 6-10px text raised to 11px.
 - All `data-icon` svgs are now 1.5px stroke Lucide-style line icons (HTML and JS-injected); `tests/line-icons.test.mjs` replaces the pixelarticons tests.
 - Deleted tests that only guarded the old look (caps/tracking/display-font, RTL tracking twins, pixel icons, connection-window headings); `tests/review-queue.test.mjs` "simultaneous processes" is flaky and unrelated.
+
+### Phase 2: menus and sessions drawer (`extension/calm-menus.css`)
+
+- Attach menu: Lucide line icons (locale strings lost their glyph prefixes), grouped with separators. Quick commands: preview card removed, rows are `/cmd` + truncated description. Slash menu uses the same rows and gains an ↑/↓/Enter/Esc highlight driven from the composer.
+- Model picker: provider chips wrap, Recent section (last 3 picks, `hermesRecentModelPicks` in localStorage, shown when the catalog has 5+ models), selected row with check, Thinking/Fast switches and effort slider as one compact block, ghost footer buttons.
+- Sessions drawer: segmented Recents/Projects, 32px live filter, Today/Yesterday/Earlier labels (source headers only when more than one source), 30px rows with relative time, accent dot for running sessions, ID/Rename/Move behind a hover `⋯` menu (ArrowRight from a row focuses it).
+- `wireMenuKeyboard` gives attach, quick commands, profile switcher, model picker and sessions drawer ↑/↓/Home/End, Esc back to the trigger, and type-to-filter where a search box exists.
+- Tests rewritten to the new contract: commands.test (preview card), session-drawer-row.test, i18n-runtime-panel-controls (group settings now an item in the row menu), common.test (refresh label).

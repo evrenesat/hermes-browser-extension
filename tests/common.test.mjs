@@ -1710,7 +1710,7 @@ test('model refresh control exposes compact loading state while syncing', () => 
   assert.match(css, /\.model-menu footer button\.model-refreshing::before/);
   assert.match(css, /@keyframes modelRefreshSpin/);
   assert.deepEqual(modelRefreshControlState({ refreshing: false }), {
-    label: '↻ Refresh Models',
+    label: 'Refresh models',
     title: 'Refresh model catalog',
     disabled: false,
     ariaBusy: 'false',
