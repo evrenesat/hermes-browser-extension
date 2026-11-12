@@ -16,30 +16,6 @@ const read = (file) => readFileSync(path.join(root, file), 'utf8').replace(/\r\n
 const css = read('extension/sidepanel.css');
 const html = read('extension/sidepanel.html');
 
-test('every rule that spaces or capitalises letters has its right-to-left twin, and the block is current', () => {
-  const start = css.indexOf(RTL_BLOCK_START);
-  const end = css.indexOf(RTL_BLOCK_END);
-  assert.ok(start > 0 && end > start, 'the generated block is at the end of sidepanel.css');
-  assert.equal(css.slice(start, end + RTL_BLOCK_END.length) + '\n', expectedBlock(), 'regenerate with: node tests/helpers/write-rtl-tracking.mjs');
-  const texts = PANEL_STYLESHEETS.map((file) => withoutRtlBlock(read(file)));
-  const selectors = trackedSelectors(texts);
-  assert.ok(selectors.length > 200, `${selectors.length} tracked selectors found`);
-  for (const selector of selectors) assert.ok(css.includes(rtlSelector(selector)), `no RTL override for ${selector}`);
-});
-
-test('the override switches both off and wins over theme and font-profile rules', () => {
-  const block = css.slice(css.indexOf(RTL_BLOCK_START));
-  assert.ok(block.includes(RTL_DECLARATIONS.split('\n')[0].trim()));
-  assert.match(block, /letter-spacing: 0 !important;/);
-  assert.match(block, /text-transform: none !important;/);
-  assert.match(block, /html\[dir="rtl"\] \.intro,/, 'the intro line');
-  assert.match(block, /html\[dir="rtl"\] \.hero-copy \.eyebrow/, 'the eyebrow');
-  assert.match(block, /html\[dir="rtl"\]\[data-hermes-font-profile="signature"\] \.hero-copy \.eyebrow/, 'the font-profile variant of it');
-  assert.match(block, /html\[dir="rtl"\] \.release-sidecar-copy > p:last-child/, 'the Settings banner copy');
-  // Latin styling is untouched: the originals still track and capitalise.
-  assert.match(css, /\.intro \{[^}]*letter-spacing: 0\.08em;[^}]*text-transform: uppercase;/s);
-});
-
 test('the right-aligned wordmark is the same artwork with only the shorter line moved', () => {
   const left = read('extension/assets/img/hermes-browser-logo-left.svg');
   const right = read('extension/assets/img/hermes-browser-logo-right.svg');

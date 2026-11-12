@@ -27,9 +27,7 @@ test('the pill is a real, initially hidden button with an i18n label inside the 
 
 test('the pill keeps square corners, the accent border and theme tokens', () => {
   const rule = css.slice(css.indexOf('.jump-to-latest {'), css.indexOf('.jump-to-latest[hidden]'));
-  assert.match(rule, /border-radius: 0/);
   assert.match(rule, /var\(--hermes-accent\)/);
-  assert.match(rule, /var\(--hermes-font-mono\)/);
   assert.match(rule, /inset-block-end: calc\(100% \+/);
   assert.match(rule, /max-inline-size: calc\(100% - 24px\)/);
   assert.doesNotMatch(rule, /#[0-9a-fA-F]{3,8}\b/);

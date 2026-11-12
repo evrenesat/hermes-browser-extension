@@ -18,9 +18,9 @@
 .haui-title {
   margin: 0 0 0.5em;
   color: var(--hermes-muted);
-  font: 600 0.8em/1.2 var(--hermes-font-mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font: 600 0.8em/1.2 var(--hermes-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 /* Metric cards */
@@ -41,19 +41,19 @@
 }
 .haui-stat-label {
   color: var(--hermes-muted);
-  font: 600 0.78em/1.2 var(--hermes-font-mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font: 600 0.78em/1.2 var(--hermes-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
   overflow-wrap: anywhere;
 }
 .haui-stat-value {
-  font-family: var(--hermes-font-display);
+  font-family: var(--hermes-font-ui);
   /* The headline face is narrow under Hermes signature; the profile's display
      scale keeps the number as big as it reads in the other fonts. */
   font-size: calc(2em * var(--hermes-display-scale, 1));
   font-weight: 400;
   line-height: 1;
-  letter-spacing: 0.01em;
+  letter-spacing: normal;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
@@ -105,7 +105,7 @@
   font-size: 1.12em;
   font-weight: 700;
   line-height: 1.25;
-  letter-spacing: 0;
+  letter-spacing: normal;
   text-transform: none;
 }
 .haui-compare-card .haui-sub { margin: 0.25em 0 0; color: var(--hermes-muted); font-size: 0.9em; }
@@ -143,10 +143,10 @@
   padding: 0.55em 0.75em;
   background: rgba(var(--hermes-ink-rgb), 0.06);
   color: var(--hermes-muted);
-  font: 600 0.78em/1.2 var(--hermes-font-mono);
-  letter-spacing: 0.05em;
+  font: 600 0.78em/1.2 var(--hermes-font-ui);
+  letter-spacing: normal;
   text-align: left;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
 }
 .haui-data-table td { padding: 0.5em 0.75em; border-top: 1px solid rgba(var(--hermes-ink-rgb), 0.1); vertical-align: top; }
@@ -176,7 +176,7 @@
   background: transparent;
   color: var(--hermes-muted);
   font: 600 0.78em/1.2 var(--hermes-font-ui, inherit);
-  letter-spacing: 0;
+  letter-spacing: normal;
   text-transform: none;
   cursor: pointer;
 }
@@ -187,7 +187,7 @@
 .web-message-content .haui-chart-svg { max-width: 40em; }
 .haui-chart-svg .haui-grid { stroke: rgba(var(--hermes-ink-rgb), 0.12); stroke-width: 1; }
 .haui-chart-svg .haui-zero { stroke: rgba(var(--hermes-ink-rgb), 0.38); }
-.haui-chart-svg .haui-axis { fill: var(--hermes-muted); font: 9px var(--hermes-font-mono); }
+.haui-chart-svg .haui-axis { fill: var(--hermes-muted); font: 9px var(--hermes-font-ui); }
 .haui-chart-svg rect.haui-s0, .haui-chart-svg circle.haui-s0 { fill: var(--haui-s0); }
 .haui-chart-svg rect.haui-s1, .haui-chart-svg circle.haui-s1 { fill: var(--haui-s1); }
 .haui-chart-svg rect.haui-s2, .haui-chart-svg circle.haui-s2 { fill: var(--haui-s2); }
@@ -216,9 +216,9 @@
   width: max-content;
   padding: 0.2em 0;
   color: var(--hermes-muted);
-  font: 600 0.78em/1.2 var(--hermes-font-mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font: 600 0.78em/1.2 var(--hermes-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
 }
 .haui-disclosure.haui-derived .haui-disclosure-body { padding: 0.4em 0 0; }
 
@@ -234,7 +234,7 @@
   background: transparent;
   color: var(--hermes-ink);
   font: 600 0.9em/1.2 var(--hermes-font-ui, inherit);
-  letter-spacing: 0;
+  letter-spacing: normal;
   text-decoration: none;
   text-transform: none;
   cursor: pointer;
@@ -247,7 +247,7 @@
   min-width: 0;
   overflow: hidden;
   color: var(--hermes-muted);
-  font: 400 0.88em/1.2 var(--hermes-font-mono);
+  font: 400 0.88em/1.2 var(--hermes-font-ui);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -286,7 +286,7 @@ code.haui-action-preview { padding: 0; background: none; border: 0; }
   margin: 0 0 0.78em;
   padding: 0.6em 0.75em;
   background: rgba(var(--hermes-ink-rgb), 0.05);
-  font: 0.92em/1.45 var(--hermes-font-mono);
+  font: 0.92em/1.45 var(--hermes-font-ui);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -313,13 +313,13 @@ ol.haui-list-items > li::before {
   content: counter(haui-list, decimal-leading-zero);
   flex: 0 0 auto;
   color: var(--hermes-muted);
-  font: 600 0.8em/1 var(--hermes-font-mono);
+  font: 600 0.8em/1 var(--hermes-font-ui);
   font-variant-numeric: tabular-nums;
 }
 .haui-list-meta {
   flex: 0 0 auto;
   color: var(--hermes-muted);
-  font: 600 0.78em/1.2 var(--hermes-font-mono);
+  font: 600 0.78em/1.2 var(--hermes-font-ui);
   font-variant-numeric: tabular-nums;
 }
 .haui-list-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
@@ -341,7 +341,7 @@ ol.haui-list-items > li::before {
 
 /* A card that could not be drawn: its words as text, never its JSON. */
 .haui-salvage { padding: 0.6em 0.85em; border: 1px dashed rgba(var(--hermes-ink-rgb), 0.22); border-radius: var(--haui-radius); }
-.haui-salvage-note { margin: 0; color: var(--hermes-muted); font: 600 0.78em/1.3 var(--hermes-font-mono); letter-spacing: 0.04em; }
+.haui-salvage-note { margin: 0; color: var(--hermes-muted); font: 600 0.78em/1.3 var(--hermes-font-ui); letter-spacing: normal; }
 .haui-salvage ul { margin: 0.45em 0 0; padding-left: 1.1em; }
 .haui-salvage li { margin: 0.15em 0; overflow-wrap: anywhere; }
 
@@ -364,10 +364,10 @@ ol.haui-list-items > li::before {
   margin: 1.1em 0 0.5em;
   padding-bottom: 0.3em;
   border-bottom: 1px solid var(--haui-line);
-  font-family: var(--hermes-font-display);
+  font-family: var(--hermes-font-ui);
   font-weight: 400;
   line-height: 1.15;
-  letter-spacing: 0.01em;
+  letter-spacing: normal;
 }
 .message.assistant[data-response-style="vivid"] .message-content > :is(h1, h2, h3):first-child,
 :root[data-response-style="vivid"] .message.assistant:not([data-response-style]) .message-content > :is(h1, h2, h3):first-child { margin-top: 0; }
@@ -375,9 +375,9 @@ ol.haui-list-items > li::before {
 :root[data-response-style="vivid"] .message.assistant:not([data-response-style]) .message-content > :is(h4, h5, h6) {
   margin: 1em 0 0.4em;
   color: var(--hermes-muted);
-  font: 600 0.8em/1.2 var(--hermes-font-mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font: 600 0.8em/1.2 var(--hermes-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
 }
 .message.assistant[data-response-style="vivid"] .message-content blockquote,
 :root[data-response-style="vivid"] .message.assistant:not([data-response-style]) .message-content blockquote {

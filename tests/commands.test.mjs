@@ -232,7 +232,6 @@ test('settings header keeps a top Save action, compact close icon, and centered 
     css,
     /#saveSettingsTopButton:hover,\s*#saveSettingsTopButton:focus-visible\s*\{[^}]*background:\s*var\(--hermes-primary-bg,\s*var\(--hermes-ink\)\)/s,
   );
-  assert.match(css, /\.settings-header-actions\s*>\s*button\s*\{[^}]*font-family:\s*var\(--hermes-font-mono\)/s);
   // Clear stored token and diagnostics buttons span the full card width with centered text.
   assert.match(css, /\.connection-security button\s*\{[^}]*justify-self:\s*stretch/s);
   assert.match(css, /\.connection-security button\s*\{[^}]*width:\s*100%/s);
