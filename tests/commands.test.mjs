@@ -165,26 +165,17 @@ test('suggestCommands searches names, aliases, and descriptions', () => {
   assert.ok(suggestCommands('/links').some((command) => command.name === 'extract'));
 });
 
-test('composer command menu exposes full hover and focus descriptions', () => {
+test('composer command menu lists /cmd rows with a truncated description, no duplicate preview card', () => {
   const js = readFileSync(new URL('../extension/sidepanel.js', import.meta.url), 'utf8');
-  const css = readFileSync(new URL('../extension/sidepanel.css', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../extension/calm-menus.css', import.meta.url), 'utf8');
 
-  assert.match(js, /quick-command-detail/);
-  assert.match(js, /showQuickCommandDetail/);
+  assert.doesNotMatch(js, /showQuickCommandDetail|quick-command-detail|qmd-/);
   assert.match(js, /promptHint/);
-  assert.match(js, /mouseenter/);
-  assert.match(js, /focus/);
-  assert.match(js, /aria-describedby/);
-  assert.match(js, /showQuickCommandDetail\(commands\[0\]\)/);
-  assert.doesNotMatch(js, /item\.title\s*=/);
-  assert.doesNotMatch(js, /item\.setAttribute\(['"]title['"]\)/);
-  assert.match(css, /\.quick-command-detail/);
-  assert.match(css, /\.quick-more-menu\.has-command-detail/);
-  assert.match(css, /\.quick-command-detail\s*\{[^}]*height:\s*108px/s);
-  assert.match(css, /\.quick-command-detail\s*\{[^}]*transition:\s*none/s);
-  assert.match(css, /\.quick-more-menu\s*\{[^}]*overflow:\s*hidden/s);
-  assert.match(css, /\.quick-command-list\s*\{[^}]*overflow-y:\s*auto/s);
-  assert.doesNotMatch(css, /\.qmi-description\s*\{[^}]*white-space:\s*normal/s);
+  assert.match(js, /qmi-token/);
+  assert.match(js, /qmi-description/);
+  assert.match(js, /wireMenuKeyboard\(els\.quickMoreMenu/);
+  assert.match(css, /\.qmi-description,[^{]*\{[^}]*text-overflow:\s*ellipsis/s);
+  assert.match(css, /\.quick-command-list,?[^{]*\{[^}]*overflow-y:\s*auto/s);
 });
 
 test('commands menu opens upward above the composer and never covers the textarea (#73)', () => {

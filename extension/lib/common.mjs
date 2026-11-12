@@ -2347,7 +2347,7 @@ export function modelRefreshControlState({ refreshing = false } = {}) {
     };
   }
   return {
-    label: '↻ Refresh Models',
+    label: 'Refresh models',
     title: 'Refresh model catalog',
     disabled: false,
     ariaBusy: 'false',

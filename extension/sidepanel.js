@@ -11058,6 +11058,47 @@ function setModelSelectionTarget(target = 'chat') {
   });
 }
 
+const RECENT_MODEL_PICKS_KEY = 'hermesRecentModelPicks';
+const RECENT_MODEL_PICKS_MAX = 3;
+const RECENT_MODELS_MIN_CATALOG = 5;
+
+function readRecentModelPicks() {
+  try {
+    const parsed = JSON.parse(globalThis.localStorage?.getItem(RECENT_MODEL_PICKS_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'string' && id) : [];
+  } catch {
+    return [];
+  }
+}
+
+function noteRecentModelPick(modelId) {
+  if (!modelId) return;
+  try {
+    const next = [modelId, ...readRecentModelPicks().filter((id) => id !== modelId)].slice(0, RECENT_MODEL_PICKS_MAX + 1);
+    globalThis.localStorage?.setItem(RECENT_MODEL_PICKS_KEY, JSON.stringify(next));
+  } catch {
+    // Recents are a convenience; a blocked store only loses them.
+  }
+}
+
+function modelRowCheckIcon() {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'model-option-check');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('width', '14');
+  svg.setAttribute('height', '14');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', 'M20 6 9 17l-5-5');
+  svg.appendChild(path);
+  return svg;
+}
+
 function renderModelMenu(query = els.modelSearchInput?.value || '') {
   const roomPick = modelSelectionTarget === 'room-member' ? roomModelPickTarget : null;
   const menuModelId = modelSelectionTarget === 'assist'
@@ -11119,43 +11160,65 @@ function renderModelMenu(query = els.modelSearchInput?.value || '') {
     return;
   }
 
+  const appendModelRow = (model, { metaProvider = false } = {}) => {
+    const runtimeStatus = modelRuntimeStatus(model);
+    const requestable = isModelRuntimeSelectable(model);
+    const isCurrent = model.id === menuModelId;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `model-option ${isCurrent ? 'selected' : ''} ${requestable ? '' : 'observed'}`.trim();
+    button.dataset.modelId = model.id;
+    button.title = runtimeStatus.detail;
+    if (isCurrent) button.setAttribute('aria-current', 'true');
+    if (model.source === 'external') {
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+    }
+
+    const name = document.createElement('span');
+    name.className = 'model-option-name';
+    name.textContent = modelDisplayName(model);
+
+    const meta = document.createElement('span');
+    meta.className = 'model-option-meta';
+    meta.textContent = metaProvider
+      ? modelProviderLabel(model)
+      : (!requestable ? 'observed' : formatTokens(model.contextTokens || 256_000).replace(' tokens', ''));
+
+    button.append(name, meta);
+    if (isCurrent) button.append(modelRowCheckIcon());
+    button.addEventListener('click', async () => {
+      if (modelSelectionTarget === 'assist') await applyAssistSelectedModel(model);
+      else if (modelSelectionTarget === 'room-member') await setRoomMemberModel(model);
+      else {
+        noteRecentModelPick(model.id);
+        requestSelectedModelWithContextConfirm(model);
+      }
+    });
+    els.modelMenuList.appendChild(button);
+  };
+
+  const recentCandidates = !needle && modelSelectionTarget === 'chat' && availableModels.length >= RECENT_MODELS_MIN_CATALOG
+    ? [menuModelId, ...readRecentModelPicks()]
+      .filter((id, position, all) => id && all.indexOf(id) === position)
+      .map((id) => availableModels.find((model) => model.id === id))
+      .filter((model) => model && model.source !== 'external')
+      .slice(0, RECENT_MODEL_PICKS_MAX)
+    : [];
+  if (recentCandidates.length > 1) {
+    const recentTitle = document.createElement('div');
+    recentTitle.className = 'model-group-title model-recent-title';
+    recentTitle.textContent = translateUiText('Recent');
+    els.modelMenuList.appendChild(recentTitle);
+    for (const model of recentCandidates) appendModelRow(model, { metaProvider: true });
+  }
+
   for (const group of groupsToRender) {
     const title = document.createElement('div');
     title.className = 'model-group-title';
-    title.textContent = needle ? `${group.label} ${group.models.length}` : `${group.label} ${group.models.length}/${group.models.length}`;
+    title.textContent = `${group.label} · ${group.models.length}`;
     els.modelMenuList.appendChild(title);
-
-    for (const model of group.models) {
-      const runtimeStatus = modelRuntimeStatus(model);
-      const requestable = isModelRuntimeSelectable(model);
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = `model-option ${model.id === menuModelId ? 'selected' : ''} ${requestable ? '' : 'observed'}`.trim();
-      button.dataset.modelId = model.id;
-      button.title = runtimeStatus.detail;
-      if (model.source === 'external') {
-        button.disabled = true;
-        button.setAttribute('aria-disabled', 'true');
-      }
-
-      const name = document.createElement('span');
-      name.className = 'model-option-name';
-      name.textContent = modelDisplayName(model);
-
-      const meta = document.createElement('span');
-      meta.className = 'model-option-meta';
-      meta.textContent = model.id === menuModelId
-        ? '✓'
-        : (!requestable ? 'observed' : formatTokens(model.contextTokens || 256_000).replace(' tokens', ''));
-
-      button.append(name, meta);
-      button.addEventListener('click', async () => {
-              if (modelSelectionTarget === 'assist') await applyAssistSelectedModel(model);
-              else if (modelSelectionTarget === 'room-member') await setRoomMemberModel(model);
-              else requestSelectedModelWithContextConfirm(model);
-            });
-      els.modelMenuList.appendChild(button);
-    }
+    for (const model of group.models) appendModelRow(model);
   }
 }
 
@@ -12581,6 +12644,7 @@ function renderSkillSuggestions() {
     const detail = document.createElement('span');
     detail.className = 'skill-option-command';
     detail.textContent = mention.detail;
+    button.title = `${mention.token} ${mention.detail}`.trim();
     button.append(name, detail);
     button.addEventListener('click', () => {
       replaceGroupMentionToken(mention.token);
@@ -12597,10 +12661,11 @@ function renderSkillSuggestions() {
     button.dataset.command = `/${cmd.name}`;
     const name = document.createElement('span');
     name.className = 'skill-option-name';
-    name.textContent = `${cmd.icon} ${cmd.name}`;
+    name.textContent = `/${cmd.name}`;
     const command = document.createElement('span');
     command.className = 'skill-option-command';
-    command.textContent = `/${cmd.name}`;
+    command.textContent = translateUiText(cmd.description || '');
+    button.title = command.textContent;
     button.append(name, command);
     button.addEventListener('click', () => {
       els.input.value = `/${cmd.name} `;
@@ -12619,10 +12684,11 @@ function renderSkillSuggestions() {
     button.dataset.command = skill.command;
     const name = document.createElement('span');
     name.className = 'skill-option-name';
-    name.textContent = skill.name;
+    name.textContent = skill.command;
     const command = document.createElement('span');
     command.className = 'skill-option-command';
-    command.textContent = skill.command;
+    command.textContent = skill.description || skill.name;
+    button.title = command.textContent;
     button.append(name, command);
     button.addEventListener('click', () => replaceActiveSkillToken(skill.command));
     els.skillMenu.appendChild(button);
@@ -12661,42 +12727,98 @@ function replaceGroupMentionToken(token) {
   renderContextWindow(replaced);
 }
 
+/* ── Menu keyboard navigation ── */
+function menuNavItems(menu, selector) {
+  return [...menu.querySelectorAll(selector)].filter((el) => !el.disabled && !el.closest('[hidden]'));
+}
+
+// Arrow/Home/End move focus through a menu's items, Escape hands focus back to the trigger, and a
+// printable key typed on an item moves to the menu's search box so the list filters as you type.
+function wireMenuKeyboard(menu, { items, search = '', trigger = null, enterPicksFirst = false } = {}) {
+  if (!menu) return;
+  menu.addEventListener('keydown', (event) => {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.isComposing) return;
+    const list = menuNavItems(menu, items);
+    const active = document.activeElement;
+    const index = list.indexOf(active);
+    const searchEl = search ? menu.querySelector(search) : null;
+    const focusAt = (position) => {
+      const target = list[Math.max(0, Math.min(list.length - 1, position))];
+      target?.focus({ preventScroll: true });
+      target?.scrollIntoView?.({ block: 'nearest' });
+    };
+    if (event.key === 'Escape') {
+      const returnTo = typeof trigger === 'function' ? trigger() : trigger;
+      if (returnTo) globalThis.setTimeout(() => returnTo.focus?.({ preventScroll: true }), 0);
+      return;
+    }
+    if (event.key === 'ArrowDown' && list.length) {
+      event.preventDefault();
+      focusAt(index < 0 ? 0 : index + 1 >= list.length ? 0 : index + 1);
+    } else if (event.key === 'ArrowUp' && list.length) {
+      event.preventDefault();
+      if (index === 0 && searchEl) searchEl.focus();
+      else focusAt(index <= 0 ? list.length - 1 : index - 1);
+    } else if (event.key === 'Home' && index >= 0) {
+      event.preventDefault();
+      focusAt(0);
+    } else if (event.key === 'End' && index >= 0) {
+      event.preventDefault();
+      focusAt(list.length - 1);
+    } else if (event.key === 'Enter' && enterPicksFirst && active === searchEl && list.length) {
+      event.preventDefault();
+      list[0].click();
+    } else if (searchEl && active !== searchEl && active?.matches?.(items) && event.key.length === 1 && event.key !== ' ') {
+      searchEl.focus();
+    }
+  });
+}
+
+function wireMenuKeyboards() {
+  wireMenuKeyboard(els.attachMenu, { items: 'button:not([hidden])', trigger: () => els.attachMenuButton });
+  wireMenuKeyboard(els.quickMoreMenu, { items: '.quick-more-item', trigger: () => els.commandMenuButton });
+  wireMenuKeyboard(document.getElementById('profileSwitchMenu'), { items: 'button', trigger: () => document.getElementById('activeProfileIndicator') });
+  wireMenuKeyboard(els.modelMenu, { items: '.model-option', search: '#modelSearchInput', trigger: () => els.modelMenuButton, enterPicksFirst: true });
+  wireMenuKeyboard(els.sessionMenu, { items: '.session-option', search: '#sessionSearchInput', trigger: () => els.sessionMenuButton, enterPicksFirst: true });
+  els.sessionMenu?.addEventListener('keydown', (event) => {
+    const row = document.activeElement?.closest?.('.session-option-row');
+    if (!row || event.defaultPrevented) return;
+    const trigger = row.querySelector('.session-actions-trigger');
+    if (event.key === 'ArrowRight' && document.activeElement.classList.contains('session-option') && trigger) {
+      event.preventDefault();
+      trigger.focus();
+    } else if (event.key === 'ArrowLeft' && document.activeElement === trigger) {
+      event.preventDefault();
+      row.querySelector('.session-option')?.focus();
+    }
+  });
+}
+
+// Typing "/" keeps focus in the composer, so ↑/↓ move a highlight through the suggestions and
+// Enter or Tab accept it; Escape dismisses without touching the draft.
+function moveSkillMenuHighlight(step) {
+  const options = menuNavItems(els.skillMenu, '[data-command]');
+  if (!options.length) return false;
+  const current = options.findIndex((option) => option.classList.contains('active'));
+  const next = current < 0 ? (step > 0 ? 0 : options.length - 1) : (current + step + options.length) % options.length;
+  options.forEach((option, position) => {
+    option.classList.toggle('active', position === next);
+    option.setAttribute('aria-selected', String(position === next));
+  });
+  options[next].scrollIntoView?.({ block: 'nearest' });
+  return true;
+}
+
 /* ── Composer quick-command menu ── */
 function setQuickCommandMenuOpen(open) {
   if (!els.quickMoreMenu) return;
   els.quickMoreMenu.hidden = !open;
   els.commandMenuButton?.setAttribute('aria-expanded', String(Boolean(open)));
-  if (!open) {
-    clearQuickCommandDetail();
-  } else {
-    scrollInputToCaret();
-  }
+  if (open) scrollInputToCaret();
 }
 
 function scrollInputToCaret() {
   requestAnimationFrame(() => syncComposerFrame({ followCaret: true }));
-}
-
-function clearQuickCommandDetail() {
-  const detail = els.quickMoreMenu?.querySelector('[data-command-detail]');
-  if (detail) detail.hidden = true;
-  els.quickMoreMenu?.classList.remove('has-command-detail');
-}
-
-function showQuickCommandDetail(cmd) {
-  const detail = els.quickMoreMenu?.querySelector('[data-command-detail]');
-  if (!detail || !cmd) return;
-  detail.querySelector('[data-command-detail-token]').textContent = `/${cmd.name}`;
-  detail.querySelector('[data-command-detail-category]').textContent = translateUiText(cmd.category || 'Command');
-  detail.querySelector('[data-command-detail-description]').textContent = translateUiText(cmd.description);
-  detail.querySelector('[data-command-detail-hint]').textContent = translateUiText(cmd.promptHint || (cmd.requiresInput
-    ? 'Add instructions after the slash command before sending.'
-    : 'Runs immediately against the current browser context.'));
-  detail.querySelector('[data-command-detail-footnote]').textContent = translateUiText(cmd.requiresInput
-    ? 'Click to insert, then add details.'
-    : 'Click or press Enter to run.');
-  detail.hidden = false;
-  els.quickMoreMenu?.classList.add('has-command-detail');
 }
 
 function applyQuickCommand(cmd) {
@@ -12718,45 +12840,8 @@ function renderQuickMoreMenu(category = 'all') {
 
   const header = document.createElement('div');
   header.className = 'quick-more-heading';
-  const headerLabel = document.createElement('span');
-  headerLabel.textContent = translateUiText('Commands');
-  const headerHint = document.createElement('small');
-  headerHint.textContent = translateUiText('Slash helpers');
-  header.append(headerLabel, headerHint);
+  header.textContent = translateUiText('Commands');
   els.quickMoreMenu.appendChild(header);
-
-  const detail = document.createElement('aside');
-  detail.id = 'quickCommandDetail';
-  detail.className = 'quick-command-detail';
-  detail.dataset.commandDetail = 'true';
-  detail.hidden = true;
-  detail.setAttribute('aria-live', 'polite');
-  detail.setAttribute('aria-label', translateUiText('Command details'));
-
-  const detailTop = document.createElement('div');
-  detailTop.className = 'qmd-top';
-  const detailToken = document.createElement('span');
-  detailToken.className = 'qmd-token';
-  detailToken.dataset.commandDetailToken = 'true';
-  const detailCategory = document.createElement('span');
-  detailCategory.className = 'qmd-category';
-  detailCategory.dataset.commandDetailCategory = 'true';
-  detailTop.append(detailToken, detailCategory);
-
-  const detailDescription = document.createElement('strong');
-  detailDescription.className = 'qmd-description';
-  detailDescription.dataset.commandDetailDescription = 'true';
-
-  const detailHint = document.createElement('p');
-  detailHint.className = 'qmd-hint';
-  detailHint.dataset.commandDetailHint = 'true';
-
-  const detailFootnote = document.createElement('span');
-  detailFootnote.className = 'qmd-footnote';
-  detailFootnote.dataset.commandDetailFootnote = 'true';
-
-  detail.append(detailTop, detailDescription, detailHint, detailFootnote);
-  els.quickMoreMenu.appendChild(detail);
 
   const list = document.createElement('div');
   list.className = 'quick-command-list';
@@ -12768,31 +12853,26 @@ function renderQuickMoreMenu(category = 'all') {
     item.className = 'quick-more-item';
     item.dataset.command = cmd.name;
     item.setAttribute('role', 'menuitem');
-    item.setAttribute('aria-describedby', 'quickCommandDetail');
+    const description = translateUiText(cmd.description);
+    item.title = [description, translateUiText(cmd.promptHint || (cmd.requiresInput
+      ? 'Add instructions after the slash command before sending.'
+      : 'Runs immediately against the current browser context.'))].filter(Boolean).join('\n');
 
     const token = document.createElement('span');
     token.className = 'qmi-token';
     token.textContent = `/${cmd.name}`;
 
     const copy = document.createElement('span');
-    copy.className = 'qmi-copy';
-    const description = document.createElement('span');
-    description.className = 'qmi-description';
-    description.textContent = translateUiText(cmd.description);
-    const categoryTag = document.createElement('span');
-    categoryTag.className = 'qmi-category';
-    categoryTag.textContent = translateUiText(cmd.category || '');
-    copy.append(description, categoryTag);
+    copy.className = 'qmi-description';
+    copy.textContent = description;
 
     item.append(token, copy);
-    item.addEventListener('mouseenter', () => showQuickCommandDetail(cmd));
-    item.addEventListener('focus', () => showQuickCommandDetail(cmd));
     item.addEventListener('click', () => applyQuickCommand(cmd));
     list.appendChild(item);
   }
   els.quickMoreMenu.appendChild(list);
-  showQuickCommandDetail(commands[0]);
   setQuickCommandMenuOpen(true);
+  list.querySelector('.quick-more-item')?.focus({ preventScroll: true });
 }
 
 // Settings → Active profile: compact verified-agent preview (avatar + name + model).
@@ -19514,6 +19594,120 @@ function openMoveToProjectFromRecents(session) {
   void controller.startMove(session, { returnTo: 'recents' });
 }
 
+function sessionActivityMs(lastActive) {
+  const value = Number(lastActive) || 0;
+  if (!value) return 0;
+  const epochMsThreshold = 1e12;
+  return value < epochMsThreshold ? value * 1000 : value;
+}
+
+function formatSessionAge(lastActive) {
+  const ms = sessionActivityMs(lastActive);
+  if (!ms) return '';
+  const seconds = Math.max(0, Math.round((Date.now() - ms) / 1000));
+  const justNowSeconds = 45;
+  if (seconds < justNowSeconds) return translateUiText('now');
+  const units = [
+    { limit: 3600, divisor: 60, suffix: 'm' },
+    { limit: 86400, divisor: 3600, suffix: 'h' },
+    { limit: 604800, divisor: 86400, suffix: 'd' },
+  ];
+  for (const unit of units) {
+    if (seconds < unit.limit) return `${Math.max(1, Math.round(seconds / unit.divisor))}${unit.suffix}`;
+  }
+  return new Date(ms).toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' });
+}
+
+function sessionDateBucket(lastActive) {
+  const ms = sessionActivityMs(lastActive);
+  if (!ms) return '';
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const dayMs = 86_400_000;
+  if (ms >= startOfToday.getTime()) return 'Today';
+  if (ms >= startOfToday.getTime() - dayMs) return 'Yesterday';
+  return 'Earlier';
+}
+
+let sessionRowMenuState = null;
+
+function closeSessionRowMenu({ restoreFocus = false } = {}) {
+  const state = sessionRowMenuState;
+  sessionRowMenuState = null;
+  state?.menu.remove();
+  if (!state) return;
+  const trigger = [...(els.sessionMenuList?.querySelectorAll('.session-option-row') || [])]
+    .find((row) => row.dataset.sessionId === state.sessionId)?.querySelector('.session-actions-trigger');
+  trigger?.setAttribute('aria-expanded', 'false');
+  if (restoreFocus) trigger?.focus({ preventScroll: true });
+}
+
+function openSessionRowMenu(trigger, session, items) {
+  const sameRow = sessionRowMenuState?.sessionId === session.id;
+  closeSessionRowMenu();
+  if (sameRow || !items.length) return;
+  const menu = document.createElement('div');
+  menu.className = 'session-row-menu';
+  menu.setAttribute('role', 'menu');
+  for (const item of items) {
+    const entry = document.createElement('button');
+    entry.type = 'button';
+    entry.className = 'session-row-menu-item';
+    entry.setAttribute('role', 'menuitem');
+    entry.textContent = item.label;
+    if (item.title) entry.title = item.title;
+    entry.addEventListener('click', (event) => {
+      event.stopPropagation();
+      closeSessionRowMenu();
+      item.run();
+    });
+    menu.append(entry);
+  }
+  menu.addEventListener('keydown', (event) => {
+    const entries = [...menu.querySelectorAll('button')];
+    const index = entries.indexOf(document.activeElement);
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const step = event.key === 'ArrowDown' ? 1 : -1;
+      entries[(index + step + entries.length) % entries.length]?.focus();
+    } else if (event.key === 'Escape' || event.key === 'ArrowLeft') {
+      event.preventDefault();
+      event.stopPropagation();
+      closeSessionRowMenu({ restoreFocus: true });
+    } else if (event.key === 'Tab') {
+      closeSessionRowMenu();
+    }
+  });
+  menu.addEventListener('click', (event) => event.stopPropagation());
+  els.sessionMenu.append(menu);
+  const host = els.sessionMenu.getBoundingClientRect();
+  const anchor = trigger.getBoundingClientRect();
+  const menuRect = menu.getBoundingClientRect();
+  const below = anchor.bottom + 4 + menuRect.height <= host.bottom - 8;
+  menu.style.top = `${Math.round((below ? anchor.bottom + 4 : anchor.top - 4 - menuRect.height) - host.top)}px`;
+  menu.style.left = `${Math.round(Math.max(8, Math.min(host.width - menuRect.width - 8, anchor.right - menuRect.width - host.left)))}px`;
+  trigger.setAttribute('aria-expanded', 'true');
+  sessionRowMenuState = { sessionId: session.id, menu };
+  menu.querySelector('button')?.focus({ preventScroll: true });
+}
+
+function sessionRowMenuTrigger(session, buildItems) {
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'session-actions-trigger';
+  const label = translateUiText('Session actions');
+  trigger.title = label;
+  trigger.setAttribute('aria-label', `${label}: ${session.title || session.id}`);
+  trigger.setAttribute('aria-haspopup', 'menu');
+  trigger.setAttribute('aria-expanded', String(sessionRowMenuState?.sessionId === session.id));
+  trigger.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="ellipsis"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>';
+  trigger.addEventListener('click', (event) => {
+    event.stopPropagation();
+    openSessionRowMenu(trigger, session, buildItems());
+  });
+  return trigger;
+}
+
 function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
   scheduleLiveSessionPoll();
   syncSessionMenuChrome();
@@ -19535,8 +19729,10 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
 
   for (const group of groups) {
     if (shouldAutoOpenSessionGroup(group, groups, closedSessionGroups)) openSessionGroups.add(group.label);
-    const isOpen = searching || openSessionGroups.has(group.label);
+    const showGroupHeader = groups.length > 1 || group.source === 'hermes_bot_group_threads';
+    const isOpen = !showGroupHeader || searching || openSessionGroups.has(group.label);
 
+    if (showGroupHeader) {
     const title = document.createElement('button');
     title.type = 'button';
     title.className = `session-group-title session-group-toggle ${isOpen ? 'open' : ''}`.trim();
@@ -19560,8 +19756,10 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
       renderSessionMenu(els.sessionSearchInput.value);
     });
     els.sessionMenuList.appendChild(title);
+    }
 
     if (!isOpen) continue;
+    let lastBucket = '';
 
     if (group.source === 'hermes_bot_group_threads') {
       const newThreadRow = document.createElement('div');
@@ -19579,6 +19777,17 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
     }
 
     for (const session of group.sessions) {
+      if (group.source !== 'hermes_bot_group_threads') {
+        const bucket = sessionDateBucket(session.lastActive);
+        if (bucket && bucket !== lastBucket) {
+          lastBucket = bucket;
+          const bucketLabel = document.createElement('div');
+          bucketLabel.className = 'session-date-label';
+          bucketLabel.setAttribute('role', 'presentation');
+          bucketLabel.textContent = translateUiText(bucket);
+          els.sessionMenuList.appendChild(bucketLabel);
+        }
+      }
       const row = document.createElement('div');
       row.className = `session-option-row ${session.selected ? 'selected' : ''}`.trim();
       row.dataset.sessionId = session.id;
@@ -19615,31 +19824,18 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
         const actions = document.createElement('span');
         actions.className = 'session-actions';
         if (session.threadId === 'main') {
-          const settingsButton = document.createElement('button');
-          settingsButton.type = 'button';
-          settingsButton.className = 'session-action-button';
-          settingsButton.textContent = t('ui.settings');
-          settingsButton.title = t('ui.group.settings');
-          settingsButton.setAttribute('aria-label', t('ui.group.settings'));
-          settingsButton.setAttribute('data-i18n', 'ui.settings');
-          settingsButton.setAttribute('data-i18n-title', 'ui.group.settings');
-          settingsButton.setAttribute('data-i18n-aria-label', 'ui.group.settings');
-          settingsButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-            closeFloatingPanels();
-            openGroupSettingsModal(activeGroupProjection);
-          });
-          const renameButton = document.createElement('button');
-          renameButton.type = 'button';
-          renameButton.className = 'session-action-button';
-          renameButton.textContent = translateUiText('Rename');
-          renameButton.title = translateUiText('Rename group room');
-          renameButton.setAttribute('aria-label', translateUiText('Rename group room'));
-          renameButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-            openSessionRenameEditor({ id: activeGroupProjection.id, title: activeGroupProjection.displayName });
-          });
-          actions.append(settingsButton, renameButton);
+          actions.append(sessionRowMenuTrigger(session, () => [
+            {
+              label: t('ui.settings'),
+              title: t('ui.group.settings'),
+              run: () => { closeFloatingPanels(); openGroupSettingsModal(activeGroupProjection); },
+            },
+            {
+              label: translateUiText('Rename'),
+              title: translateUiText('Rename group room'),
+              run: () => openSessionRenameEditor({ id: activeGroupProjection.id, title: activeGroupProjection.displayName }),
+            },
+          ]));
         }
         row.append(button, actions);
         els.sessionMenuList.appendChild(row);
@@ -19667,7 +19863,7 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
       if (modelLabel) tooltipLines.push(t('session.row_model', { model: modelLabel }));
       if (session.messageCount) tooltipLines.push(`${t('ui.messages')}: ${session.messageCount}`);
       button.title = tooltipLines.join('\n');
-      meta.textContent = session.selected ? '✓' : '';
+      meta.textContent = session.selected ? '' : formatSessionAge(session.lastActive);
 
       const isAttachedSession = String(session.id || '') === String(settings.sessionId || '');
       const ownsLocalRun = localSessionStream?.sessionId === String(session.id || '');
@@ -19690,51 +19886,35 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
       } else if (liveAttach?.sessionId === session.id) {
         meta.textContent = translateUiText('Running');
       }
+      if (meta.dataset.liveState === 'running' || row.dataset.liveState === 'running') {
+        meta.dataset.liveState = 'running';
+        meta.classList.add('session-live-dot');
+      }
 
       button.setAttribute('aria-label', `${sessionDisplayName(session)}${row.dataset.liveState === 'running' ? ' · ' + translateUiText('Running') : ''}`);
       // An empty meta cell would still cost its grid gap, so it is added only when it has something to say.
       button.append(...(meta.textContent ? [name, meta] : [name]));
+      if (!meta.textContent) button.classList.add('no-meta');
       button.addEventListener('click', () => openHermesSession(session));
 
       const actions = document.createElement('span');
       actions.className = 'session-actions';
-
-      const copyButton = document.createElement('button');
-      copyButton.type = 'button';
-      copyButton.className = 'session-action-button';
-      copyButton.textContent = 'ID';
-      copyButton.title = translateUiText('Copy session ID');
-      copyButton.setAttribute('aria-label', t('session.copy_id_for', { title: sessionDisplayName(session) }));
-      copyButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        copyTextToClipboard(session.id, { label: translateUiText('Copy session ID') });
-      });
-
-      const renameButton = document.createElement('button');
-      renameButton.type = 'button';
-      renameButton.className = 'session-action-button';
-      renameButton.textContent = translateUiText('Rename');
-      renameButton.title = translateUiText('Rename session');
-      renameButton.setAttribute('aria-label', t('session.rename_named', { title: sessionDisplayName(session) }));
-      renameButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        openSessionRenameEditor(session);
-      });
-
-      actions.append(copyButton, renameButton);
-      if (canMoveToProject) {
-        const moveButton = document.createElement('button');
-        moveButton.type = 'button';
-        moveButton.className = 'session-action-button';
-        moveButton.textContent = t('projects.move.action');
-        moveButton.title = t('projects.move.action_title');
-        moveButton.setAttribute('aria-label', t('projects.move.action_for', { title: sessionDisplayName(session) }));
-        moveButton.addEventListener('click', (event) => {
-          event.stopPropagation();
-          openMoveToProjectFromRecents(session);
-        });
-        actions.append(moveButton);
-      }
+      actions.append(sessionRowMenuTrigger(session, () => [
+        {
+          label: translateUiText('Copy session ID'),
+          run: () => copyTextToClipboard(session.id, { label: translateUiText('Copy session ID') }),
+        },
+        {
+          label: translateUiText('Rename'),
+          title: translateUiText('Rename session'),
+          run: () => openSessionRenameEditor(session),
+        },
+        ...(canMoveToProject ? [{
+          label: t('projects.move.action'),
+          title: t('projects.move.action_title'),
+          run: () => openMoveToProjectFromRecents(session),
+        }] : []),
+      ]));
       row.append(button, actions);
       els.sessionMenuList.appendChild(row);
     }
@@ -25267,11 +25447,13 @@ function setPickButtonState() {
   const pickingActive = elementPickActiveForTab();
   const attachPick = document.querySelector('[data-attach="pick-element"]');
   if (attachPick) {
-    attachPick.textContent = pickingActive
+    const pickLabel = pickingActive
       ? translateUiText('◈ Picking element...')
       : hasPick
         ? translateUiText('◈ Pick a different element')
         : translateUiText('◈ Pick page element');
+    const pickText = attachPick.querySelector('span');
+    if (pickText) { pickText.removeAttribute('data-i18n'); pickText.textContent = pickLabel.replace(/^◈\s*/, ''); }
     attachPick.setAttribute('aria-pressed', String(pickingActive || Boolean(hasPick)));
   }
   const attachClear = document.getElementById('clearPickAttachButton');
@@ -29794,6 +29976,7 @@ async function testConnection() {
 }
 
 function closeFloatingPanels() {
+  closeSessionRowMenu();
   els.modelMenu.hidden = true;
   els.modelMenuButton.setAttribute('aria-expanded', 'false');
   els.inlineAssistModelButton?.setAttribute('aria-expanded', 'false');
@@ -29812,6 +29995,7 @@ function closeFloatingPanels() {
   els.attachMenu.hidden = true;
   els.attachMenuButton.setAttribute('aria-expanded', 'false');
   if (els.skillMenu) els.skillMenu.hidden = true;
+  if (els.quickMoreMenu && !els.quickMoreMenu.hidden) setQuickCommandMenuOpen(false);
   els.contextPopover.hidden = true;
   els.contextBarButton.setAttribute('aria-expanded', 'false');
   els.botModeThreadsButton?.setAttribute('aria-expanded', 'false');
@@ -30234,6 +30418,7 @@ function bindEvents() {
     panel.addEventListener('pointerdown', (event) => event.stopPropagation());
   });
   // Escape inside a project, the create form or the move picker steps back to the project list first.
+  els.sessionMenu.addEventListener('click', () => closeSessionRowMenu());
   els.sessionMenu.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !projectsTabActive()) return;
     const controller = getProjectsController();
@@ -31281,8 +31466,22 @@ function bindEvents() {
     await askHermes(userText, [...attachments]);
   });
   els.input.addEventListener('keydown', (event) => {
+    if (!els.skillMenu.hidden && !event.isComposing) {
+      const highlighted = els.skillMenu.querySelector('[data-command].active');
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        if (moveSkillMenuHighlight(event.key === 'ArrowDown' ? 1 : -1)) { event.preventDefault(); return; }
+      } else if (event.key === 'Escape') {
+        els.skillMenu.hidden = true;
+        event.preventDefault();
+        return;
+      } else if (event.key === 'Enter' && highlighted && !event.shiftKey) {
+        event.preventDefault();
+        highlighted.click();
+        return;
+      }
+    }
     if (!els.skillMenu.hidden && (event.key === 'Tab' || event.key === 'ArrowRight')) {
-      const first = els.skillMenu.querySelector('[data-command]');
+      const first = els.skillMenu.querySelector('[data-command].active') || els.skillMenu.querySelector('[data-command]');
       if (first?.dataset.command) {
         event.preventDefault();
         replaceActiveSkillToken(first.dataset.command);
@@ -31894,3 +32093,4 @@ function renderContextUsageCard(root, view) {
 }
 
 observeComposerPopovers();
+wireMenuKeyboards();

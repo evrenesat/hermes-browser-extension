@@ -2469,9 +2469,6 @@ html[data-hermes-font-profile] .browser-control-dialog .browser-control-action {
   padding: 6px;
 }
 .quick-more-menu[hidden] { display: none; }
-.quick-more-menu.has-command-detail {
-  overflow: hidden;
-}
 .quick-more-heading {
   display: flex;
   align-items: baseline;
@@ -2491,86 +2488,6 @@ html[data-hermes-font-profile] .browser-control-dialog .browser-control-action {
   letter-spacing: normal;
   text-transform: none;
   white-space: nowrap;
-}
-.quick-command-detail {
-  position: relative;
-  z-index: 2;
-  flex: 0 0 auto;
-  height: 108px;
-  margin: 0 0 6px;
-  padding: 8px 9px 8px 11px;
-  overflow: hidden;
-  pointer-events: none;
-  border: 1px solid rgba(var(--hermes-accent-rgb),0.48);
-  border-radius: calc(var(--radius) + 2px);
-  background:
-    linear-gradient(135deg, rgba(var(--hermes-accent-rgb),0.18), rgba(var(--hermes-bg-rgb),0.04) 42%),
-    linear-gradient(180deg, rgba(var(--hermes-fg-rgb),0.08), rgba(var(--hermes-fg-rgb),0.025)),
-    var(--hermes-menu-bg);
-  box-shadow:
-    0 12px 26px rgba(var(--hermes-shadow-rgb),0.28),
-    inset 0 1px 0 rgba(var(--hermes-fg-rgb),0.12);
-  transform: none;
-  opacity: 1;
-  transition: none;
-}
-.quick-command-detail[hidden] { display: none; }
-.quick-more-menu.has-command-detail .quick-command-detail {
-  transform: none;
-  opacity: 1;
-}
-.quick-command-detail::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 9px;
-  bottom: 9px;
-  width: 2px;
-  background: var(--hermes-accent);
-  box-shadow: 0 0 16px rgba(var(--hermes-accent-rgb),0.55);
-}
-.qmd-top {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-}
-.qmd-token {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: var(--hermes-font-mono);
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  color: var(--hermes-accent);
-}
-.qmd-category,
-.qmd-footnote {
-  color: rgba(var(--hermes-fg-rgb),0.52);
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  text-transform: none;
-  letter-spacing: normal;
-  white-space: nowrap;
-}
-.qmd-description {
-  display: block;
-  margin-top: 5px;
-  font-family: var(--hermes-font-ui);
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  font-weight: 500;
-  line-height: 1.42;
-  color: var(--hermes-fg);
-}
-.qmd-hint {
-  margin: 4px 0 0;
-  color: rgba(var(--hermes-fg-rgb),0.72);
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  line-height: 1.38;
-}
-.qmd-footnote {
-  display: inline-flex;
-  margin-top: 6px;
-  color: rgba(var(--hermes-accent-rgb),0.78);
 }
 .quick-command-list {
   display: grid;
