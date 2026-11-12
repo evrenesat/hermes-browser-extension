@@ -13,3 +13,10 @@
 - Legacy stylesheets no longer set uppercase, letter-spacing or display/mono faces on UI chrome (mono kept for code and IDs); 6-10px text raised to 11px.
 - All `data-icon` svgs are now 1.5px stroke Lucide-style line icons (HTML and JS-injected); `tests/line-icons.test.mjs` replaces the pixelarticons tests.
 - Deleted tests that only guarded the old look (caps/tracking/display-font, RTL tracking twins, pixel icons, connection-window headings); `tests/review-queue.test.mjs` "simultaneous processes" is flaky and unrelated.
+
+### Phase 2: onboarding, startup/error screens, dialogs (`extension/calm-onboarding.css`)
+
+- First run is welcome (small icon, "Hermes Browser", one muted line, Connect to Hermes / Skip for now) then Connect only. Theme, font, style, layout and language steps are gone; the panel follows the browser language until one is chosen in Settings. "Run first-time setup again" removed from Settings > Appearance.
+- Connect step has an inline gateway address field with validation (`gatewayAddressError`); token/mode stay in Manual setup (Settings > Connections).
+- Startup/error screen is one compact card with a status icon, heading, detail and the fixing action (Retry / Connect to Hermes / settings); no CRT, dither or artwork.
+- Dialogs, toast, Hermes control dialog, new-group/bot-mode panels, voice dictation, microphone permission and the Hermes Web hand-off page are compact calm cards. Deleted the dither-hover module and its tests.

@@ -29276,8 +29276,8 @@ function connectionTestButtons() {
 function setTestConnectionButtonLabel(label) {
   for (const button of connectionTestButtons()) {
     const target = button.querySelector('.settings-connection-test-label');
-    const nextLabel = button === els.startupTestConnectionButton && label === 'TEST'
-      ? 'TEST CONNECTION'
+    const nextLabel = button === els.startupTestConnectionButton
+      ? ({ TEST: t('ui.retry'), TESTING: `${t('ui.retry')}...`, ONLINE: 'Online', FAILED: 'Failed' }[label] || label)
       : label;
     if (target) target.textContent = nextLabel;
     else button.textContent = nextLabel;

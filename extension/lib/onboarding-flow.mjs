@@ -129,12 +129,12 @@ export function createOnboardingFlow({
           <input id="onboardingGatewayUrl" type="text" inputmode="url" autocomplete="off" spellcheck="false" data-onboarding-url value="${escapeHtml(typedUrl ?? connection.gatewayUrl ?? '')}" placeholder="http://127.0.0.1:8642" aria-describedby="onboardingUrlError"${urlError ? ' aria-invalid="true"' : ''}>
           <p class="onboarding-field-error" id="onboardingUrlError" role="alert"${urlError ? '' : ' hidden'}>${escapeHtml(urlError ? t(urlError) : '')}</p>
         </div>
-        <p class="onboarding-connect-status" role="status" tabindex="-1">${connected ? ONBOARDING_ICONS.connected : ''}<span>${escapeHtml(status)}</span></p>
         ${approvalNode ? '<div class="onboarding-approval-slot"></div>' : ''}
         <div class="onboarding-connect-actions"${connected ? ' hidden' : ''}>
           <button type="button" class="onboarding-connect-button" data-onboarding-connect${connection.busy ? ' disabled' : ''}>${escapeHtml(connection.busy ? (connection.busyLabel || t('ui.connect.to.hermes')) : t('ui.connect.to.hermes'))}</button>
           <button type="button" class="secondary" data-onboarding-manual>${escapeHtml(t('ui.manual.setup'))}</button>
         </div>
+        <p class="onboarding-connect-status" role="status" tabindex="-1">${connected ? ONBOARDING_ICONS.connected : ''}<span>${escapeHtml(status)}</span></p>
         <p class="onboarding-connect-other">${escapeHtml(t('onboarding.connect.other_hint'))}</p>
       </div>`;
   }

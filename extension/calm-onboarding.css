@@ -111,9 +111,7 @@ html[data-hermes-mode="dark"] { --calm-scrim: rgba(0, 0, 0, 0.55); }
   align-items: flex-start;
   gap: 6px;
   margin: 0;
-  padding: 8px 10px;
-  border-radius: var(--calm-radius-card);
-  background: var(--calm-surface);
+  padding: 0;
   color: var(--calm-muted);
   font-size: 12px;
   line-height: 1.5;
@@ -126,6 +124,7 @@ html[data-hermes-mode="dark"] { --calm-scrim: rgba(0, 0, 0, 0.55); }
 .onboarding-connect-actions[hidden] { display: none; }
 .onboarding-connect-other { margin: 0; color: var(--calm-muted); font-size: 12px; line-height: 1.5; }
 .onboarding-approval-slot .pairing-approval-frame { height: min(340px, 48dvh); border: 1px solid var(--calm-border); border-radius: var(--calm-radius-card); }
+.onboarding-connect:not(.is-connected, .is-failed, .is-busy, .is-approving) .onboarding-connect-status { display: none; }
 .onboarding-connect.is-approving :is(.onboarding-connect-actions, .onboarding-field, .onboarding-connect-other) { display: none; }
 .onboarding-connect.is-busy .onboarding-connect-button { opacity: 0.7; }
 .onboarding-nav { display: flex; justify-content: flex-end; padding: 0; border: 0; background: transparent; }
@@ -222,61 +221,58 @@ html[data-hermes-mode="light"] .startup-brand-icon { --startup-logo: none; }
   letter-spacing: normal;
   color: var(--calm-muted);
   opacity: 1;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 6;
 }
 .startup-screen.is-error .startup-label { color: var(--calm-danger); }
 .startup-screen.is-error .startup-detail,
 .startup-screen.is-setup .startup-detail { font: 400 13px/1.5 var(--calm-font-ui); opacity: 1; color: var(--calm-muted); }
 .startup-actions {
   position: static;
-  inline-size: min(100%, 320px);
+  inset: auto;
+  inline-size: 100%;
+  margin-block-start: 4px;
   justify-content: flex-end;
   gap: 6px;
 }
 .startup-actions[hidden] { display: none; }
 body.startup-active .startup-actions :is(#settingsButton, #startupTestConnectionButton:not([hidden]), #startupConnectButton:not([hidden]), #newSessionButton) {
+  position: static;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: var(--calm-control-h);
+  inline-size: auto;
+  min-inline-size: 0;
+  block-size: var(--calm-control-h);
+  min-block-size: var(--calm-control-h);
   margin: 0;
   padding: 0 10px;
   border: 1px solid transparent;
   border-radius: var(--calm-radius-control);
   background: var(--calm-surface-2);
+  box-shadow: none;
   color: var(--calm-text);
   font: 500 13px/1 var(--calm-font-ui);
+  text-transform: none;
+  letter-spacing: normal;
+  visibility: visible;
 }
 body.startup-active .startup-actions #settingsButton { inline-size: var(--calm-control-h); padding: 0; }
-body.startup-active .startup-actions :is(#settingsButton, #startupTestConnectionButton:not([hidden]), #newSessionButton):hover {
+body.startup-active .startup-actions :is(#settingsButton, #startupTestConnectionButton, #startupConnectButton, #newSessionButton):is(:hover, :focus-visible) {
   background: color-mix(in srgb, var(--calm-surface-2) 82%, var(--calm-text) 18%);
   color: var(--calm-text);
   border-color: transparent;
 }
-body.startup-active .startup-actions #startupConnectButton:not([hidden]),
-body.startup-active .startup-actions #startupConnectButton:not([hidden]):hover {
+body.startup-active .startup-actions :is(#startupConnectButton:not([hidden]), .startup-screen.is-error #startupTestConnectionButton:not([hidden])),
+.startup-screen.is-error .startup-actions #startupTestConnectionButton:not([hidden]),
+body.startup-active .startup-actions #startupConnectButton:not([hidden]):is(:hover, :focus-visible),
+.startup-screen.is-error .startup-actions #startupTestConnectionButton:not([hidden]):is(:hover, :focus-visible) {
   background: var(--calm-accent);
   color: var(--calm-accent-fg);
   border-color: transparent;
-}
-.startup-screen.is-error .startup-actions #startupTestConnectionButton:not([hidden]) {
-  background: var(--calm-accent);
-  color: var(--calm-accent-fg);
-  border-color: transparent;
-}
-/* The test button names itself (Retry) instead of hiding behind a tooltip. */
-.startup-actions #startupTestConnectionButton .sr-only {
-  position: static;
-  inline-size: auto;
-  block-size: auto;
-  margin: 0;
-  overflow: visible;
-  clip: auto;
-  white-space: nowrap;
-  text-transform: none;
 }
 .startup-actions [data-tip]::after { display: none; }
+body.startup-active .startup-actions #startupTestConnectionButton .settings-connection-test-label { position: static; clip: auto; inline-size: auto; block-size: auto; overflow: visible; margin: 0; }
 
 /* ------------------------------------------------------------------ */
 /* 4. Connect pop-up                                                   */
@@ -460,6 +456,7 @@ html .bot-mode-sheet-field input, html .bot-mode-sheet-field textarea, html .bot
 html .bot-mode-sheet-field input, html .bot-mode-sheet-field select { min-height: var(--calm-input-h); }
 html .bot-mode-avatar-stage { display: grid; justify-items: center; gap: 6px; }
 html .bot-mode-avatar-sheet { inline-size: 72px; block-size: 72px; border-radius: 16px; border: 1px solid var(--calm-border); box-shadow: none; }
+html .bot-mode-pet-picker { border: 0; border-radius: var(--calm-radius-card); background: var(--calm-surface); }
 html .bot-mode-advanced, html .bot-mode-pet-summary { border: 0; border-radius: var(--calm-radius-card); background: var(--calm-surface); padding: 0; }
 html .bot-mode-advanced summary { min-height: var(--calm-control-h); padding: 6px 10px; font: 600 13px/1.4 var(--calm-font-ui); text-transform: none; letter-spacing: normal; cursor: pointer; }
 html .bot-mode-advanced-panel { padding: 4px 10px 10px; }
@@ -514,5 +511,24 @@ html .bot-mode-panel .bot-mode-action { border: 0; }
 html .bot-mode-panel .bot-mode-action.primary { background: var(--calm-accent); color: var(--calm-accent-fg); }
 html .bot-mode-sheet .bot-mode-pet-summary, html .bot-mode-sheet .bot-mode-advanced { border: 0; background: var(--calm-surface); }
 html .bot-mode-sheet .bot-mode-sheet-label { font-weight: 600; }
-html .browser-control-dialog .browser-control-dialog-title { text-transform: none; outline: none; color: var(--calm-text); }
+html .browser-control-dialog .browser-control-dialog-title { text-transform: lowercase; outline: none; color: var(--calm-text); }
 html .browser-control-dialog .browser-control-dialog-title:focus-visible { outline: none; }
+html .browser-control-dialog .browser-control-dialog-title::first-letter { text-transform: uppercase; }
+
+/* ------------------------------------------------------------------ */
+/* 9. Voice dictation tab: one compact card                            */
+/* ------------------------------------------------------------------ */
+html body.voice-page { background: var(--calm-bg); color: var(--calm-text); font-family: var(--calm-font-ui); }
+html body.voice-page .voice-shell { inline-size: min(380px, 100%); gap: 8px; }
+html body.voice-page .voice-hero { min-height: 0; padding: 12px 16px; border: 1px solid var(--calm-border); border-radius: 12px; background: var(--calm-surface); box-shadow: none; }
+html body.voice-page .voice-hero :is(.hero-wordmark, .hero-badge) { display: none; }
+html body.voice-page .voice-hero .hero-copy { padding: 0; }
+html body.voice-page .voice-hero .eyebrow { margin: 0; font: 600 15px/1.35 var(--calm-font-ui); letter-spacing: normal; text-transform: none; color: var(--calm-text); }
+html body.voice-page .voice-hero .hero-dismiss { inset-block-start: 8px; inset-inline-end: 8px; inline-size: var(--calm-control-h); block-size: var(--calm-control-h); color: var(--calm-muted); background: transparent; border: 0; }
+html body.voice-page .voice-composer { padding: 12px; border: 1px solid var(--calm-border); border-radius: 12px; background: var(--calm-surface); box-shadow: none; gap: 8px; }
+html body.voice-page .voice-stage { min-height: 96px; padding: 12px; border: 1px solid var(--calm-border); border-radius: var(--calm-radius-card); background: var(--calm-bg); color: var(--calm-text); }
+html body.voice-page .voice-status-title { font: 600 12px/1.4 var(--calm-font-ui); letter-spacing: normal; text-transform: none; }
+html body.voice-page .voice-status { font: 400 13px/1.5 var(--calm-font-ui); color: var(--calm-muted); }
+html body.voice-page .voice-actions { justify-content: flex-end; gap: 6px; }
+html body.voice-page .voice-actions button { flex: 0 1 auto; min-height: var(--calm-control-h); padding: 0 12px; border: 0; border-radius: var(--calm-radius-control); background: var(--calm-surface-2); color: var(--calm-text); font: 500 13px/1 var(--calm-font-ui); text-transform: none; letter-spacing: normal; }
+html body.voice-page .voice-actions #startVoiceButton { background: var(--calm-accent); color: var(--calm-accent-fg); }
