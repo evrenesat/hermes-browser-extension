@@ -553,3 +553,11 @@ body.startup-active .startup-actions #settingsButton .startup-settings-label { d
 html .browser-control-dialog .browser-control-light { --light-color: var(--calm-muted); }
 html .browser-control-dialog .browser-control-light[data-state="on"] { --light-color: var(--calm-ok); color: var(--calm-text); }
 html .browser-control-dialog .browser-control-light-dot { box-shadow: none; }
+
+/* Phase 3: microphone permission page actions on one wrapping row, primary first. */
+html .permission-card .permission-actions { display: flex; flex-flow: row wrap; justify-content: flex-end; gap: 6px; }
+html .permission-card .permission-actions button { flex: 0 1 auto; min-height: var(--calm-control-h); padding: 0 12px; border: 0; border-radius: var(--calm-radius-control); background: var(--calm-surface-2); color: var(--calm-text); font: 500 13px/1 var(--calm-font-ui); }
+html .permission-card .permission-actions #allowMicrophoneButton { order: 3; background: var(--calm-accent); color: var(--calm-accent-fg); }
+html .permission-card .permission-actions #closePermissionButton { order: 1; background: transparent; color: var(--calm-muted); }
+html .permission-card .permission-actions #openMicrophoneSettingsButton { order: 2; }
+html .permission-card .eyebrow { margin: 0; color: var(--calm-muted); font: 500 12px/1.4 var(--calm-font-ui); letter-spacing: normal; text-transform: none; }

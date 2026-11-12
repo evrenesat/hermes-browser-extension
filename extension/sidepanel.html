@@ -518,11 +518,11 @@
             <textarea id="promptInput" rows="1" title="Enter to send, Shift+Enter for a new line, / for commands" placeholder="Ask Hermes about this page…" data-i18n-placeholder="ui.ask.hermes.about.this.page"></textarea>
             <div class="composer-resize" aria-hidden="true"><span></span></div>
             <div id="dropOverlay" class="drop-overlay" hidden data-i18n="ui.drop.files.to.attach">Drop files to attach</div>
-            <button id="attachMenuButton" class="attach-menu-button composer-plus" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Attach context" title="Attach context" data-i18n-title="ui.attach.context" data-i18n-aria-label="ui.attach.context">
+            <button id="attachMenuButton" class="attach-menu-button composer-plus" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Attach context" title="Attach files, images or a URL (drag and drop works too)" data-i18n-title="composer.tip.attach" data-i18n-aria-label="ui.attach.context">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="attachment"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
             </button>
-            <button id="commandMenuButton" class="composer-icon composer-slash" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="quickMoreMenu" aria-label="Open quick commands" title="Open quick commands" data-i18n-title="ui.open.quick.commands" data-i18n-aria-label="ui.open.quick.commands"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="slash"><path d="M16 4 8 20"/></svg></button>
-            <button id="modelMenuButton" class="model-menu-button composer-model-chip" type="button" aria-haspopup="dialog" aria-expanded="false">
+            <button id="commandMenuButton" class="composer-icon composer-slash" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="quickMoreMenu" aria-label="Open quick commands" title="Quick commands (type / in the message box)" data-i18n-title="composer.tip.commands" data-i18n-aria-label="ui.open.quick.commands"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="slash"><path d="M16 4 8 20"/></svg></button>
+            <button id="modelMenuButton" class="model-menu-button composer-model-chip" type="button" aria-haspopup="dialog" aria-expanded="false" title="Model and reasoning options" data-i18n-title="composer.tip.model">
               <span class="model-button-copy"><span id="currentModelName">Select model</span><strong id="currentModelEffort" class="sr-only">Med</strong></span>
               <span class="composer-model-caret" aria-hidden="true"></span>
             </button>
@@ -537,10 +537,10 @@
               <span class="context-track" aria-hidden="true"><span id="contextMeterFill"></span></span>
               <strong id="contextPercentLabel">—</strong>
             </button>
-            <button id="voiceButton" class="composer-icon composer-mic" type="button" aria-label="Start voice dictation" title="Start voice dictation" data-i18n-title="ui.start.voice.dictation" data-i18n-aria-label="ui.start.voice.dictation">
+            <button id="voiceButton" class="composer-icon composer-mic" type="button" aria-label="Start voice dictation" title="Dictate with your microphone" data-i18n-title="composer.tip.mic" data-i18n-aria-label="ui.start.voice.dictation">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="mic"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg>
             </button>
-            <button id="inlineSendButton" class="composer-icon composer-send" type="submit" aria-label="Send message" title="Send message" data-i18n-title="ui.send.message" data-i18n-aria-label="ui.send.message">
+            <button id="inlineSendButton" class="composer-icon composer-send" type="submit" aria-label="Send message" title="Send (Enter)" data-i18n-title="composer.tip.send" data-i18n-aria-label="ui.send.message">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="send"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
             </button>
             <button id="stopButton" class="composer-icon composer-stop" type="button" aria-label="Stop Hermes" title="Stop Hermes" hidden data-i18n-title="ui.stop.hermes" data-i18n-aria-label="ui.stop.hermes">■</button>

@@ -2933,6 +2933,7 @@ function startupScreenUi() {
   return startupScreenView;
 }
 
+let composerAutoFocused = false;
 function renderStartupReadiness() {
   const view = deriveStartupView(startupReadiness);
   // First-run setup takes over while the screen is still up, so its logo can
@@ -2951,6 +2952,13 @@ function renderStartupReadiness() {
     els.startupTestConnectionButton.hidden = view.phase === 'setup-needed';
   }
   document.body?.classList.toggle('startup-active', view.visible);
+  if (!view.visible && !composerAutoFocused && els.input) {
+    composerAutoFocused = true;
+    globalThis.setTimeout(() => {
+      const active = document.activeElement;
+      if (!active || active === document.body) els.input.focus({ preventScroll: true });
+    }, 0);
+  }
   positionStartupSettings(view.visible);
   startupScreenUi()?.render(view);
   els.composer?.classList.toggle('startup-blocked', view.visible);
@@ -5630,7 +5638,7 @@ function renderContextScopeTabList(query = '') {
     toggle.dataset.promptTabToggle = String(tab.id);
     toggle.setAttribute('aria-pressed', String(isIncluded));
     toggle.title = translateUiText(isIncluded ? 'Remove this tab from the prompt tab list' : 'Include this tab in the prompt tab list');
-    toggle.textContent = translateUiText(isIncluded ? 'IN' : 'OUT');
+    toggle.textContent = translateUiText(isIncluded ? 'In' : 'Out');
     if (isIncluded) toggle.classList.add('selected');
     row.appendChild(toggle);
     list.appendChild(row);
@@ -5692,7 +5700,7 @@ function renderContextScopePromptControls(tabs = currentContext.tabs || []) {
   });
   appendContextScopeMenuButton({
     action: 'prompt-tabs-triage',
-    label: translateUiText('AI Triage Tabs'),
+    label: translateUiText('AI triage tabs'),
     detail: 'sort',
     title: translateUiText('Use AI to scan, categorize, and cluster all open tabs by topic, detect duplicates, and recommend tabs to close.'),
     parent: actions,
@@ -12794,10 +12802,10 @@ function wireMenuKeyboard(menu, { items, search = '', trigger = null, enterPicks
 }
 
 function wireMenuKeyboards() {
-  wireMenuKeyboard(els.attachMenu, { items: 'button:not([hidden])', trigger: () => els.attachMenuButton });
-  wireMenuKeyboard(els.quickMoreMenu, { items: '.quick-more-item', trigger: () => els.commandMenuButton });
+  wireMenuKeyboard(els.attachMenu, { items: 'button:not([hidden])', trigger: () => els.input });
+  wireMenuKeyboard(els.quickMoreMenu, { items: '.quick-more-item', trigger: () => els.input });
   wireMenuKeyboard(document.getElementById('profileSwitchMenu'), { items: 'button', trigger: () => document.getElementById('activeProfileIndicator') });
-  wireMenuKeyboard(els.modelMenu, { items: '.model-option', search: '#modelSearchInput', trigger: () => els.modelMenuButton, enterPicksFirst: true });
+  wireMenuKeyboard(els.modelMenu, { items: '.model-option', search: '#modelSearchInput', trigger: () => els.input, enterPicksFirst: true });
   wireMenuKeyboard(els.sessionMenu, { items: '.session-option', search: '#sessionSearchInput', trigger: () => els.sessionMenuButton, enterPicksFirst: true });
   els.sessionMenu?.addEventListener('keydown', (event) => {
     const row = document.activeElement?.closest?.('.session-option-row');
@@ -29884,6 +29892,18 @@ async function testConnection() {
   }
 }
 
+function anyComposerPanelOpen() {
+  return [els.modelMenu, els.sessionMenu, els.attachMenu, els.skillMenu, els.quickMoreMenu, els.contextPopover, els.contextScopeMenu, els.contextPreview]
+    .some((panel) => panel && !panel.hidden);
+}
+
+// Menus hand focus back to the composer, so typing carries on where it stopped.
+function focusComposerSoon() {
+  globalThis.setTimeout(() => {
+    if (els.input && !els.input.disabled && els.settingsDialog?.hidden !== false) els.input.focus({ preventScroll: true });
+  }, 0);
+}
+
 function closeFloatingPanels() {
   closeSessionRowMenu();
   els.modelMenu.hidden = true;
@@ -30443,8 +30463,18 @@ function bindEvents() {
         showSettingsPane('');
         return;
       }
-      if (!els.settingsDialog.hidden) closeSettingsDialog();
+      if (!els.settingsDialog.hidden) {
+        closeSettingsDialog();
+        return;
+      }
+      const hadOpenPanel = anyComposerPanelOpen();
       closeFloatingPanels();
+      if (els.contextScopeMenu) els.contextScopeMenu.hidden = true;
+      if (els.contextPreview && !els.contextPreview.hidden) {
+        els.contextPreview.hidden = true;
+        els.contextChip?.setAttribute('aria-expanded', 'false');
+      }
+      if (hadOpenPanel) focusComposerSoon();
     }
   });
   document.addEventListener('click', (event) => {

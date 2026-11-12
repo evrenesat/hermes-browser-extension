@@ -584,9 +584,9 @@ html .settings-dialog .theme-grid {
 }
 html .settings-dialog .theme-card {
   aspect-ratio: auto;
-  grid-template-rows: 44px auto;
-  gap: 6px;
-  padding: 5px;
+  grid-template-rows: 32px auto;
+  gap: 4px;
+  padding: 4px;
   border: 1px solid var(--calm-border);
   border-radius: var(--calm-radius-card);
   background: var(--calm-surface);
@@ -1026,3 +1026,12 @@ html .settings-dialog .compatibility-toggle::after {
 html .settings-dialog .compatibility-panel[open] .compatibility-toggle::after { content: "\203A"; transform: rotate(90deg); border: 0; color: var(--calm-muted); }
 html .settings-dialog .compatibility-row .compatibility-meta { display: none; }
 html .settings-dialog .compatibility-row:is(:hover, :focus-within) .compatibility-meta { display: block; }
+html .settings-dialog .settings-toggle-card + .settings-control-group { margin-top: 16px; }
+
+/* Phase 3: bot-mode density rows and assist add-site row are flat. */
+html .settings-dialog form label.bot-mode-density-row { padding: 6px 0; border: 0; border-top: 1px solid var(--calm-border); background: none; }
+html .settings-dialog .bot-mode-density-row > span { font: 500 calc(13px * var(--hermes-text-zoom, 1))/1.3 var(--calm-font-ui); color: var(--calm-text); }
+html .settings-dialog .bot-mode-density-row select { border: 0; background: var(--calm-surface-2); color: var(--calm-text); font: 400 13px/1.4 var(--calm-font-ui); border-radius: var(--calm-radius-control); }
+html .settings-dialog details.bot-mode-cron-card { padding: 8px 0; border: 0; border-top: 1px solid var(--calm-border); border-radius: 0; background: none; }
+html .settings-dialog .inline-assist-site-new { display: flex; gap: 6px; padding: 0; border: 0; background: none; }
+html .settings-dialog .inline-assist-site-add-typed { min-height: var(--calm-input-h); padding: 0 12px; border: 0; border-radius: var(--calm-radius-control); background: var(--calm-accent); color: var(--calm-accent-fg); font: 500 13px/1 var(--calm-font-ui); text-transform: none; }

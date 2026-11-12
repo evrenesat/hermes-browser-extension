@@ -628,7 +628,7 @@
     "description": "Runtime interface message bot_mode.clone_hint"
   },
   "runtime_bot_mode_close": {
-    "message": "Close Bot Mode",
+    "message": "Close bot mode",
     "description": "Runtime interface message bot_mode.close"
   },
   "runtime_bot_mode_color_picker_label": {
@@ -656,7 +656,7 @@
     "description": "Runtime interface message bot_mode.cron_refresh"
   },
   "runtime_bot_mode_cron_title": {
-    "message": "Active Cron Jobs",
+    "message": "Active cron jobs",
     "description": "Runtime interface message bot_mode.cron_title"
   },
   "runtime_bot_mode_custom_image": {
@@ -676,7 +676,7 @@
     "description": "Runtime interface message bot_mode.density_compact"
   },
   "runtime_bot_mode_dialog_label": {
-    "message": "Bot Mode",
+    "message": "Bot mode",
     "description": "Runtime interface message bot_mode.dialog_label"
   },
   "runtime_bot_mode_earlier_messages": {
@@ -696,11 +696,11 @@
     "description": "Runtime interface message bot_mode.earlier_messages_note"
   },
   "runtime_bot_mode_edit_profile": {
-    "message": "Edit Profile",
+    "message": "Edit profile",
     "description": "Runtime interface message bot_mode.edit_profile"
   },
   "runtime_bot_mode_enable_label": {
-    "message": "Enable Bot Mode",
+    "message": "Enable bot mode",
     "description": "Runtime interface message bot_mode.enable_label"
   },
   "runtime_bot_mode_face_blobatar": {
@@ -800,11 +800,11 @@
     "description": "Runtime interface message bot_mode.group_sheet_meta"
   },
   "runtime_bot_mode_group_sheet_title": {
-    "message": "New Group Chat",
+    "message": "New group chat",
     "description": "Runtime interface message bot_mode.group_sheet_title"
   },
   "runtime_bot_mode_group_threads": {
-    "message": "Group Chat Threads",
+    "message": "Group chat threads",
     "description": "Runtime interface message bot_mode.group_threads"
   },
   "runtime_bot_mode_group_title_required": {
@@ -820,7 +820,7 @@
     "description": "Runtime interface message bot_mode.installed_skills_hint"
   },
   "runtime_bot_mode_leave_confirm": {
-    "message": "Return to Regular Sessions",
+    "message": "Return to regular sessions",
     "description": "Runtime interface message bot_mode.leave_confirm"
   },
   "runtime_bot_mode_leave_detail": {
@@ -832,7 +832,7 @@
     "description": "Runtime interface message bot_mode.leave_kicker"
   },
   "runtime_bot_mode_leave_title": {
-    "message": "Exit Bot Mode?",
+    "message": "Exit bot mode?",
     "description": "Runtime interface message bot_mode.leave_title"
   },
   "runtime_bot_mode_main_thread": {
@@ -868,7 +868,7 @@
     "description": "Runtime interface message bot_mode.model_switch_title"
   },
   "runtime_bot_mode_new_agent": {
-    "message": "New Bot",
+    "message": "New bot",
     "description": "Runtime interface message bot_mode.new_agent"
   },
   "runtime_bot_mode_new_group": {
@@ -880,11 +880,11 @@
     "description": "Runtime interface message bot_mode.off_hint_sidepanel"
   },
   "runtime_bot_mode_open_chat": {
-    "message": "Open Bot Chat",
+    "message": "Open bot chat",
     "description": "Runtime interface message bot_mode.open_chat"
   },
   "runtime_bot_mode_open_title": {
-    "message": "Open Bot Mode",
+    "message": "Open bot mode",
     "description": "Runtime interface message bot_mode.open_title"
   },
   "runtime_bot_mode_pet_apply": {
@@ -944,7 +944,7 @@
     "description": "Runtime interface message bot_mode.refresh_agents"
   },
   "runtime_bot_mode_return_to_sessions": {
-    "message": "Regular Sessions",
+    "message": "Regular sessions",
     "description": "Runtime interface message bot_mode.return_to_sessions"
   },
   "runtime_bot_mode_return_to_sessions_title": {
@@ -988,7 +988,7 @@
     "description": "Runtime interface message bot_mode.settings_copy_sidepanel"
   },
   "runtime_bot_mode_settings_title": {
-    "message": "Bots & Bot Mode",
+    "message": "Bots & bot mode",
     "description": "Runtime interface message bot_mode.settings_title"
   },
   "runtime_bot_mode_share_keys": {
@@ -1008,7 +1008,7 @@
     "description": "Runtime interface message bot_mode.sheet_create_offline"
   },
   "runtime_bot_mode_sheet_create_title": {
-    "message": "New Agent",
+    "message": "New agent",
     "description": "Runtime interface message bot_mode.sheet_create_title"
   },
   "runtime_bot_mode_sheet_edit_title": {
@@ -1104,7 +1104,7 @@
     "description": "Runtime interface message bot_mode.tab_general"
   },
   "runtime_bot_mode_tab_groups": {
-    "message": "Group Chats",
+    "message": "Group chats",
     "description": "Runtime interface message bot_mode.tab_groups"
   },
   "runtime_bot_mode_tab_mcp": {
@@ -1140,7 +1140,7 @@
     "description": "Runtime interface message bot_mode.threads_title"
   },
   "runtime_bot_mode_title": {
-    "message": "Bot Mode",
+    "message": "Bot mode",
     "description": "Runtime interface message bot_mode.title"
   },
   "runtime_bot_mode_toolsets": {
@@ -2262,6 +2262,26 @@
   "runtime_composer_restore_held_draft": {
     "message": "Restore draft",
     "description": "Runtime interface message composer.restore_held_draft"
+  },
+  "runtime_composer_tip_attach": {
+    "message": "Attach files, images or a URL (drag and drop works too)",
+    "description": "Runtime interface message composer.tip.attach"
+  },
+  "runtime_composer_tip_commands": {
+    "message": "Quick commands (type / in the message box)",
+    "description": "Runtime interface message composer.tip.commands"
+  },
+  "runtime_composer_tip_mic": {
+    "message": "Dictate with your microphone",
+    "description": "Runtime interface message composer.tip.mic"
+  },
+  "runtime_composer_tip_model": {
+    "message": "Model and reasoning options",
+    "description": "Runtime interface message composer.tip.model"
+  },
+  "runtime_composer_tip_send": {
+    "message": "Send (Enter)",
+    "description": "Runtime interface message composer.tip.send"
   },
   "runtime_connect_approve_or_paste": {
     "message": "Approve pairing when available, or paste",
@@ -3724,7 +3744,7 @@
     "description": "Runtime interface message projects.reason_code"
   },
   "runtime_projects_refresh": {
-    "message": "Refresh Projects",
+    "message": "Refresh projects",
     "description": "Runtime interface message projects.refresh"
   },
   "runtime_projects_retry": {
@@ -4028,7 +4048,7 @@
     "description": "Runtime interface message settings.categories.about.summary"
   },
   "runtime_settings_categories_about_title": {
-    "message": "About & Diagnostics",
+    "message": "About & diagnostics",
     "description": "Runtime interface message settings.categories.about.title"
   },
   "runtime_settings_categories_agents_summary": {
@@ -4036,7 +4056,7 @@
     "description": "Runtime interface message settings.categories.agents.summary"
   },
   "runtime_settings_categories_agents_title": {
-    "message": "Agents & Bot Mode",
+    "message": "Agents & bot mode",
     "description": "Runtime interface message settings.categories.agents.title"
   },
   "runtime_settings_categories_appearance_summary": {
@@ -4044,7 +4064,7 @@
     "description": "Runtime interface message settings.categories.appearance.summary"
   },
   "runtime_settings_categories_appearance_title": {
-    "message": "Appearance & Themes",
+    "message": "Appearance & themes",
     "description": "Runtime interface message settings.categories.appearance.title"
   },
   "runtime_settings_categories_assist_summary": {
@@ -4052,7 +4072,7 @@
     "description": "Runtime interface message settings.categories.assist.summary"
   },
   "runtime_settings_categories_assist_title": {
-    "message": "Assist & Actions",
+    "message": "Assist & actions",
     "description": "Runtime interface message settings.categories.assist.title"
   },
   "runtime_settings_categories_back": {
@@ -4092,7 +4112,7 @@
     "description": "Runtime interface message settings.categories.models.summary"
   },
   "runtime_settings_categories_models_title": {
-    "message": "Models & Runtime",
+    "message": "Models & runtime",
     "description": "Runtime interface message settings.categories.models.title"
   },
   "runtime_settings_categories_permissions_summary": {
@@ -4100,7 +4120,7 @@
     "description": "Runtime interface message settings.categories.permissions.summary"
   },
   "runtime_settings_categories_permissions_title": {
-    "message": "Permissions & Control",
+    "message": "Permissions & control",
     "description": "Runtime interface message settings.categories.permissions.title"
   },
   "runtime_settings_categories_sessions_summary": {
@@ -4108,7 +4128,7 @@
     "description": "Runtime interface message settings.categories.sessions.summary"
   },
   "runtime_settings_categories_sessions_title": {
-    "message": "Sessions & Context",
+    "message": "Sessions & context",
     "description": "Runtime interface message settings.categories.sessions.title"
   },
   "runtime_settings_categories_voice_summary": {
@@ -4116,7 +4136,7 @@
     "description": "Runtime interface message settings.categories.voice.summary"
   },
   "runtime_settings_categories_voice_title": {
-    "message": "Voice & Wake",
+    "message": "Voice & wake",
     "description": "Runtime interface message settings.categories.voice.title"
   },
   "runtime_settings_context_depth_full": {
@@ -4504,7 +4524,7 @@
     "description": "Runtime interface message ui.agent.ports.invalid"
   },
   "runtime_ui_agent_profile": {
-    "message": "Agent Profile",
+    "message": "Agent profile",
     "description": "Runtime interface message ui.agent.profile"
   },
   "runtime_ui_agent_scheme": {
@@ -4848,7 +4868,7 @@
     "description": "Runtime interface message ui.browser"
   },
   "runtime_ui_browser_behavior": {
-    "message": "Browser Behavior",
+    "message": "Browser behavior",
     "description": "Runtime interface message ui.browser.behavior"
   },
   "runtime_ui_browser_extension": {
@@ -5152,7 +5172,7 @@
     "description": "Runtime interface message ui.color"
   },
   "runtime_ui_color_mode": {
-    "message": "Color Mode",
+    "message": "Color mode",
     "description": "Runtime interface message ui.color.mode"
   },
   "runtime_ui_color_mode_588a2981": {
@@ -5272,7 +5292,7 @@
     "description": "Runtime interface message ui.composer.hermes_running"
   },
   "runtime_ui_composer_new_thread": {
-    "message": "New Thread",
+    "message": "New thread",
     "description": "Runtime interface message ui.composer.new_thread"
   },
   "runtime_ui_composer_send": {
@@ -5572,7 +5592,7 @@
     "description": "Runtime interface message ui.copy.blocked.select.preview.manually"
   },
   "runtime_ui_copy_diagnostics": {
-    "message": "Copy Diagnostics",
+    "message": "Copy diagnostics",
     "description": "Runtime interface message ui.copy.diagnostics"
   },
   "runtime_ui_copy_failed": {
@@ -6128,7 +6148,7 @@
     "description": "Runtime interface message ui.gateway"
   },
   "runtime_ui_gateway_connection": {
-    "message": "Gateway Connection",
+    "message": "Gateway connection",
     "description": "Runtime interface message ui.gateway.connection"
   },
   "runtime_ui_gateway_default": {

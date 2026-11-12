@@ -2263,6 +2263,26 @@
     "message": "Concept herstellen",
     "description": "Runtime interface message composer.restore_held_draft"
   },
+  "runtime_composer_tip_attach": {
+    "message": "Attach files, images or a URL (drag and drop works too)",
+    "description": "Runtime interface message composer.tip.attach"
+  },
+  "runtime_composer_tip_commands": {
+    "message": "Quick commands (type / in the message box)",
+    "description": "Runtime interface message composer.tip.commands"
+  },
+  "runtime_composer_tip_mic": {
+    "message": "Dictate with your microphone",
+    "description": "Runtime interface message composer.tip.mic"
+  },
+  "runtime_composer_tip_model": {
+    "message": "Model and reasoning options",
+    "description": "Runtime interface message composer.tip.model"
+  },
+  "runtime_composer_tip_send": {
+    "message": "Send (Enter)",
+    "description": "Runtime interface message composer.tip.send"
+  },
   "runtime_connect_approve_or_paste": {
     "message": "Keur het koppelen goed, indien beschikbaar, of plak",
     "description": "Runtime interface message connect.approve_or_paste"
