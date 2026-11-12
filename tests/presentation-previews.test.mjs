@@ -99,10 +99,10 @@ test('arrow keys move and select like a radio group', () => {
   assert.equal(press('a'), false, 'other keys pass through');
 });
 
-test('Appearance & Themes runs Language, Font family, Theme, Response style, Chat layout', () => {
+test('Appearance & Themes runs Theme, Response style, Chat layout, Text zoom, Font family, Language', () => {
   const html = read('extension/sidepanel.html');
   const pane = html.slice(html.indexOf('id="settingsPane-appearance"'), html.indexOf('id="settingsPane-connections"'));
-  const order = ['language-setting', 'font-profile-setting', 'class="theme-setting"', 'id="responseStyleChoices"', 'id="messageLayoutChoices"', 'id="rerunOnboardingButton"']
+  const order = ['class="theme-setting"', 'id="responseStyleChoices"', 'id="messageLayoutChoices"', 'text-zoom-setting', 'language-setting', 'font-profile-setting', 'id="rerunOnboardingButton"']
     .map((marker) => pane.indexOf(marker));
   assert.ok(order.every((index) => index > 0), `all present: ${order}`);
   assert.deepEqual([...order].sort((a, b) => a - b), order, 'in this order');

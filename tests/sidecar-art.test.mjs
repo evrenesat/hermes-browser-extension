@@ -52,6 +52,4 @@ test('both sidecar surfaces read the shared art variable and the panel picks one
   assert.match(js, /document\.documentElement\.style\.setProperty\('--sidecar-art', sidecarArtCssValue\(entry\)\);/);
   assert.match(js, /pickSidecarArt\(Math\.random, lastSidecarArt\)/);
   assert.match(js, /^applySidecarArt\(\);/m);
-  // The mini badge image stays a fixed asset, untouched by the rotation.
-  assert.match(readFileSync(new URL('../extension/sidepanel.html', import.meta.url), 'utf8'), /class="release-sidecar-badge" src="assets\/img\/hermes-badge\.webp"/);
 });

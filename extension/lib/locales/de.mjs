@@ -2284,4 +2284,11 @@ export default Object.freeze({
   "read_aloud.meta.gateway": "Quelle: Hermes-Dashboard (/api/audio/speak)",
   "read_aloud.meta.browser": "Quelle: dieser Browser (speechSynthesis)",
   "read_aloud.meta.none": "Quelle: keine",
+  "settings.advanced": "Advanced",
+  "settings.learn_more": "Learn more",
+  "settings.show_less": "Show less",
+  "settings.search_placeholder": "Search settings",
+  "settings.search_none": "No matching settings",
+  "settings.search_results": "Search results",
+  "settings.test_connection": "Test connection",
 });

@@ -675,55 +675,19 @@
     <section id="settingsDialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
       <form id="settingsForm">
         <header>
-          <div>
-            <h2 id="settingsTitle" data-i18n="ui.settings">Settings</h2>
-          </div>
+          <h2 id="settingsTitle" data-i18n="ui.settings">Settings</h2>
           <div class="settings-header-actions">
-            <button id="saveSettingsTopButton" class="settings-button" type="submit" title="Save settings" data-i18n-title="ui.save.settings" data-i18n="ui.save">Save</button>
-            <button id="testConnectionButton" class="settings-connection-test secondary" type="button" aria-busy="false" data-signal="none" title="Test the current Hermes connection" data-i18n-title="ui.test.the.current.hermes.connection">
-              <svg class="settings-connection-test-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="cellular-signal-3"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>
-              <span class="settings-connection-test-label sr-only" data-i18n="ui.test.984816fd">TEST</span>
-            </button>
             <button id="closeSettingsButton" class="settings-button settings-close-icon" type="button" aria-label="Close settings" title="Close settings" data-i18n-aria-label="ui.close.settings" data-i18n-title="ui.close.settings">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="close"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
           </div>
-          <p id="settingsSaveStatus" class="settings-save-status" role="status" aria-live="polite" data-i18n-runtime></p>
         </header>
 
-        <section class="settings-section release-settings browser-release-card" aria-labelledby="releaseTitle">
-          <div class="release-sidecar" aria-label="Hermes Browser local sidecar" data-i18n-aria-label="ui.hermes.browser.local.sidecar">
-            <div class="release-sidecar-copy">
-              <p class="eyebrow" data-i18n="ui.local.sidecar.chrome.panel">LOCAL SIDECAR / CHROME PANEL</p>
-              <svg class="release-sidecar-wordmark release-sidecar-wordmark-ltr" viewBox="0 0 2918.77 1206.98" role="img" aria-label="Hermes Browser" data-i18n-aria-label="ui.hermes.browser">
-                <use href="assets/img/hermes-browser-logo-left.svg#Layer_1"></use>
-              </svg>
-              <svg class="release-sidecar-wordmark release-sidecar-wordmark-rtl" viewBox="0 0 2918.77 1206.98" role="img" aria-label="Hermes Browser" data-i18n-aria-label="ui.hermes.browser">
-                <use href="assets/img/hermes-browser-logo-right.svg#Layer_1"></use>
-              </svg>
-              <p data-i18n="ui.ask.about.any.page.hermes.sees.the.active.tab.selected.text.pag.b2a32c39">Ask about any page. Hermes sees the active tab, selected text, page context, and open tabs.</p>
-            </div>
-            <img class="release-sidecar-badge" src="assets/img/hermes-badge.webp" alt="Hermes Agent badge" data-i18n-alt="ui.hermes.agent.badge" />
-          </div>
-          <div class="release-control">
-            <div class="release-row">
-              <div>
-                <h3 id="releaseTitle" data-i18n="ui.browser.updates">Extension updates</h3>
-                <p><span id="versionLabel" data-i18n-runtime data-i18n="ui.version.loading">version loading…</span> <span data-i18n="settings.public_alpha_load_unpacked">· public alpha / load unpacked</span></p>
-              </div>
-              <div class="release-actions">
-                <button id="checkUpdatesButton" class="secondary" type="button" data-i18n="ui.check">Check</button>
-                <button id="reviewUpdateButton" type="button" data-i18n="ui.update">Update</button>
-              </div>
-            </div>
-            <p id="updateStatus" class="hint">Updates are checked against the public GitHub repo.</p>
-            <div id="updateReloadPending" class="update-reload-pending" hidden>
-              <p id="updateReloadPendingText" class="update-reload-pending-text">A newer build is on disk. Reload to run it.</p>
-              <button id="reloadBuildButton" class="secondary" type="button">Reload now</button>
-            </div>
-          </div>
-        </section>
         <nav id="settingsCategoryHome" class="settings-category-home" aria-labelledby="settingsCategoryHomeTitle">
+          <div class="settings-search">
+            <input id="settingsSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="Search settings" aria-label="Search settings" data-i18n-placeholder="settings.search_placeholder" data-i18n-aria-label="settings.search_placeholder" />
+            <ul id="settingsSearchResults" class="settings-search-results" role="listbox" aria-label="Search results" data-i18n-aria-label="settings.search_results" hidden></ul>
+          </div>
           <div class="settings-section-head compact"><div><h4 id="settingsCategoryHomeTitle" data-i18n="settings.categories.home_title">Choose a category</h4><p data-i18n="settings.categories.home_copy">Everything the Hermes Browser Extension can do, grouped by what it is for.</p></div></div>
           <div class="settings-category-grid">
             <button type="button" class="settings-category-card" data-settings-category="appearance" aria-describedby="settingsCategorySummary-appearance">
@@ -772,7 +736,6 @@
               <span class="settings-category-edited" hidden data-i18n="settings.categories.edited">Edited</span>
             </button>
           </div>
-          <span class="nous-strip nous-strip-home" role="img" aria-label="Nous Research" data-i18n-invariant></span>
         </nav>
 
         <section id="settingsPane-appearance" class="settings-pane" data-settings-pane="appearance" data-settings-live aria-labelledby="settingsPaneTitle-appearance" hidden>
@@ -787,78 +750,6 @@
               <h3 id="appearanceTitle" data-i18n="ui.appearance">Appearance</h3>
               <p data-i18n="ui.mode.controls.brightness.theme.controls.the.accent.palette.and.0d9c3d47">Mode controls brightness. Theme controls the accent palette and chat surface styling.</p>
             </div>
-          </div>
-
-          <div class="appearance-control-stack text-zoom-setting">
-            <div>
-              <strong data-i18n="appearance.text_zoom">Text zoom</strong>
-              <span data-i18n="ui.adjust.extension.text.without.changing.browser.zoom">Adjust text across the extension without changing browser zoom.</span>
-            </div>
-            <div id="textZoomPresetGrid" class="text-zoom-preset-grid" role="radiogroup" aria-label="Text zoom" data-i18n-aria-label="appearance.text_zoom">
-              <button type="button" data-text-zoom-percent="90" role="radio" aria-checked="false">90%</button>
-              <button type="button" data-text-zoom-percent="100" role="radio" aria-checked="true">100%</button>
-              <button type="button" data-text-zoom-percent="110" role="radio" aria-checked="false">110%</button>
-              <button type="button" data-text-zoom-percent="125" role="radio" aria-checked="false">125%</button>
-              <button type="button" data-text-zoom-percent="150" role="radio" aria-checked="false">150%</button>
-              <button type="button" data-text-zoom-percent="175" role="radio" aria-checked="false">175%</button>
-            </div>
-            <div class="text-zoom-stepper">
-              <button id="textZoomDecreaseButton" type="button" aria-label="Decrease text zoom" data-i18n-aria-label="appearance.decrease_text_zoom">−</button>
-              <label class="text-zoom-input-wrap" for="textZoomInput">
-                <span class="sr-only" data-i18n="appearance.custom_percentage">Custom percentage</span>
-                <input id="textZoomInput" type="number" min="75" max="200" step="1" inputmode="numeric" value="100" aria-label="Custom percentage" data-i18n-aria-label="appearance.custom_percentage" />
-                <span aria-hidden="true">%</span>
-              </label>
-              <button id="textZoomIncreaseButton" type="button" aria-label="Increase text zoom" data-i18n-aria-label="appearance.increase_text_zoom">+</button>
-            </div>
-          </div>
-
-          <div class="appearance-control-stack language-setting">
-            <label for="languageSelect">
-              <strong data-i18n="settings.language.label">Language</strong>
-              <span data-i18n="settings.language.description">Choose the interface language.</span>
-            </label>
-            <select id="languageSelect" class="language-select" data-language-select data-i18n-aria-label="settings.language.label" aria-label="Language">
-              <option value="en">English</option>
-              <option value="zh-CN">简体中文</option>
-            </select>
-          </div>
-
-          <div class="appearance-control-stack font-profile-setting">
-            <label for="fontProfileSelect">
-              <strong data-i18n="appearance.font_family">Font family</strong>
-            </label>
-            <select id="fontProfileSelect" aria-label="Font family" data-i18n-aria-label="appearance.font_family">
-              <option value="signature" data-i18n="appearance.font_signature">Hermes signature</option>
-              <option value="collapse" data-i18n="appearance.font_collapse">Hermes Legacy</option>
-              <option value="system-sans" data-i18n="appearance.font_system_sans">System sans</option>
-              <option value="times-new-roman" data-i18n="appearance.font_times">Times New Roman</option>
-              <option value="georgia" data-i18n="appearance.font_georgia">Georgia</option>
-              <option value="palatino" data-i18n="appearance.font_palatino">Palatino</option>
-              <option value="garamond" data-i18n="appearance.font_garamond">Garamond</option>
-              <option value="cambria" data-i18n="appearance.font_cambria">Cambria</option>
-              <option value="calibri" data-i18n="appearance.font_calibri">Calibri</option>
-              <option value="trebuchet" data-i18n="appearance.font_trebuchet">Trebuchet MS</option>
-              <option value="high-legibility" data-i18n="appearance.font_high_legibility">High legibility</option>
-              <option value="montserrat" data-i18n="appearance.font_montserrat">Montserrat</option>
-              <option value="source-sans-3" data-i18n="appearance.font_source_sans">Source Sans 3</option>
-              <option value="ibm-plex-sans" data-i18n="appearance.font_ibm_plex">IBM Plex Sans</option>
-              <option value="outfit" data-i18n="appearance.font_outfit">Outfit</option>
-              <option value="space-grotesk" data-i18n="appearance.font_space_grotesk">Space Grotesk</option>
-              <option value="playfair-display" data-i18n="appearance.font_playfair">Playfair Display</option>
-              <option value="libre-baskerville" data-i18n="appearance.font_libre_baskerville">Libre Baskerville</option>
-              <option value="fraunces" data-i18n="appearance.font_fraunces">Fraunces</option>
-              <option value="cinzel" data-i18n="appearance.font_cinzel">Cinzel</option>
-              <option value="mono" data-i18n="appearance.font_monospace">Monospace</option>
-              <option value="custom-local" data-i18n="appearance.font_installed_local">Installed local font</option>
-            </select>
-            <label id="customFontFamilyField" class="custom-font-family-field" for="customFontFamilyInput" hidden>
-              <strong data-i18n="appearance.local_font_family_name">Local font family name</strong>
-              <span data-i18n="appearance.local_font_fallback">The browser uses a fallback when the local font family is unavailable.</span>
-              <input id="customFontFamilyInput" type="text" maxlength="80" autocomplete="off" placeholder="Atkinson Hyperlegible" data-i18n-invariant />
-            </label>
-            <p id="signatureFontFallbackNote" class="appearance-signature-font-fallback-note" data-i18n="appearance.font_fallback_note" hidden>Rules signature font did not load — showing the bundled fallback face.</p>
-            <p id="appearanceSaveStatus" class="appearance-save-status" role="status" aria-live="polite"></p>
           </div>
 
           <div class="theme-setting">
@@ -933,10 +824,84 @@
             <div id="messageLayoutChoices" class="presentation-choices" role="radiogroup" aria-label="Chat layout" data-i18n-aria-label="responses.layout.label"></div>
           </div>
 
+          <div class="appearance-control-stack text-zoom-setting">
+            <div>
+              <strong data-i18n="appearance.text_zoom">Text zoom</strong>
+              <span data-i18n="ui.adjust.extension.text.without.changing.browser.zoom">Adjust text across the extension without changing browser zoom.</span>
+            </div>
+            <div id="textZoomPresetGrid" class="text-zoom-preset-grid" role="radiogroup" aria-label="Text zoom" data-i18n-aria-label="appearance.text_zoom">
+              <button type="button" data-text-zoom-percent="90" role="radio" aria-checked="false">90%</button>
+              <button type="button" data-text-zoom-percent="100" role="radio" aria-checked="true">100%</button>
+              <button type="button" data-text-zoom-percent="110" role="radio" aria-checked="false">110%</button>
+              <button type="button" data-text-zoom-percent="125" role="radio" aria-checked="false">125%</button>
+              <button type="button" data-text-zoom-percent="150" role="radio" aria-checked="false">150%</button>
+              <button type="button" data-text-zoom-percent="175" role="radio" aria-checked="false">175%</button>
+            </div>
+            <div class="text-zoom-stepper">
+              <button id="textZoomDecreaseButton" type="button" aria-label="Decrease text zoom" data-i18n-aria-label="appearance.decrease_text_zoom">−</button>
+              <label class="text-zoom-input-wrap" for="textZoomInput">
+                <span class="sr-only" data-i18n="appearance.custom_percentage">Custom percentage</span>
+                <input id="textZoomInput" type="number" min="75" max="200" step="1" inputmode="numeric" value="100" aria-label="Custom percentage" data-i18n-aria-label="appearance.custom_percentage" />
+                <span aria-hidden="true">%</span>
+              </label>
+              <button id="textZoomIncreaseButton" type="button" aria-label="Increase text zoom" data-i18n-aria-label="appearance.increase_text_zoom">+</button>
+            </div>
+          </div>
+
+          <div class="appearance-control-stack language-setting">
+            <label for="languageSelect">
+              <strong data-i18n="settings.language.label">Language</strong>
+              <span data-i18n="settings.language.description">Choose the interface language.</span>
+            </label>
+            <select id="languageSelect" class="language-select" data-language-select data-i18n-aria-label="settings.language.label" aria-label="Language">
+              <option value="en">English</option>
+              <option value="zh-CN">简体中文</option>
+            </select>
+          </div>
+
+          <div class="appearance-control-stack font-profile-setting">
+            <label for="fontProfileSelect">
+              <strong data-i18n="appearance.font_family">Font family</strong>
+            </label>
+            <select id="fontProfileSelect" aria-label="Font family" data-i18n-aria-label="appearance.font_family">
+              <option value="signature" data-i18n="appearance.font_signature">Hermes signature</option>
+              <option value="collapse" data-i18n="appearance.font_collapse">Hermes Legacy</option>
+              <option value="system-sans" data-i18n="appearance.font_system_sans">System sans</option>
+              <option value="times-new-roman" data-i18n="appearance.font_times">Times New Roman</option>
+              <option value="georgia" data-i18n="appearance.font_georgia">Georgia</option>
+              <option value="palatino" data-i18n="appearance.font_palatino">Palatino</option>
+              <option value="garamond" data-i18n="appearance.font_garamond">Garamond</option>
+              <option value="cambria" data-i18n="appearance.font_cambria">Cambria</option>
+              <option value="calibri" data-i18n="appearance.font_calibri">Calibri</option>
+              <option value="trebuchet" data-i18n="appearance.font_trebuchet">Trebuchet MS</option>
+              <option value="high-legibility" data-i18n="appearance.font_high_legibility">High legibility</option>
+              <option value="montserrat" data-i18n="appearance.font_montserrat">Montserrat</option>
+              <option value="source-sans-3" data-i18n="appearance.font_source_sans">Source Sans 3</option>
+              <option value="ibm-plex-sans" data-i18n="appearance.font_ibm_plex">IBM Plex Sans</option>
+              <option value="outfit" data-i18n="appearance.font_outfit">Outfit</option>
+              <option value="space-grotesk" data-i18n="appearance.font_space_grotesk">Space Grotesk</option>
+              <option value="playfair-display" data-i18n="appearance.font_playfair">Playfair Display</option>
+              <option value="libre-baskerville" data-i18n="appearance.font_libre_baskerville">Libre Baskerville</option>
+              <option value="fraunces" data-i18n="appearance.font_fraunces">Fraunces</option>
+              <option value="cinzel" data-i18n="appearance.font_cinzel">Cinzel</option>
+              <option value="mono" data-i18n="appearance.font_monospace">Monospace</option>
+              <option value="custom-local" data-i18n="appearance.font_installed_local">Installed local font</option>
+            </select>
+            <label id="customFontFamilyField" class="custom-font-family-field" for="customFontFamilyInput" hidden>
+              <strong data-i18n="appearance.local_font_family_name">Local font family name</strong>
+              <span data-i18n="appearance.local_font_fallback">The browser uses a fallback when the local font family is unavailable.</span>
+              <input id="customFontFamilyInput" type="text" maxlength="80" autocomplete="off" placeholder="Atkinson Hyperlegible" data-i18n-invariant />
+            </label>
+            <p id="signatureFontFallbackNote" class="appearance-signature-font-fallback-note" data-i18n="appearance.font_fallback_note" hidden>Rules signature font did not load — showing the bundled fallback face.</p>
+            <p id="appearanceSaveStatus" class="appearance-save-status" role="status" aria-live="polite"></p>
+          </div>
+
+<details class="settings-advanced"><summary><span data-i18n="settings.advanced">Advanced</span></summary><div class="settings-advanced-body">
           <button id="rerunOnboardingButton" class="settings-setup-row" type="button">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="reload"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
             <span class="settings-setup-copy"><strong data-i18n="responses.setup_again">Run first-time setup again</strong><small data-i18n="responses.setup_again_description">Step through theme, response style and chat layout again.</small></span>
           </button>
+</div></details>
         </section>
         </section>
 
@@ -1011,13 +976,32 @@
           <input id="apiKeyInput" name="apiKey" type="password" autocomplete="off" placeholder="API key (blank = dashboard)" data-i18n-placeholder="ui.api.key.blank.dashboard" />
         </label>
 
+        <div class="settings-test-row">
+        <button id="testConnectionButton" class="settings-connection-test secondary" type="button" aria-busy="false" data-signal="none" title="Test the current Hermes connection" data-i18n-title="ui.test.the.current.hermes.connection">
+          <svg class="settings-connection-test-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="cellular-signal-3"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>
+          <span class="settings-connection-test-label" data-i18n="settings.test_connection">Test connection</span>
+        </button>
+        </div>
+
         <p class="hint connection-flow-note" data-i18n="ui.public.flow.connect.to.hermes.creates.a.scoped.browser.token.wh.9184ad4d">Public flow: Connect to Hermes creates a scoped browser token when the API server supports pairing. For remote hosts, set API_SERVER_CORS_ORIGINS to this extension origin and use a strong API_SERVER_KEY or scoped token.</p>
 
+<details class="settings-advanced"><summary><span data-i18n="settings.advanced">Advanced</span></summary><div class="settings-advanced-body">
         <label id="hermesWebAddressField">
           <span data-i18n="webapp.setting_label">Hermes Web address</span>
           <input id="hermesWebAddressInput" name="hermesWebAddress" type="url" autocomplete="off" spellcheck="false" placeholder="http://127.0.0.1:9120" data-i18n-invariant />
         </label>
         <p id="hermesWebAddressHint" class="hint" data-i18n="webapp.setting_hint">Leave this empty on a local connection to use http://127.0.0.1:9120 automatically. For a remote gateway, enter the address where it serves Hermes Web.</p>
+        <div class="connection-security" aria-labelledby="connectionSecurityTitle">
+          <div class="settings-section-head">
+            <div>
+              <h4 id="connectionSecurityTitle" data-i18n="ui.connection.security">Connection security</h4>
+              <p data-i18n="ui.tokens.are.stored.in.chrome.storage.local.and.never.displayed.after.save">Tokens are stored in chrome.storage.local and never displayed after save.</p>
+            </div>
+          </div>
+          <div id="connectionSecuritySummary" class="connection-security-summary"></div>
+          <button id="clearTokenButton" class="secondary" type="button" data-i18n="ui.clear.stored.token">Clear stored token</button>
+        </div>
+</div></details>
 
         <label class="settings-toggle-card" id="webappKeepSignedInField">
           <span class="settings-toggle-copy">
@@ -1118,16 +1102,6 @@
           </details>
         </section>
 
-        <div class="connection-security" aria-labelledby="connectionSecurityTitle">
-          <div class="settings-section-head">
-            <div>
-              <h4 id="connectionSecurityTitle" data-i18n="ui.connection.security">Connection security</h4>
-              <p data-i18n="ui.tokens.are.stored.in.chrome.storage.local.and.never.displayed.after.save">Tokens are stored in chrome.storage.local and never displayed after save.</p>
-            </div>
-          </div>
-          <div id="connectionSecuritySummary" class="connection-security-summary"></div>
-          <button id="clearTokenButton" class="secondary" type="button" data-i18n="ui.clear.stored.token">Clear stored token</button>
-        </div>
         </section>
 <section id="settingsPane-agents" class="settings-pane" data-settings-pane="agents" data-settings-live aria-labelledby="settingsPaneTitle-agents" hidden>
           <div class="settings-pane-bar">
@@ -1211,6 +1185,7 @@
               </div>
             </div>
           </section>
+<details class="settings-advanced"><summary><span data-i18n="settings.advanced">Advanced</span></summary><div class="settings-advanced-body">
           <section class="settings-section models-catalog-settings" aria-labelledby="modelsCatalogTitle">
             <div class="settings-section-head"><div><h3 id="modelsCatalogTitle" data-i18n="settings.models.catalog_title">Model catalog</h3><p id="settingsModelCatalogCount" data-i18n-runtime>&mdash;</p></div></div>
             <button id="settingsRefreshModelsButton" type="button" class="secondary models-refresh-row"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="reload"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg><span data-i18n="settings.models.refresh">Refresh models</span></button>
@@ -1223,21 +1198,19 @@
           </section>
         </section>
 
+</div></details>
         <section id="settingsPane-sessions" class="settings-pane" data-settings-pane="sessions" aria-labelledby="settingsPaneTitle-sessions" hidden>
           <div class="settings-pane-bar">
             <button type="button" class="settings-pane-back" data-settings-back aria-label="Back to categories" title="Back to categories" data-i18n-aria-label="settings.categories.back_to" data-i18n-title="settings.categories.back_to"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="arrow-left"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
             <div class="settings-pane-heading"><span class="settings-pane-crumb" aria-hidden="true" data-i18n="ui.settings">Settings</span><h3 id="settingsPaneTitle-sessions" class="settings-pane-title" tabindex="-1" data-i18n="settings.categories.sessions.title">Sessions &amp; Context</h3></div>
             <span class="settings-pane-flags"><span class="settings-pane-edited" hidden data-i18n="settings.categories.edited_hint">Unsaved edits</span><span class="settings-pane-saved" role="status" aria-live="polite" hidden></span></span>
           </div>
-        <label>
-          <span data-i18n="ui.session.id">Session ID</span>
-          <input id="sessionIdInput" name="sessionId" type="text" placeholder="hermes-browser-extension" data-i18n-invariant />
-        </label>
 
         <label>
           <span data-i18n="ui.session.title">Session title</span>
           <input id="sessionTitleInput" name="sessionTitle" type="text" placeholder="Hermes Browser Extension" data-i18n-placeholder="manifest.extension_name" />
         </label>
+
 
         <section class="settings-subsection browser-behavior-settings" aria-labelledby="browserBehaviorTitle">
           <div class="settings-section-head compact">
@@ -1375,6 +1348,12 @@
           </details>
         </section>
 
+                <details class="settings-advanced"><summary><span data-i18n="settings.advanced">Advanced</span></summary><div class="settings-advanced-body">
+        <label>
+          <span data-i18n="ui.session.id">Session ID</span>
+          <input id="sessionIdInput" name="sessionId" type="text" placeholder="hermes-browser-extension" data-i18n-invariant />
+        </label>
+        </div></details>
         </section>
 
         <section id="settingsPane-permissions" class="settings-pane" data-settings-pane="permissions" aria-labelledby="settingsPaneTitle-permissions" hidden>
@@ -1470,6 +1449,7 @@
             <input id="inlineAssistEnabled" class="settings-switch-input" type="checkbox" />
             <span class="settings-switch" aria-hidden="true"></span>
           </label>
+<details class="settings-advanced"><summary><span data-i18n="settings.advanced">Advanced</span></summary><div class="settings-advanced-body">
           <fieldset id="inlineAssistIconOptions" class="inline-assist-icon-options settings-choice-group">
             <legend data-i18n="ui.button.icon">Button icon</legend>
             <div class="settings-choice-grid assist-icon-grid">
@@ -1502,6 +1482,7 @@
               </label>
             </div>
           </fieldset>
+</div></details>
           <fieldset id="inlineAssistOpenModeOptions" class="inline-assist-open-options settings-choice-group">
             <legend data-i18n="ui.when.you.click.it">When you click it</legend>
             <div class="settings-choice-grid assist-open-grid">
@@ -1661,6 +1642,25 @@
             <div class="settings-pane-heading"><span class="settings-pane-crumb" aria-hidden="true" data-i18n="ui.settings">Settings</span><h3 id="settingsPaneTitle-about" class="settings-pane-title" tabindex="-1" data-i18n="settings.categories.about.title">About &amp; Diagnostics</h3></div>
             <span class="settings-pane-flags"><span class="settings-pane-edited" hidden data-i18n="settings.categories.edited_hint">Unsaved edits</span><span class="settings-pane-saved" role="status" aria-live="polite" hidden></span></span>
           </div>
+        <section class="settings-section release-settings" aria-labelledby="releaseTitle">
+          <div class="release-control">
+            <div class="release-row">
+              <div>
+                <h3 id="releaseTitle" data-i18n="ui.browser.updates">Extension updates</h3>
+                <p><span id="versionLabel" data-i18n-runtime data-i18n="ui.version.loading">version loading…</span> <span data-i18n="settings.public_alpha_load_unpacked">· public alpha / load unpacked</span></p>
+              </div>
+              <div class="release-actions">
+                <button id="checkUpdatesButton" class="secondary" type="button" data-i18n="ui.check">Check</button>
+                <button id="reviewUpdateButton" type="button" data-i18n="ui.update">Update</button>
+              </div>
+            </div>
+            <p id="updateStatus" class="hint">Updates are checked against the public GitHub repo.</p>
+            <div id="updateReloadPending" class="update-reload-pending" hidden>
+              <p id="updateReloadPendingText" class="update-reload-pending-text">A newer build is on disk. Reload to run it.</p>
+              <button id="reloadBuildButton" class="secondary" type="button">Reload now</button>
+            </div>
+          </div>
+        </section>
         <details id="compatibilityPanel" class="compatibility-panel" aria-labelledby="compatibilityTitle">
           <summary class="compatibility-summary" aria-controls="compatibilityList">
             <span class="compatibility-summary-copy">
@@ -1693,8 +1693,12 @@
           <button id="copyDiagnosticsButton" class="secondary" type="button" data-i18n="ui.copy.diagnostics">Copy Diagnostics</button>
           <p id="diagnosticsCopyStatus" class="hint">Use this when filing GitHub issues or support reports.</p>
         </div>
-        <span class="nous-strip nous-strip-pane" role="img" aria-label="Nous Research" data-i18n-invariant></span>
         </section>
+
+        <footer class="settings-footer">
+          <p id="settingsSaveStatus" class="settings-save-status" role="status" aria-live="polite" data-i18n-runtime></p>
+          <button id="saveSettingsTopButton" class="settings-button primary" type="submit" title="Save settings" data-i18n-title="ui.save.settings" data-i18n="ui.save" disabled>Save</button>
+        </footer>
 
         <button id="settingsBackToTop" class="settings-back-to-top" type="button" hidden aria-label="Back to top" data-i18n-aria-label="settings.back_to_top"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="arrow-up"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg><span data-i18n="settings.back_to_top">Back to top</span></button>
       </form>

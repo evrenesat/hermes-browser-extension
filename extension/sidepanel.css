@@ -7396,101 +7396,6 @@ html[data-hermes-theme="nous"][data-hermes-mode="light"] .update-dialog-mark {
   background: var(--hermes-primary-bg, var(--hermes-ink));
   color: var(--hermes-primary-fg, var(--hermes-paper));
 }
-.appearance-control-stack {
-  display: grid;
-  gap: 9px;
-  padding: 10px;
-  border: 1px solid var(--hermes-line);
-  background: rgba(var(--hermes-ink-rgb),0.035);
-}
-.appearance-control-stack strong { display: block; color: var(--hermes-ink); font-size: calc(12px * var(--hermes-text-zoom, 1)); }
-.appearance-control-stack span { display: block; margin-top: 3px; color: var(--hermes-muted); font-size: calc(11px * var(--hermes-text-zoom, 1)); line-height: 1.35; }
-#textZoomPresetGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 5px;
-  width: 100%;
-}
-#textZoomPresetGrid [data-text-zoom-percent] {
-  min-width: 0;
-  min-height: 36px;
-  padding: 7px 4px;
-  border: 1px solid var(--hermes-line);
-  background: transparent;
-  color: var(--hermes-muted);
-  overflow: hidden;
-  white-space: nowrap;
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  letter-spacing: normal;
-}
-#textZoomPresetGrid [data-text-zoom-percent]:hover,
-#textZoomPresetGrid [data-text-zoom-percent]:focus-visible,
-#textZoomPresetGrid [data-text-zoom-percent].selected {
-  border-color: var(--hermes-primary-fg, var(--hermes-paper));
-  background: var(--hermes-primary-bg, var(--hermes-ink));
-  color: var(--hermes-primary-fg, var(--hermes-paper));
-}
-.text-zoom-stepper {
-  display: grid;
-  grid-template-columns: 38px minmax(0, 1fr) 38px;
-  min-height: 38px;
-  gap: 0;
-  overflow: hidden;
-  border: 1px solid var(--hermes-line);
-  background: var(--hermes-input-bg);
-}
-#textZoomDecreaseButton,
-#textZoomIncreaseButton {
-  width: 38px;
-  min-width: 38px;
-  height: 38px;
-  min-height: 38px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--hermes-ink);
-  font-size: calc(17px * var(--hermes-text-zoom, 1));
-  line-height: 1;
-}
-#textZoomDecreaseButton { border-right: 1px solid var(--hermes-line); }
-#textZoomIncreaseButton { border-left: 1px solid var(--hermes-line); }
-#textZoomDecreaseButton:hover, #textZoomIncreaseButton:hover, #textZoomDecreaseButton:focus-visible, #textZoomIncreaseButton:focus-visible { background: var(--hermes-primary-bg, var(--hermes-ink)); color: var(--hermes-primary-fg, var(--hermes-paper)); }
-.text-zoom-input-wrap { position: relative; display: block; min-width: 0; height: 38px; }
-.text-zoom-input-wrap #textZoomInput {
-  width: 100%;
-  height: 38px;
-  min-height: 38px;
-  margin: 0;
-  padding: 0 36px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--hermes-ink);
-  text-align: center;
-  line-height: 38px;
-  font: 700 calc(12px * var(--hermes-text-zoom, 1)) var(--hermes-font-ui);
-  appearance: textfield;
-  -moz-appearance: textfield;
-}
-#textZoomInput::-webkit-inner-spin-button,
-#textZoomInput::-webkit-outer-spin-button {
-  margin: 0;
-  appearance: none;
-  -webkit-appearance: none;
-}
-.text-zoom-input-wrap > span:last-child {
-  position: absolute;
-  inset: 0 0 0 auto;
-  display: grid;
-  width: 32px;
-  place-items: center;
-  margin: 0;
-  border-left: 1px solid var(--hermes-line);
-  color: var(--hermes-muted);
-  line-height: 1;
-  pointer-events: none;
-}
 
 .context-menu-actions-disclosure {
   border: 1px solid var(--hermes-line);
@@ -10591,19 +10496,9 @@ html[dir="rtl"] .settings-pane-back svg { transform: scaleX(-1); }
 /* Category grid: two even columns, the odd last card spans the full bottom row.
    Wide surfaces use three columns, which divides nine evenly. */
 .settings-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.settings-category-grid > .settings-category-card:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
-  min-height: 0;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  column-gap: 12px;
-}
 @media (min-width: 640px) {
   .settings-category-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .settings-category-grid > .settings-category-card:last-child:nth-child(odd) {
-    grid-column: auto; min-height: 112px; grid-template-columns: none; align-items: start;
   }
-}
 @media (max-width: 299px) {
   .settings-category-grid { grid-template-columns: minmax(0, 1fr); }
 }
@@ -10611,11 +10506,9 @@ html[dir="rtl"] .settings-pane-back svg { transform: scaleX(-1); }
 /* Category grid: nine cards never leave an orphan. Two columns with the last
    card spanning the full row; three even columns once there is room. */
 .settings-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.settings-category-grid > .settings-category-card:last-child:nth-child(odd) { grid-column: 1 / -1; min-height: 0; }
 @media (min-width: 600px) {
   .settings-category-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .settings-category-grid > .settings-category-card:last-child:nth-child(odd) { grid-column: auto; min-height: 112px; }
-}
+  }
 @media (max-width: 300px) {
   .settings-category-grid { grid-template-columns: minmax(0, 1fr); }
 }

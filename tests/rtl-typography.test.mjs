@@ -34,17 +34,7 @@ test('the right-aligned wordmark is the same artwork with only the shorter line 
 
 test('the banner carries both wordmarks and shows the right one for the direction', () => {
   const { document } = parseHTML(html);
-  for (const [scope, cls] of [['.release-sidecar', 'release-sidecar-wordmark']]) {
-    const marks = [...document.querySelector(scope).querySelectorAll(`svg.${cls}`)];
-    assert.equal(marks.length, 2);
-    assert.equal(marks[0].querySelector('use').getAttribute('href'), 'assets/img/hermes-browser-logo-left.svg#Layer_1');
-    assert.equal(marks[1].querySelector('use').getAttribute('href'), 'assets/img/hermes-browser-logo-right.svg#Layer_1');
-    for (const mark of marks) {
-      assert.equal(mark.getAttribute('role'), 'img');
-      assert.equal(mark.getAttribute('aria-label'), 'Hermes Browser');
-      assert.equal(mark.getAttribute('data-i18n-aria-label'), 'ui.hermes.browser');
-    }
-  }
+  assert.equal(document.querySelector('.release-sidecar'), null, 'Settings no longer shows the wordmark hero');
   // Scoped so it outranks the later `.release-sidecar-wordmark { display: block; }`,
   // which otherwise showed both logos in Settings.
   assert.match(css, /\.hero-card \.hero-wordmark-rtl,\s*\.release-sidecar \.release-sidecar-wordmark-rtl \{ display: none; \}/);
