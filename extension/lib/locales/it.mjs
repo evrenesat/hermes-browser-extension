@@ -269,6 +269,8 @@ export default Object.freeze({
   "ui.queue.comments": "Queue comments",
   "ui.save.comment": "Save comment",
   "ui.send.comments": "Send comments",
+  "ui.explain.selection": "Explain selection",
+  "ui.key.points": "Key points",
   "ui.select.area": "Area",
   "ui.select.element": "Element",
   "ui.subagents": "SUBAGENTI",

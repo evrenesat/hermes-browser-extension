@@ -18,6 +18,14 @@ export async function writeClipboardText(text, clipboard = globalThis.navigator?
   return true;
 }
 
+function codeLanguage(pre) {
+  const code = pre?.querySelector?.('code');
+  const declared = String(code?.dataset?.lang || code?.getAttribute?.('data-lang') || '').trim();
+  if (declared) return declared;
+  const match = /(?:^|\s)(?:language|lang)-([\w+#.-]+)/.exec(`${code?.className || ''} ${pre?.className || ''}`);
+  return match ? match[1] : '';
+}
+
 function setCopyIcon(button, markup) {
   button.innerHTML = markup;
 }
@@ -38,6 +46,8 @@ function wrapPreWithCopyControl(pre, {
 } = {}) {
   const wrap = doc.createElement('div');
   wrap.className = 'md-code';
+  const lang = codeLanguage(pre);
+  if (lang) wrap.setAttribute('data-lang', lang);
   const button = doc.createElement('button');
   button.type = 'button';
   button.className = 'md-code-copy';

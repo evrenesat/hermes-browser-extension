@@ -1438,6 +1438,8 @@ export default Object.freeze({
   "ui.save": "保存",
   "ui.save.comment": "Save comment",
   "ui.send.comments": "Send comments",
+  "ui.explain.selection": "Explain selection",
+  "ui.key.points": "Key points",
   "ui.save.settings": "保存设置",
   "ui.saved": "已保存",
   "ui.saved.when.you.send.the.first.message": "发送第一条消息后保存。",
