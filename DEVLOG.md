@@ -27,3 +27,13 @@
 - Connect step has an inline gateway address field with validation (`gatewayAddressError`); token/mode stay in Manual setup (Settings > Connections).
 - Startup/error screen is one compact card with a status icon, heading, detail and the fixing action (Retry / Connect to Hermes / settings); no CRT, dither or artwork.
 - Dialogs, toast, Hermes control dialog, new-group/bot-mode panels, voice dictation, microphone permission and the Hermes Web hand-off page are compact calm cards. Deleted the dither-hover module and its tests.
+
+### Phase 3: polish and coherence
+
+- Page context line: favicon + truncated tab title (or "This page can't be read"), a small Page/Selection pill, and a "This tab only" / "Follow active tab" scope button; the preview opens as "What Hermes will see with your next message".
+- New chats show "New chat" (display only; stored default title unchanged). Thinking is a quiet pulsing "Thinking…"; kaomoji faces are the opt-in setting `classicThinkingFaces` (Settings > Sessions & context).
+- Jump-to-latest moved to the right edge plus bottom thread padding; toast sits above the dock; three-button dialogs stack; gateway error card shows one summary line, a Details disclosure, "Connection settings" and "Retry"; startup progress lines are plain language.
+- One 32x18 pill switch everywhere (`.toggle-switch`, `.settings-switch`); Settings effort is compact chips; Hermes Control light is muted when off and green when on; mic permission page follows the colour mode; tab scope menu restyled flat; diagnostics Source/Checked lines show on hover.
+- Sentence case and "…" across English copy (caps kickers, Title Case labels, "Refresh", "Edit models…"). New English-only fallbacks were copied into the other locale packs.
+- Esc closes menus, scope menu, preview, settings and returns focus to the composer, which is focused when the panel is ready. Tooltips on attach, commands, model, mic, send.
+- Harness: `temp/harness/p3.mjs` (running state, keyboard checks, light/dark mic and voice pages), fake gateway `slowChat` flag. Shots: `temp/shots/p3f` (full), `p3e`, `p3s`.
