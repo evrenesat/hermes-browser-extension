@@ -463,7 +463,7 @@ export default Object.freeze({
   "diagnostic.runtime_exception_detail": "Hermes API server is reachable, but upstream Hermes Agent raised a runtime exception. This often points at an optional runtime/tool issue such as computer_use/cua-driver, not Browser auth, pairing, CORS, or packaging.",
   "diagnostic.runtime_exception_title": "Hermes runtime exception",
   "diagnostic.runtime_exception_user": "Hermes gateway traceback detected inside upstream Hermes Agent. The extension can stay connected; check Hermes logs and run `hermes computer-use doctor` if computer_use/cua-driver appears in the traceback.",
-  "custom_theme.active_unavailable": "Active theme is unavailable. Using Nous.",
+  "custom_theme.active_unavailable": "Active theme is unavailable. Using Calm.",
   "custom_theme.choose_theme_file": "Choose theme file",
   "custom_theme.confirm_delete": "Confirm delete",
   "custom_theme.confirm_reset": "Confirm reset",

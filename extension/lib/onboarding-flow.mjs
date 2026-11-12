@@ -23,13 +23,13 @@ export function onboardingSteps({ includeConnect = true } = {}) {
 
 // Unmodified pixelarticons glyphs (tests/pixel-icons.test.mjs checks them).
 export const ONBOARDING_ICONS = Object.freeze({
-  light: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" data-icon="sun"><path d="M13 22h-2v-3h2v3Zm-6-3H5v-2h2v2Zm12 0h-2v-2h2v2Zm-4-2H9v-2h6v2Zm-6-2H7V9h2v6Zm8 0h-2V9h2v6ZM5 13H2v-2h3v2Zm17 0h-3v-2h3v2Zm-7-4H9V7h6v2ZM7 7H5V5h2v2Zm12 0h-2V5h2v2Zm-6-2h-2V2h2v3Z"/></svg>',
-  dark: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" data-icon="moon"><path d="M18 22H8v-2h10v2ZM8 20H6v-2h2v2Zm12 0h-2v-2h2v2ZM6 18H4v-2h2v2Zm16 0h-2v-4h-2v-2h2v-2h2v8ZM4 16H2V6h2v10Zm14 0h-6v-2h6v2Zm-6-2h-2v-2h2v2Zm-2-2H8V6h2v6ZM6 6H4V4h2v2Zm8-2h-2v2h-2V4H6V2h8v2Z"/></svg>',
-  system: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" data-icon="monitor"><path d="M4 2h16v2H4zm0 14h16v2H4zM2 4h2v12H2zm18 0h2v12h-2zm-9 14h2v2h-2zm-3 2h8v2H8z"/></svg>',
-  connect: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" data-icon="plug"><path d="M16 18h-3v4h-2v-4H8v-2h8v2Zm-8-2H6v-2h2v2Zm10 0h-2v-2h2v2Zm-8-9h4V2h2v5h5v2h-1v5h-2V9H6v5H4V9H3V7h5V2h2v5Z"/></svg>',
-  back: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" data-icon="arrow-left"><path d="M20 11v2H4v-2zM8 13v2H6v-2zm2 2v2H8v-2zm2 2v2h-2v-2zm-4-6V9H6v2z"/><path d="M10 15V7H8v8zm2 2V5h-2v12z"/></svg>',
-  next: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" data-icon="arrow-right"><path d="M4 11v2h16v-2zm12 2v2h2v-2zm-2 2v2h2v-2zm-2 2v2h2v-2zm4-6V9h2v2z"/><path d="M14 15V7h2v8zm-2 2V5h2v12z"/></svg>',
-  connected: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" data-icon="check"><path d="M10 18H8v-2h2v2Zm-2-2H6v-2h2v2Zm4-2v2h-2v-2h2Zm-6 0H4v-2h2v2Zm8 0h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2V8h2v2Zm2-2h-2V6h2v2Z"/></svg>',
+  light: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>',
+  dark: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="moon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',
+  system: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="monitor"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>',
+  connect: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="plug"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg>',
+  back: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="arrow-left"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>',
+  next: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>',
+  connected: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="check"><path d="M20 6 9 17l-5-5"/></svg>',
 });
 
 export const ONBOARDING_COLOR_MODES = Object.freeze([
@@ -277,7 +277,7 @@ export function createOnboardingFlow({
     }
     if (step === 'font') {
       const cards = fonts.map((font) => {
-        const selected = font.value === (state.fontProfile || 'signature');
+        const selected = font.value === (state.fontProfile || 'system-sans');
         const family = fontFamilyPreview(font.value);
         return `<button class="onboarding-font-card${selected ? ' selected' : ''}" type="button" role="radio" aria-checked="${selected}" tabindex="${selected ? 0 : -1}" data-onboarding-font="${escapeHtml(font.value)}" data-radio-key="font:${escapeHtml(font.value)}" style="${escapeHtml(`--onboarding-font:${family}`)}"><span class="onboarding-font-sample" aria-hidden="true">Aa</span><span class="onboarding-font-name">${escapeHtml(t(font.label))}</span><span class="presentation-card-check" aria-hidden="true"></span></button>`;
       }).join('');

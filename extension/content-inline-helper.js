@@ -411,10 +411,10 @@
   let assistSettings = {
     inlineAssistEnabled: true,
     inlineAssistDefaultRoute: policy.routePreferences?.ASK || 'ask',
-    appearanceTheme: appearance.defaultTheme || 'nous',
-    colorMode: appearance.defaultColorMode || 'dark',
+    appearanceTheme: appearance.defaultTheme || 'calm',
+    colorMode: appearance.defaultColorMode || 'system',
     inlineAssistIcon: 'wing',
-    fontProfile: 'signature',
+    fontProfile: 'system-sans',
     customFontFamily: '',
   };
   let requestedFontFamilies = '';
@@ -493,7 +493,7 @@
   }
 
   function applyAssistFontStacks() {
-    const profile = appearancePreferences?.normalizeFontProfile?.(assistSettings.fontProfile, assistSettings.customFontFamily) || 'signature';
+    const profile = appearancePreferences?.normalizeFontProfile?.(assistSettings.fontProfile, assistSettings.customFontFamily) || 'system-sans';
     const profileStack = appearancePreferences?.fontFamilyPreview?.(profile, assistSettings.customFontFamily) || '';
     const localFamily = profile === 'custom-local' ? appearancePreferences?.sanitizeLocalFontFamily?.(assistSettings.customFontFamily) || '' : '';
     const stacks = look?.inlineAssistFontStacks?.(profile, profileStack, fontName, { localFamily });

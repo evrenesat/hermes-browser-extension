@@ -9668,8 +9668,8 @@ async function fallbackDeletedCustomThemeSelections(id, { allCustom = false } = 
     if (!panelFallback && !webFallback) return freshSettings;
     return {
       ...freshSettings,
-      ...(panelFallback ? { appearanceTheme: 'nous' } : {}),
-      ...(webFallback ? { webAppearanceTheme: 'nous' } : {}),
+      ...(panelFallback ? { appearanceTheme: 'calm' } : {}),
+      ...(webFallback ? { webAppearanceTheme: 'calm' } : {}),
     };
   });
 }
@@ -9689,7 +9689,7 @@ async function handleCustomThemeDelete(id) {
     const result = await deleteCustomTheme(browserApi.storage.local, id);
     if (!result.ok) throw new Error(result.error?.message || 'Could not delete custom theme');
     customThemeStoreState = { ok: true, status: result.store.themes.length ? 'ready' : 'empty', themes: result.store.themes };
-    if (settings.appearanceTheme === id) settings = { ...settings, ...savedSettings, appearanceTheme: 'nous' };
+    if (settings.appearanceTheme === id) settings = { ...settings, ...savedSettings, appearanceTheme: 'calm' };
     customThemeImportStatus = customThemeText('custom_theme.deleted', 'Theme deleted.');
     renderAppearanceControls();
   } catch (error) {
@@ -9766,8 +9766,8 @@ async function handleCustomThemeStoreChange() {
   const hydrated = await readBrowserSettingsFromStorage();
   const freshAppearanceTheme = hydrated?.appearanceTheme ?? previousTheme;
   const nextTheme = normalizedPanelThemeId(freshAppearanceTheme);
-  if (String(previousTheme || '').startsWith('custom:') && nextTheme === 'nous' && previousTheme !== 'nous') {
-    appearanceSaveStatus = customThemeText('custom_theme.active_unavailable', 'Active theme is unavailable. Using Nous.');
+  if (String(previousTheme || '').startsWith('custom:') && nextTheme === 'calm' && previousTheme !== 'calm') {
+    appearanceSaveStatus = customThemeText('custom_theme.active_unavailable', 'Active theme is unavailable. Using Calm.');
   }
   settings = { ...settings, appearanceTheme: nextTheme };
   renderAppearanceControls();
@@ -9782,7 +9782,7 @@ function resolvedColorMode(value = settings.colorMode) {
 function panelAppearancePreferences() {
   return {
     textZoomPercent: normalizeTextZoomPercent(settings.textZoomPercent),
-    fontProfile: settings.fontProfile || 'signature',
+    fontProfile: settings.fontProfile || 'system-sans',
     customFontFamily: sanitizeLocalFontFamily(settings.customFontFamily),
   };
 }
@@ -9949,7 +9949,7 @@ async function setAppearanceOption(key, value, { persist = true } = {}) {
   if (key === 'colorMode') settings = { ...settings, colorMode: normalizeColorMode(value) };
   if (key === 'appearanceTheme') settings = { ...settings, appearanceTheme: normalizedPanelThemeId(value) };
   if (key === 'textZoomPercent') settings = { ...settings, textZoomPercent: normalizeTextZoomPercent(value) };
-  if (key === 'fontProfile') settings = { ...settings, fontProfile: String(value || 'signature') };
+  if (key === 'fontProfile') settings = { ...settings, fontProfile: String(value || 'system-sans') };
   if (key === 'customFontFamily') settings = { ...settings, customFontFamily: sanitizeLocalFontFamily(value) };
 
   if (settings.fontProfile === 'custom-local' && !sanitizeLocalFontFamily(settings.customFontFamily)) {
@@ -13763,7 +13763,7 @@ function renderBotModeGroupChats(query = '') {
     settingsBtn.className = 'group-settings-btn';
     settingsBtn.title = `Group settings for ${row.displayName}`;
     settingsBtn.setAttribute('aria-label', `Group settings for ${row.displayName}`);
-    settingsBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" data-icon="settings-cog"><path d="M4 20h3v-2h4v4h2v-4h4v2h-2v4H9v-4H7v2H2v-5h2v3Zm18 2h-5v-2h3v-3h2v5ZM6 11H2v2h4v4H4v-2H0V9h4V7h2v4Zm14-2h4v6h-4v2h-2v-4h4v-2h-4V7h2v2Zm-6 7h-4v-2h4v2Zm-4-2H8v-4h2v4Zm6 0h-2v-4h2v4Zm-2-4h-4V8h4v2ZM7 4H4v3H2V2h5v2Zm8 0h2V2h5v5h-2V4h-3v2h-4V2h-2v4H7V4h2V0h6v4Z"/></svg>';
+    settingsBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="settings-cog"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
     settingsBtn.addEventListener('click', (ev) => {
       ev.stopPropagation();
       openGroupSettingsModal(row);
@@ -14395,7 +14395,7 @@ function renderGroupFailureNotices() {
     const icon = document.createElement('span');
     icon.className = 'presence-notice-icon';
     icon.setAttribute('aria-hidden', 'true');
-    icon.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" data-icon="warning-diamond"><path d="M2 10h2v2H2zm0 4h2v-2H2zm20-4h-2v2h2zm0 4h-2v-2h2zM4 8h2v2H4zm0 8h2v-2H4zm16-8h-2v2h2zm0 8h-2v-2h2zM6 6h2v2H6zm0 12h2v-2H6zM18 6h-2v2h2zm0 12h-2v-2h2zM8 4h2v2H8zm0 16h2v-2H8zm8-16h-2v2h2zm0 16h-2v-2h2zM10 2h2v2h-2zm0 20h2v-2h-2zm4-20h-2v2h2zm0 20h-2v-2h2zm-3-5h2v-2h-2zm0-4h2V7h-2z"/></svg>';
+    icon.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="warning-diamond"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
     const avatar = document.createElement('span');
     avatar.className = 'presence-avatar';
     avatar.setAttribute('aria-hidden', 'true');
@@ -18497,7 +18497,7 @@ function onboardingState() {
     theme: normalizedPanelThemeId(settings.appearanceTheme),
     colorMode: normalizeColorMode(settings.colorMode),
     resolvedMode: resolvedColorMode(),
-    fontProfile: settings.fontProfile || 'signature',
+    fontProfile: settings.fontProfile || 'system-sans',
     ...responsePresentationFromSettings(settings),
     connection: {
       connected: isConnected(),
@@ -23616,7 +23616,7 @@ async function loadSettings({ restoreMessages = false } = {}) {
     appearanceTheme: normalizedPanelThemeId(settings.appearanceTheme),
     appearanceSchemaVersion: 2,
     textZoomPercent: normalizeTextZoomPercent(settings.textZoomPercent),
-    fontProfile: settings.fontProfile || 'signature',
+    fontProfile: settings.fontProfile || 'system-sans',
     customFontFamily: sanitizeLocalFontFamily(settings.customFontFamily),
     browserContextConsentLedger: normalizeContextConsentLedger(stored[CONTEXT_CONSENT_STORAGE_KEY] || settings.browserContextConsentLedger),
     panelResidencyMode: normalizePanelResidencyMode(settings.panelResidencyMode),

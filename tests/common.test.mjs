@@ -3950,7 +3950,7 @@ test('settings dialog render path refreshes appearance theme cards on open', () 
 test('settings appearance defaults pin the zoom/font schema and keep textSize only for legacy compat', () => {
   assert.equal(DEFAULT_SETTINGS.appearanceSchemaVersion, 2);
   assert.equal(DEFAULT_SETTINGS.textZoomPercent, 100);
-  assert.equal(DEFAULT_SETTINGS.fontProfile, 'signature');
+  assert.equal(DEFAULT_SETTINGS.fontProfile, 'system-sans');
   assert.equal(DEFAULT_SETTINGS.customFontFamily, '');
   // The legacy named-size key survives only as a compatibility default at this
   // unit; production surfaces must migrate through the shared module instead.
@@ -4229,13 +4229,13 @@ test('side-panel Agent Theme Studio uses the validated theme pipeline and polish
   assert.match(source, /extractAgentThemeDocument/);
   assert.match(source, /await askHermes\([\s\S]*?onComplete/);
   assert.match(source, /await installCustomTheme\([\s\S]*?await setAppearanceOption\('appearanceTheme'/);
-  assert.match(css, /\.settings-dialog \.custom-theme-file-control,[\s\S]*?#customThemePreviewButton[\s\S]*?font:\s*700 calc\(10px \* var\(--hermes-text-zoom/s);
+  assert.match(css, /\.settings-dialog \.custom-theme-file-control,[\s\S]*?#customThemePreviewButton[\s\S]*?font:\s*700 calc\(11px \* var\(--hermes-text-zoom/s);
   assert.match(css, /\.settings-dialog \.custom-theme-file-control\s*\{[^}]*display:\s*grid[^}]*place-items:\s*center/s);
   assert.match(css, /#customThemePreviewButton\s*\{[^}]*display:\s*grid[^}]*place-items:\s*center/s);
   assert.match(css, /#agentThemeCreateButton\s*\{[^}]*background:\s*#0505e8[^}]*color:\s*#fff/s, 'Ask Hermes must stay cobalt in Mono instead of becoming black');
   assert.match(css, /#agentThemeDescription,[\s\S]*?#agentThemeCreateButton\s*\{[^}]*height:\s*42px[^}]*margin-top:\s*0/s, 'Ask Hermes and its prompt must be exactly the same height');
-  assert.match(css, /\.agent-theme-studio > p\s*\{[^}]*font:[^;}]*calc\(9px \* var\(--hermes-text-zoom, 1\)\)\/1\.45/s, 'Agent Theme Studio helper copy must match the readable example');
-  assert.match(css, /\.custom-theme-json-field > strong\s*\{[^}]*font:[^;}]*calc\(10px \* var\(--hermes-text-zoom, 1\)\)\/1\.25/s, 'Paste Theme JSON heading must remain clearly separated and readable');
+  assert.match(css, /\.agent-theme-studio > p\s*\{[^}]*font:[^;}]*calc\(11px \* var\(--hermes-text-zoom, 1\)\)\/1\.45/s, 'Agent Theme Studio helper copy must match the readable example');
+  assert.match(css, /\.custom-theme-json-field > strong\s*\{[^}]*font:[^;}]*calc\(11px \* var\(--hermes-text-zoom, 1\)\)\/1\.25/s, 'Paste Theme JSON heading must remain clearly separated and readable');
   assert.match(css, /html\[data-hermes-theme="mono"\]\[data-hermes-mode="dark"\][\s\S]*?\.agent-theme-studio > p,[\s\S]*?\.agent-theme-status\s*\{\s*color:\s*#36ff7a/s, 'Mono dark must restore the green Agent Theme Studio copy');
 });
 
