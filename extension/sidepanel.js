@@ -1367,6 +1367,8 @@ const els = {
   customFontFamilyInput: $('#customFontFamilyInput'),
   appearanceSaveStatus: $('#appearanceSaveStatus'),
   settingsSaveStatus: $('#settingsSaveStatus'),
+  settingsSearchInput: $('#settingsSearchInput'),
+  settingsSearchResults: $('#settingsSearchResults'),
   signatureFontFallbackNote: $('#signatureFontFallbackNote'),
   quickMoreMenu: $('#quickMoreMenu'),
   commandMenuButton: $('#commandMenuButton'),
@@ -3162,8 +3164,17 @@ function adoptInlineAssistAutoReplaceChange(value) {
   adoptSettingsBaselineValue(box);
 }
 
+function syncSaveButtonEnabled() {
+  const button = els.saveSettingsTopButton;
+  if (!button) return;
+  const dirty = els.settingsDialog.dataset.dirty === 'true';
+  button.disabled = button.getAttribute('aria-busy') === 'true' || !dirty;
+}
+
 function renderSettingsEditedMarkers() {
   const dirty = settingsBaseline ? changedPanes(settingsBaseline, settingsControlEntries()) : new Set();
+  els.settingsDialog.dataset.dirty = String(dirty.size > 0);
+  syncSaveButtonEnabled();
   for (const card of els.settingsForm.querySelectorAll('[data-settings-category]')) {
     const edited = dirty.has(card.dataset.settingsCategory);
     card.classList.toggle('is-edited', edited);
@@ -3331,10 +3342,8 @@ function openSettingsModelPicker(event) {
 
 function showSettingsPane(pane, { field = '', focus = true } = {}) {
   const home = document.getElementById('settingsCategoryHome');
-  const release = els.settingsForm.querySelector('.release-settings');
   settingsActivePane = SETTINGS_PANES.includes(pane) ? pane : '';
   home.hidden = Boolean(settingsActivePane);
-  if (release) release.hidden = Boolean(settingsActivePane);
   for (const paneEl of els.settingsForm.querySelectorAll('[data-settings-pane]')) {
     paneEl.hidden = paneEl.dataset.settingsPane !== settingsActivePane;
   }
@@ -3375,6 +3384,98 @@ function showSettingsPane(pane, { field = '', focus = true } = {}) {
   paneEl.querySelector('.settings-pane-title')?.focus({ preventScroll: true });
 }
 
+// Settings search: indexes the live DOM of every pane (label and description text of each row or section),
+// so a setting added to any pane is found without registering it anywhere.
+const SETTINGS_SEARCH_ROW_SELECTOR = [
+  '.settings-toggle-card', '.assist-setting-row', 'button.runtime-toggle', '.settings-choice-group', '.appearance-control-stack',
+  '.theme-setting', '.saved-connections', '.settings-section-head', '.settings-control-group-head', '.compatibility-panel',
+  '.release-row', 'form label:not(.settings-choice-card):not(.settings-toggle-card):not(.assist-setting-row)', '.custom-theme-manager',
+].join(', ');
+const SETTINGS_SEARCH_MAX_RESULTS = 40;
+const SETTINGS_SEARCH_HIT_MS = 2400;
+
+function settingsSearchIndex() {
+  const entries = [];
+  for (const paneEl of els.settingsForm.querySelectorAll('[data-settings-pane]')) {
+    const pane = paneEl.dataset.settingsPane;
+    const paneTitle = paneEl.querySelector('.settings-pane-title')?.textContent.trim() || pane;
+    const seen = new Set();
+    for (const row of paneEl.querySelectorAll(SETTINGS_SEARCH_ROW_SELECTOR)) {
+      if (row.closest('.settings-pane-bar')) continue;
+      const labelEl = row.querySelector('strong, h3, h4, legend, summary .compatibility-title, .custom-theme-title') || row.querySelector('span:not(.sr-only)') || row;
+      const title = (labelEl.textContent || '').replace(/\s+/g, ' ').trim();
+      const text = (row.textContent || '').replace(/\s+/g, ' ').trim();
+      if (!title || title.length > 90 || seen.has(title.toLowerCase())) continue;
+      seen.add(title.toLowerCase());
+      entries.push({ pane, paneTitle, title, haystack: `${title} ${text}`.toLowerCase(), row });
+    }
+  }
+  return entries;
+}
+
+function renderSettingsSearch() {
+  const input = els.settingsSearchInput;
+  const list = els.settingsSearchResults;
+  if (!input || !list) return;
+  const terms = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+  const grid = els.settingsCategoryHome.querySelector('.settings-category-grid');
+  list.replaceChildren();
+  list.hidden = !terms.length;
+  if (grid) grid.hidden = Boolean(terms.length);
+  if (!terms.length) return;
+  const hits = settingsSearchIndex().filter((entry) => terms.every((term) => entry.haystack.includes(term))).slice(0, SETTINGS_SEARCH_MAX_RESULTS);
+  if (!hits.length) {
+    const none = document.createElement('li');
+    none.className = 'settings-search-empty';
+    none.textContent = 'No matching settings';
+    list.append(none);
+    return;
+  }
+  for (const hit of hits) {
+    const item = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.setAttribute('role', 'option');
+    const crumb = document.createElement('small');
+    crumb.textContent = hit.paneTitle;
+    const title = document.createElement('span');
+    title.textContent = hit.title;
+    button.append(title, crumb);
+    button.addEventListener('click', () => openSettingsSearchHit(hit));
+    item.append(button);
+    list.append(item);
+  }
+}
+
+function openSettingsSearchHit(hit) {
+  els.settingsSearchInput.value = '';
+  renderSettingsSearch();
+  showSettingsPane(hit.pane, { focus: false });
+  for (let node = hit.row.parentElement; node; node = node.parentElement) if (node.tagName === 'DETAILS') node.open = true;
+  requestAnimationFrame(() => {
+    hit.row.scrollIntoView({ block: 'center', behavior: 'auto' });
+    hit.row.classList.add('settings-search-hit');
+    setTimeout(() => hit.row.classList.remove('settings-search-hit'), SETTINGS_SEARCH_HIT_MS);
+  });
+}
+
+function bindSettingsSearch() {
+  const input = els.settingsSearchInput;
+  if (!input) return;
+  input.addEventListener('input', renderSettingsSearch);
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      els.settingsSearchResults.querySelector('button')?.click();
+    } else if (event.key === 'Escape' && input.value) {
+      event.preventDefault();
+      event.stopPropagation();
+      input.value = '';
+      renderSettingsSearch();
+    }
+  });
+}
+
 function openSettingsDialog(arg) {
   const target = resolveSettingsTarget(arg);
   renderVersionInfo();
@@ -3389,6 +3490,7 @@ function openSettingsDialog(arg) {
   // no jobs route (empty state, no fake rows).
   if (isConnected()) void loadCronJobs({ quiet: true });
   els.settingsDialog.hidden = false;
+  if (els.settingsSearchInput) { els.settingsSearchInput.value = ''; renderSettingsSearch(); }
   els.settingsDialog.setAttribute('aria-hidden', 'false');
   settingsReturnFocus = null;
   showSettingsPane(target.pane, { field: target.field, focus: false });
@@ -3426,8 +3528,8 @@ function setSaveSettingsState(state) {
   if (!button) return;
   clearTimeout(saveSettingsResetTimer);
   const saving = state === 'saving';
-  button.disabled = saving;
   button.setAttribute('aria-busy', String(saving));
+  syncSaveButtonEnabled();
   button.classList.toggle('is-saving', saving);
   button.classList.toggle('is-saved', state === 'saved');
   button.classList.toggle('is-failed', state === 'failed');
@@ -29402,12 +29504,14 @@ function connectionTestButtons() {
   return [els.testConnectionButton, els.startupTestConnectionButton].filter(Boolean);
 }
 
+const SETTINGS_TEST_LABELS = { TEST: 'Test connection', TESTING: 'Testing…', ONLINE: 'Online', FAILED: 'Failed' };
+
 function setTestConnectionButtonLabel(label) {
   for (const button of connectionTestButtons()) {
     const target = button.querySelector('.settings-connection-test-label');
     const nextLabel = button === els.startupTestConnectionButton && label === 'TEST'
       ? 'TEST CONNECTION'
-      : label;
+      : button === els.testConnectionButton ? (SETTINGS_TEST_LABELS[label] || label) : label;
     if (target) target.textContent = nextLabel;
     else button.textContent = nextLabel;
     if (button.dataset.tip) button.dataset.tip = nextLabel;
@@ -30725,6 +30829,7 @@ function bindEvents() {
     compactCurrentSessionContext().catch((error) => setStatus('warn', 'Context compaction failed', error?.message || String(error), { translateDetail: false }));
   });
   els.testConnectionButton.addEventListener('click', testConnection);
+  bindSettingsSearch();
   // Read the connection afresh whenever Settings opens, so the bars are live
   // without the button needing a click first.
   new MutationObserver(() => {

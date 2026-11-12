@@ -1,1 +1,892 @@
-/* Calm UI: settings surfaces. See docs/design/ui-revamp.md. Loaded after sidepanel-calm.css. */
+/* Calm UI: settings surfaces. See docs/design/ui-revamp.md. Loaded after sidepanel-calm.css.
+   Sections: 1 shell + header, 2 category home, 3 pane chrome, 4 sections + rows,
+   5 switches, 6 segmented + choice rows, 7 fields, 8 appearance, 9 connections,
+   10 about + diagnostics, 11 footer, 12 related dialogs. */
+
+/* ------------------------------------------------------------------ */
+/* 1. Shell + header                                                   */
+/* ------------------------------------------------------------------ */
+html .settings-dialog {
+  background: var(--calm-bg);
+  color: var(--calm-text);
+  font-size: calc(13px * var(--hermes-text-zoom, 1));
+}
+html .settings-dialog form {
+  --settings-gutter: 12px;
+  padding: 0;
+  gap: 0;
+  min-height: 100dvh;
+  background: var(--calm-bg);
+  align-items: stretch;
+}
+html .settings-dialog header {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  block-size: var(--calm-topbar-h);
+  min-block-size: var(--calm-topbar-h);
+  padding: 0 8px 0 var(--settings-gutter);
+  background: var(--calm-bg);
+  border-bottom: 1px solid var(--calm-border);
+  box-shadow: none;
+}
+html .settings-dialog #settingsTitle {
+  margin: 0;
+  font-size: calc(15px * var(--hermes-text-zoom, 1));
+  font-weight: 600;
+  color: var(--calm-text);
+}
+html .settings-dialog .settings-header-actions { display: flex; align-items: center; gap: 4px; }
+html .settings-dialog .settings-close-icon {
+  background: transparent;
+  color: var(--calm-muted);
+  border-color: transparent;
+}
+html .settings-dialog .settings-close-icon:hover { background: var(--calm-surface-2); color: var(--calm-text); }
+
+/* Inside a pane the pane bar is the header; the close button floats over its right end. */
+html .settings-dialog[data-settings-view]:not([data-settings-view="home"]) header {
+  block-size: 0;
+  min-block-size: 0;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+}
+html .settings-dialog[data-settings-view]:not([data-settings-view="home"]) #settingsTitle { display: none; }
+html .settings-dialog[data-settings-view]:not([data-settings-view="home"]) .settings-header-actions {
+  position: absolute;
+  top: calc((var(--calm-topbar-h) - var(--calm-control-h)) / 2);
+  right: 8px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. Category home                                                    */
+/* ------------------------------------------------------------------ */
+html .settings-dialog .settings-category-home {
+  display: block;
+  margin: 12px var(--settings-gutter);
+}
+html .settings-dialog .settings-category-home > .settings-section-head { display: none; }
+html .settings-dialog .settings-category-grid {
+  grid-template-columns: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--calm-surface);
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  overflow: hidden;
+}
+html .settings-dialog .settings-category-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 16px;
+  align-items: center;
+  align-content: center;
+  column-gap: 12px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 0;
+  border-top: 1px solid var(--calm-border);
+  background: transparent;
+  box-shadow: none;
+  color: var(--calm-text);
+  text-align: start;
+  transform: none;
+}
+html .settings-dialog .settings-category-card:first-child { border-top: 0; }
+html .settings-dialog .settings-category-card:hover,
+html .settings-dialog .settings-category-card:focus-visible,
+html .settings-dialog .settings-category-card:active {
+  background: var(--calm-surface-2) !important;
+  color: var(--calm-text) !important;
+  box-shadow: none;
+  border-color: var(--calm-border) !important;
+  transform: none;
+}
+html .settings-dialog .settings-category-card:first-child:hover { border-top: 0; }
+html .settings-dialog .settings-category-card:focus-visible { outline-offset: -2px; }
+html .settings-dialog .settings-category-icon {
+  display: grid;
+  place-items: center;
+  inline-size: 16px;
+  block-size: 16px;
+  border: 0;
+  color: var(--calm-muted);
+}
+html .settings-dialog .settings-category-icon svg { inline-size: 16px; block-size: 16px; }
+html .settings-dialog .settings-category-copy { display: grid; gap: 0; min-width: 0; }
+html .settings-dialog .settings-category-copy strong {
+  font-size: calc(13px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html .settings-dialog .settings-category-copy small {
+  display: block;
+  margin: 0;
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  line-height: 1.35;
+  color: var(--calm-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html .settings-dialog .settings-category-card::after {
+  content: "";
+  grid-column: 3;
+  grid-row: 1;
+  inline-size: 6px;
+  block-size: 6px;
+  justify-self: center;
+  border-inline-end: 1.5px solid var(--calm-muted);
+  border-block-start: 1.5px solid var(--calm-muted);
+  transform: rotate(45deg);
+}
+html .settings-dialog .settings-category-card:dir(rtl)::after { transform: rotate(-135deg); }
+/* Edited marker: a small accent dot on the icon. */
+html .settings-dialog .settings-category-edited {
+  position: absolute;
+  inset-inline-start: 24px;
+  inset-block-start: 11px;
+  inline-size: 7px;
+  block-size: 7px;
+  border-radius: 50%;
+  background: var(--calm-accent);
+  box-shadow: 0 0 0 2px var(--calm-surface);
+  font-size: 0;
+  line-height: 0;
+  overflow: hidden;
+  color: transparent;
+}
+html .settings-dialog .settings-category-edited[hidden] { display: none; }
+html .settings-dialog .settings-category-card:hover .settings-category-edited { box-shadow: 0 0 0 2px var(--calm-surface-2); }
+
+/* ------------------------------------------------------------------ */
+/* 3. Pane chrome                                                      */
+/* ------------------------------------------------------------------ */
+html .settings-dialog .settings-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-content: normal;
+  padding: 0 0 24px;
+}
+html .settings-dialog .settings-pane[hidden] { display: none; }
+html .settings-dialog .settings-pane > :not(.settings-pane-bar) { margin-inline: var(--settings-gutter); }
+html .settings-dialog .settings-pane-bar {
+  position: sticky;
+  top: 0;
+  z-index: 85;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  block-size: var(--calm-topbar-h);
+  min-block-size: var(--calm-topbar-h);
+  margin: 0 0 -8px;
+  padding: 0 44px 0 8px;
+  background: var(--calm-bg);
+  border: 0;
+  border-bottom: 1px solid var(--calm-border);
+}
+html .settings-dialog .settings-pane-back {
+  flex: none;
+  inline-size: var(--calm-control-h);
+  block-size: var(--calm-control-h);
+  min-block-size: var(--calm-control-h);
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  background: transparent;
+  color: var(--calm-muted);
+}
+html .settings-dialog .settings-pane-back:hover { background: var(--calm-surface-2); color: var(--calm-text); }
+html .settings-dialog .settings-pane-heading { display: block; flex: 1 1 auto; min-width: 0; }
+html .settings-dialog .settings-pane-crumb { display: none; }
+html .settings-dialog .settings-pane-title {
+  margin: 0;
+  font-size: calc(15px * var(--hermes-text-zoom, 1));
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--calm-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html .settings-dialog .settings-pane-title:focus-visible { outline: none; }
+html .settings-dialog .settings-pane-flags {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+html .settings-dialog .settings-pane-edited,
+html .settings-dialog .settings-pane-saved {
+  font-size: calc(11px * var(--hermes-text-zoom, 1));
+  color: var(--calm-muted);
+  white-space: nowrap;
+}
+html .settings-dialog .settings-pane-edited { display: inline-flex; align-items: center; gap: 5px; }
+html .settings-dialog .settings-pane-edited::before {
+  content: "";
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--calm-accent);
+}
+html .settings-dialog .settings-pane-edited[hidden],
+html .settings-dialog .settings-pane-saved[hidden] { display: none; }
+html .settings-dialog .settings-pane-saved[data-state="saved"] { color: var(--calm-ok); }
+html .settings-dialog .settings-pane-saved[data-state="failed"] { color: var(--calm-danger); }
+
+/* ------------------------------------------------------------------ */
+/* 4. Sections + rows                                                  */
+/* ------------------------------------------------------------------ */
+html .settings-dialog :is(.settings-section, .settings-subsection) {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+html .settings-dialog .settings-subsection { gap: 0; }
+html .settings-dialog .settings-section-head { margin: 0 0 4px; padding: 0; }
+html .settings-dialog .settings-section-head > div { display: grid; gap: 2px; }
+html .settings-dialog :is(.settings-section-head, .settings-section-head.compact) :is(h3, h4),
+html .settings-dialog .settings-control-group-head strong,
+html .settings-dialog .settings-choice-group legend,
+html .settings-dialog .context-section-label {
+  margin: 0;
+  padding: 0;
+  font-size: calc(13px * var(--hermes-text-zoom, 1));
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--calm-text);
+  text-transform: none;
+}
+html .settings-dialog :is(.settings-section-head p, .settings-control-group-head small, .hint, .settings-prose, .settings-toggle-copy small, .settings-choice-copy small) {
+  margin: 0;
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--calm-muted);
+  text-transform: none;
+  letter-spacing: normal;
+}
+html .settings-dialog .hint { margin-top: 4px; }
+html .settings-dialog .settings-control-group { display: flex; flex-direction: column; gap: 0; }
+html .settings-dialog .settings-control-group-head { display: grid; gap: 2px; margin: 12px 0 4px; }
+html .settings-dialog .settings-control-group-head:first-child { margin-top: 0; }
+html .settings-dialog .settings-toggle-grid,
+html .settings-dialog .settings-toggle-grid-three { display: flex; flex-direction: column; gap: 0; }
+
+/* Toggle rows: label (+ one muted line) left, switch right. */
+html .settings-dialog .settings-toggle-card,
+html .settings-dialog .settings-toggle-card.compact-toggle,
+html .settings-dialog .assist-setting-row,
+html .settings-dialog .runtime-toggle {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 0;
+  border: 0;
+  border-top: 1px solid var(--calm-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--calm-text);
+  text-align: start;
+  cursor: pointer;
+  transform: none;
+}
+html .settings-dialog .settings-toggle-card:first-child,
+html .settings-dialog .settings-section-head + .settings-toggle-card { border-top: 0; }
+html .settings-dialog .settings-toggle-card:hover,
+html .settings-dialog .runtime-toggle:hover,
+html .settings-dialog .assist-setting-row:hover { background: transparent; border-color: var(--calm-border); box-shadow: none; }
+html .settings-dialog .settings-toggle-card:has(input:checked) { background: transparent; border-color: var(--calm-border); }
+html .settings-dialog .settings-toggle-copy { display: grid; gap: 1px; min-width: 0; }
+html .settings-dialog .settings-toggle-copy strong,
+html .settings-dialog .settings-choice-copy strong,
+html .settings-dialog label > strong {
+  font-size: calc(13px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--calm-text);
+  text-transform: none;
+}
+html .settings-dialog .settings-toggle-copy small { margin: 0; }
+html .settings-dialog .settings-toggle-card.compact-toggle .settings-switch { justify-self: end; }
+
+/* ------------------------------------------------------------------ */
+/* 5. Switches (32x18)                                                 */
+/* ------------------------------------------------------------------ */
+html .settings-dialog .settings-switch-input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+html .settings-dialog .settings-switch {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  flex: none;
+  inline-size: 32px;
+  block-size: 18px;
+  min-inline-size: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--calm-radius-pill);
+  background: var(--calm-border-strong);
+  box-shadow: none;
+  transition: background-color var(--calm-ease);
+}
+html .settings-dialog .settings-switch::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-start: 2px;
+  inline-size: 14px;
+  block-size: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transform: none;
+  transition: transform var(--calm-ease);
+}
+html .settings-dialog :is(.settings-toggle-card:has(input:checked), .assist-setting-row:has(input:checked), .runtime-toggle[aria-checked="true"]) .settings-switch {
+  background: var(--calm-accent);
+  border: 0;
+}
+html .settings-dialog :is(.settings-toggle-card:has(input:checked), .assist-setting-row:has(input:checked), .runtime-toggle[aria-checked="true"]) .settings-switch::after {
+  transform: translateX(14px);
+  background: #fff;
+}
+html .settings-dialog .settings-toggle-card:has(input:focus-visible) .settings-switch {
+  outline: 2px solid var(--calm-accent);
+  outline-offset: 2px;
+}
+html .settings-dialog .settings-toggle-card:has(input:disabled) { cursor: not-allowed; opacity: 0.55; }
+
+/* ------------------------------------------------------------------ */
+/* 6. Segmented controls + choice rows                                 */
+/* ------------------------------------------------------------------ */
+html .settings-dialog :is(.segmented-control, .text-zoom-preset-grid) {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 2px;
+  border: 0;
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface-2);
+  max-inline-size: 100%;
+  inline-size: auto;
+}
+html .settings-dialog .theme-setting .mode-switch { display: flex; inline-size: 100%; margin: 0; }
+html .settings-dialog :is(.mode-choice, .text-zoom-preset-grid button) {
+  flex: 1 1 0;
+  min-width: 0;
+  min-block-size: 24px;
+  block-size: 24px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--calm-muted);
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-direction: row;
+  line-height: 1.2;
+  text-transform: none;
+}
+html .settings-dialog :is(.mode-choice, .text-zoom-preset-grid button):hover { color: var(--calm-text); background: transparent; }
+html .settings-dialog :is(.mode-choice.selected, .mode-choice[aria-checked="true"], .text-zoom-preset-grid button[aria-checked="true"]) {
+  background: var(--calm-bg);
+  color: var(--calm-text);
+  box-shadow: 0 0 0 1px var(--calm-border);
+}
+html .settings-dialog .mode-choice svg { inline-size: 14px; block-size: 14px; flex: none; }
+
+/* Radio-style choice cards become list rows with a radio dot on the right. */
+html .settings-dialog .settings-choice-group { display: flex; flex-direction: column; gap: 0; margin: 12px 0 0; padding: 0; border: 0; min-width: 0; }
+html .settings-dialog .settings-choice-group legend { padding: 0; margin-bottom: 4px; float: none; }
+html .settings-dialog :is(.settings-choice-grid, .settings-choice-grid-three) {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  overflow: hidden;
+}
+html .settings-dialog .settings-choice-card,
+html .settings-dialog .settings-choice-card.compact-choice,
+html .settings-dialog .runtime-effort {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  align-items: center;
+  column-gap: 12px;
+  min-height: 36px;
+  margin: 0;
+  padding: 6px 12px;
+  border: 0;
+  border-top: 1px solid var(--calm-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--calm-text);
+  text-align: start;
+  cursor: pointer;
+  transform: none;
+}
+html .settings-dialog .settings-choice-card:first-child { border-top: 0; }
+html .settings-dialog .settings-choice-card:hover,
+html .settings-dialog .runtime-effort:hover { background: var(--calm-surface-2); border-color: var(--calm-border); box-shadow: none; }
+html .settings-dialog .settings-choice-card:has(input:checked),
+html .settings-dialog .runtime-effort[aria-checked="true"] { background: var(--calm-accent-soft); border-color: var(--calm-border); box-shadow: none; }
+html .settings-dialog .settings-choice-card:has(input:checked) .settings-choice-copy strong,
+html .settings-dialog .runtime-effort[aria-checked="true"] .settings-choice-copy strong { color: var(--calm-accent); }
+html .settings-dialog .settings-choice-copy { display: grid; gap: 0; min-width: 0; }
+html .settings-dialog .settings-choice-card input[type="radio"] { position: absolute; opacity: 0; pointer-events: none; inline-size: 1px; block-size: 1px; }
+html .settings-dialog .settings-choice-mark {
+  position: static;
+  box-sizing: border-box;
+  inline-size: 16px;
+  block-size: 16px;
+  border: 1.5px solid var(--calm-border-strong);
+  border-radius: 50%;
+  background: transparent;
+  display: grid;
+  place-items: center;
+}
+html .settings-dialog .settings-choice-mark::after {
+  content: "";
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+  background: transparent;
+  border: 0;
+  transform: none;
+}
+html .settings-dialog :is(.settings-choice-card:has(input:checked), .runtime-effort[aria-checked="true"]) .settings-choice-mark { border-color: var(--calm-accent); }
+html .settings-dialog :is(.settings-choice-card:has(input:checked), .runtime-effort[aria-checked="true"]) .settings-choice-mark::after { background: var(--calm-accent); }
+html .settings-dialog .settings-choice-card:has(input:focus-visible) { outline: 2px solid var(--calm-accent); outline-offset: -2px; }
+
+/* ------------------------------------------------------------------ */
+/* 7. Fields                                                           */
+/* ------------------------------------------------------------------ */
+html .settings-dialog form label:not(.settings-toggle-card):not(.settings-choice-card):not(.assist-setting-row):not(.text-zoom-input-wrap) {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+  color: var(--calm-muted);
+  text-transform: none;
+  letter-spacing: normal;
+}
+html .settings-dialog :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]), select, textarea) {
+  inline-size: 100%;
+  min-block-size: var(--calm-input-h);
+  padding: 4px 10px;
+  box-sizing: border-box;
+  font-size: calc(13px * var(--hermes-text-zoom, 1));
+  font-weight: 400;
+  background: var(--calm-surface);
+  color: var(--calm-text);
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-control);
+}
+html .settings-dialog textarea { padding: 8px 10px; }
+html .settings-dialog :is(input, select, textarea):focus-visible { border-color: var(--calm-accent); outline-offset: 0; }
+html .settings-dialog form > :is(label, .hint, .settings-pane) { min-width: 0; }
+/* Fields sit inside sections; sections space their own children. */
+html .settings-dialog :is(.settings-section, .settings-subsection) > :is(label, .hint, .saved-connections, .gateway-mode, .remote-env-block, .appearance-control-stack, .theme-setting, .profile-control-stack) { margin-top: 12px; }
+html .settings-dialog :is(.settings-section, .settings-subsection) > .hint { margin-top: 6px; }
+html .settings-dialog :is(.settings-section, .settings-subsection) > :is(.settings-section-head + *) { margin-top: 8px; }
+/* Row-style fields: label left, control right. */
+html .settings-dialog .appearance-control-stack { display: grid; gap: 8px; margin: 0; padding: 12px 0 0; border-top: 1px solid var(--calm-border); }
+html .settings-dialog .appearance-control-stack:first-of-type { border-top: 0; padding-top: 0; }
+html .settings-dialog .appearance-control-stack :is(strong) { display: block; font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 500; color: var(--calm-text); }
+html .settings-dialog .appearance-control-stack > div > span,
+html .settings-dialog .appearance-control-stack > label > span,
+html .settings-dialog .theme-setting > span {
+  display: block;
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  font-weight: 400;
+  color: var(--calm-muted);
+  line-height: 1.4;
+}
+html .settings-dialog :is(button.secondary, .release-actions button, .saved-connection-actions button, .settings-row > button, .browser-control-action, .agent-scan-action, .status-actions button, .profile-action-row button, .settings-setup-row button, .hermes-account-actions button) {
+  min-block-size: var(--calm-control-h);
+  block-size: auto;
+  padding: 3px 10px;
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  border: 1px solid transparent;
+  border-radius: var(--calm-radius-control);
+  text-transform: none;
+  letter-spacing: normal;
+  box-shadow: none;
+}
+html .settings-dialog :is(.release-actions, .saved-connection-actions, .profile-action-row, .status-actions) { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ------------------------------------------------------------------ */
+/* 8. Appearance                                                       */
+/* ------------------------------------------------------------------ */
+html .settings-dialog .text-zoom-setting { gap: 8px; }
+html .settings-dialog .text-zoom-stepper { display: inline-flex; align-items: center; gap: 4px; }
+html .settings-dialog .text-zoom-stepper > button {
+  inline-size: var(--calm-control-h);
+  block-size: var(--calm-control-h);
+  min-block-size: var(--calm-control-h);
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: var(--calm-surface-2);
+}
+html .settings-dialog .text-zoom-input-wrap { position: relative; display: block; inline-size: 72px; margin: 0; }
+html .settings-dialog .text-zoom-input-wrap #textZoomInput { block-size: var(--calm-control-h); min-block-size: var(--calm-control-h); padding-inline: 8px 22px; text-align: end; }
+html .settings-dialog .text-zoom-input-wrap > span:last-child { color: var(--calm-muted); font-size: calc(12px * var(--hermes-text-zoom, 1)); }
+html .settings-dialog .theme-setting { display: grid; gap: 8px; margin-top: 0; padding-top: 12px; border-top: 1px solid var(--calm-border); }
+html .settings-dialog .theme-setting > strong { font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 500; }
+html .settings-dialog .theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+html .settings-dialog .theme-card {
+  aspect-ratio: auto;
+  grid-template-rows: 44px auto;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  box-shadow: none;
+}
+html .settings-dialog .theme-card:hover { background: var(--calm-surface-2); border-color: var(--calm-border-strong); box-shadow: none; }
+html .settings-dialog .theme-card.selected { border-color: var(--calm-accent); box-shadow: 0 0 0 1px var(--calm-accent); background: var(--calm-surface); }
+html .settings-dialog .theme-preview { border-radius: 5px; }
+html .settings-dialog .theme-card-copy { padding: 0 2px 1px; }
+html .settings-dialog .theme-card-copy strong { font-size: calc(12px * var(--hermes-text-zoom, 1)); font-weight: 500; line-height: 1.3; }
+html .settings-dialog .theme-card.selected .theme-check {
+  inset-block-end: auto;
+  inset-block-start: 8px;
+  right: 8px;
+  inline-size: 14px;
+  block-size: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--calm-accent);
+}
+html .settings-dialog .theme-card.selected .theme-check::after { inline-size: 6px; block-size: 6px; border-radius: 50%; background: var(--calm-accent-fg); }
+html .settings-dialog .custom-theme-manager {
+  margin-top: 4px;
+  border: 0;
+  border-top: 1px solid var(--calm-border);
+  border-radius: 0;
+  background: none;
+  padding: 8px 0 0;
+}
+html .settings-dialog .custom-theme-summary { font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 500; text-transform: none; cursor: pointer; }
+html .settings-dialog .custom-theme-manager-body { display: grid; gap: 12px; padding-top: 8px; }
+html .settings-dialog :is(.marketplace-theme-browser, .agent-theme-studio) { border: 0; padding: 0; background: none; border-radius: 0; box-shadow: none; display: grid; gap: 8px; }
+html .settings-dialog :is(.marketplace-theme-search, .agent-theme-compose) { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
+html .settings-dialog .marketplace-theme-search input,
+html .settings-dialog .marketplace-theme-search button { block-size: var(--calm-input-h); min-block-size: var(--calm-input-h); height: var(--calm-input-h); width: auto; font-size: calc(13px * var(--hermes-text-zoom, 1)); }
+html .settings-dialog .marketplace-theme-search input { width: 100%; }
+html .settings-dialog .custom-theme-local-divider { margin: 0; font-size: calc(11px * var(--hermes-text-zoom, 1)); font-weight: 600; color: var(--calm-muted); text-transform: none; letter-spacing: normal; }
+html .settings-dialog .custom-theme-local-divider::before,
+html .settings-dialog .custom-theme-local-divider::after { background: var(--calm-border); }
+html .settings-dialog .appearance-save-status:empty { display: none; }
+html .settings-dialog .appearance-save-status { margin: 0; font-size: calc(12px * var(--hermes-text-zoom, 1)); color: var(--calm-muted); font-weight: 400; }
+
+/* ------------------------------------------------------------------ */
+/* 9. Connections                                                      */
+/* ------------------------------------------------------------------ */
+html .settings-dialog .saved-connections { display: flex; flex-direction: column; gap: 8px; margin-block-end: 0; }
+html .settings-dialog .saved-connection-list,
+html .settings-dialog .gateway-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  overflow: hidden;
+}
+html .settings-dialog .saved-connection-list:empty { display: none; }
+html .settings-dialog .conn-mode-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  inline-size: 100%;
+  min-height: 44px;
+  padding: 8px 40px 8px 12px;
+  border: 0;
+  border-top: 1px solid var(--calm-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--calm-text);
+  text-align: start;
+  transform: none;
+}
+html .settings-dialog :is(.saved-connection-list, .gateway-mode) > .conn-mode-card:first-child { border-top: 0; }
+html .settings-dialog .conn-mode-card:hover { background: var(--calm-surface-2); box-shadow: none; border-color: var(--calm-border); }
+html .settings-dialog .conn-mode-card.selected,
+html .settings-dialog .conn-mode-card[aria-checked="true"] { background: var(--calm-accent-soft); box-shadow: none; border-color: var(--calm-border); }
+html .settings-dialog .conn-mode-head { display: block; }
+html .settings-dialog .conn-mode-title { display: block; font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 500; line-height: 1.35; color: var(--calm-text); text-transform: none; letter-spacing: normal; }
+html .settings-dialog .conn-mode-card[aria-checked="true"] .conn-mode-title { color: var(--calm-accent); }
+html .settings-dialog .conn-mode-desc { display: block; margin: 0; font-size: calc(12px * var(--hermes-text-zoom, 1)); line-height: 1.4; font-weight: 400; color: var(--calm-muted); text-transform: none; letter-spacing: normal; }
+html .settings-dialog .conn-mode-check {
+  position: absolute;
+  inset-inline-end: 12px;
+  inset-block-start: 50%;
+  translate: 0 -50%;
+  box-sizing: border-box;
+  inline-size: 16px;
+  block-size: 16px;
+  border: 1.5px solid var(--calm-border-strong);
+  border-radius: 50%;
+  background: transparent;
+  display: grid;
+  place-items: center;
+}
+html .settings-dialog .conn-mode-check::after { content: ""; inline-size: 8px; block-size: 8px; border-radius: 50%; background: transparent; border: 0; transform: none; }
+html .settings-dialog .conn-mode-card[aria-checked="true"] .conn-mode-check { border-color: var(--calm-accent); }
+html .settings-dialog .conn-mode-card[aria-checked="true"] .conn-mode-check::after { background: var(--calm-accent); }
+html .settings-dialog .saved-connection-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+html .settings-dialog .saved-connection-pair { display: flex; gap: 6px; }
+html .settings-dialog .saved-connection-editor { display: grid; gap: 6px; }
+html .settings-dialog .saved-connection-actions[hidden],
+html .settings-dialog .saved-connection-editor[hidden] { display: none; }
+html .settings-dialog #connectionModeLabel { margin-top: 12px; }
+html .settings-dialog .settings-test-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+html .settings-dialog .settings-connection-test {
+  min-block-size: var(--calm-control-h);
+  padding: 3px 10px;
+  gap: 6px;
+  display: inline-flex;
+  align-items: center;
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  border: 1px solid transparent;
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  text-transform: none;
+}
+html .settings-dialog .settings-connection-test:hover:not(:disabled) { background: color-mix(in srgb, var(--calm-surface-2) 82%, var(--calm-text) 18%); color: var(--calm-text); border-color: transparent; }
+html .settings-dialog .settings-connection-test-label { text-transform: none; letter-spacing: normal; }
+html .settings-dialog .hermes-account-row { grid-template-columns: minmax(0, 1fr); cursor: default; }
+
+/* ------------------------------------------------------------------ */
+/* 10. About + diagnostics                                             */
+/* ------------------------------------------------------------------ */
+html .settings-dialog .release-control { display: grid; gap: 6px; padding: 0; }
+html .settings-dialog .release-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+html .settings-dialog .release-row h3 { margin: 0; font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 600; text-transform: none; }
+html .settings-dialog .release-row p { margin: 0; font-size: calc(12px * var(--hermes-text-zoom, 1)); color: var(--calm-muted); text-transform: none; }
+html .settings-dialog .release-row .release-actions { flex: none; }
+html .settings-dialog #reviewUpdateButton { background: var(--calm-accent); color: var(--calm-accent-fg); }
+html .settings-dialog .update-reload-pending { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+html .settings-dialog .update-reload-pending[hidden] { display: none; }
+html .settings-dialog .update-reload-pending-text { margin: 0; font-size: calc(12px * var(--hermes-text-zoom, 1)); color: var(--calm-muted); }
+
+html .settings-dialog .compatibility-panel {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+html .settings-dialog .compatibility-panel[hidden] { display: none; }
+html .settings-dialog .compatibility-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0;
+  cursor: pointer;
+  list-style: none;
+}
+html .settings-dialog .compatibility-summary-copy { display: grid; gap: 2px; min-width: 0; }
+html .settings-dialog .compatibility-title { font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 600; text-transform: none; letter-spacing: normal; color: var(--calm-text); }
+html .settings-dialog .compatibility-status { margin: 0; }
+html .settings-dialog .compatibility-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  overflow: hidden;
+}
+html .settings-dialog .compatibility-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 8px;
+  padding: 7px 12px 7px 28px;
+  border: 0;
+  border-top: 1px solid var(--calm-border);
+  border-radius: 0;
+  background: transparent;
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+}
+html .settings-dialog .compatibility-row:first-child { border-top: 0; }
+html .settings-dialog .compatibility-row::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 12px;
+  inset-block-start: 12px;
+  inline-size: 7px;
+  block-size: 7px;
+  border-radius: 50%;
+  background: var(--calm-muted);
+}
+html .settings-dialog .compatibility-row.ok::before { background: var(--calm-ok); }
+html .settings-dialog .compatibility-row.warn::before,
+html .settings-dialog .compatibility-row[data-capability-state="degraded"]::before,
+html .settings-dialog .compatibility-row[data-capability-state="cached"]::before { background: var(--calm-warn); }
+html .settings-dialog .compatibility-row.error::before,
+html .settings-dialog .compatibility-row[data-capability-state="blocked"]::before,
+html .settings-dialog .compatibility-row[data-capability-state="unsupported"]::before { background: var(--calm-danger); }
+html .settings-dialog .compatibility-row[data-capability-state="unknown"]::before { background: var(--calm-border-strong); }
+html .settings-dialog .compatibility-row > span:first-child { font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 500; color: var(--calm-text); }
+html .settings-dialog .compatibility-row strong,
+html .settings-dialog .compatibility-row.ok strong,
+html .settings-dialog .compatibility-row.warn strong,
+html .settings-dialog .compatibility-row[data-capability-state] strong {
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+  color: var(--calm-muted);
+  text-transform: none;
+  letter-spacing: normal;
+}
+html .settings-dialog .compatibility-row small { grid-column: 1 / -1; color: var(--calm-muted); font-size: calc(12px * var(--hermes-text-zoom, 1)); line-height: 1.4; }
+html .settings-dialog .compatibility-row small.compatibility-meta { font-size: calc(11px * var(--hermes-text-zoom, 1)); }
+html .settings-dialog .support-diagnostics { display: grid; gap: 8px; padding: 0; border: 0; background: none; }
+html .settings-dialog .support-diagnostics .settings-section-head { margin: 0; }
+html .settings-dialog .support-diagnostics > button { justify-self: start; }
+html .settings-dialog .nous-strip { display: none; }
+
+/* ------------------------------------------------------------------ */
+/* 11. Footer                                                          */
+/* ------------------------------------------------------------------ */
+html .settings-dialog .settings-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: auto 0 0;
+  padding: 10px var(--settings-gutter);
+  background: var(--calm-bg);
+  border-top: 1px solid var(--calm-border);
+}
+html .settings-dialog[data-settings-view="home"][data-dirty="false"] .settings-footer { display: none; }
+html .settings-dialog .settings-save-status {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+  line-height: 1.35;
+  color: var(--calm-muted);
+}
+html .settings-dialog .settings-save-status[data-state="idle"] { display: none; }
+html .settings-dialog .settings-save-status[data-state="saved"] { color: var(--calm-ok); }
+html .settings-dialog .settings-save-status[data-state="warn"] { color: var(--calm-warn); }
+html .settings-dialog .settings-save-status[data-state="failed"] { color: var(--calm-danger); }
+html .settings-dialog #saveSettingsTopButton {
+  flex: none;
+  min-inline-size: 72px;
+  min-block-size: var(--calm-control-h);
+  padding: 3px 14px;
+  background: var(--calm-accent);
+  color: var(--calm-accent-fg);
+  border: 1px solid transparent;
+  font-size: calc(13px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+}
+html .settings-dialog #saveSettingsTopButton:disabled { background: var(--calm-surface-2); color: var(--calm-muted); opacity: 1; cursor: default; }
+html .settings-dialog #saveSettingsTopButton.is-saved:disabled { background: var(--calm-surface-2); color: var(--calm-ok); }
+html .settings-dialog #saveSettingsTopButton.is-failed { background: var(--calm-danger); color: var(--calm-bg); }
+html .settings-dialog form { padding-block-end: 0; }
+html .settings-dialog .settings-back-to-top { inset-block-end: 64px; }
+
+@media (pointer: coarse) {
+  html .settings-dialog .settings-category-card { min-height: 52px; }
+  html .settings-dialog :is(.mode-choice, .text-zoom-preset-grid button) { block-size: 32px; }
+}
+
+/* ------------------------------------------------------------------ */
+/* 12. Related dialogs                                                 */
+/* ------------------------------------------------------------------ */
+.add-connection-card .settings-switch { inline-size: 32px; block-size: 18px; }
+
+/* Search */
+html .settings-dialog .settings-search { display: grid; gap: 8px; margin-bottom: 12px; }
+html .settings-dialog .settings-search input { inline-size: 100%; }
+html .settings-dialog .settings-search-results { list-style: none; margin: 0; padding: 0; border: 1px solid var(--calm-border); border-radius: var(--calm-radius-card); background: var(--calm-surface); overflow: hidden; }
+html .settings-dialog .settings-search-results[hidden] { display: none; }
+html .settings-dialog .settings-search-results li + li { border-top: 1px solid var(--calm-border); }
+html .settings-dialog .settings-search-results button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  inline-size: 100%;
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--calm-text);
+  text-align: start;
+  font-size: calc(13px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+}
+html .settings-dialog .settings-search-results button:hover { background: var(--calm-surface-2); }
+html .settings-dialog .settings-search-results button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html .settings-dialog .settings-search-results small { color: var(--calm-muted); font-size: calc(12px * var(--hermes-text-zoom, 1)); font-weight: 400; white-space: nowrap; }
+html .settings-dialog .settings-search-empty { padding: 10px 12px; color: var(--calm-muted); font-size: calc(12px * var(--hermes-text-zoom, 1)); }
+html .settings-dialog .settings-search-hit { animation: settings-search-hit 2.4s ease-out; border-radius: var(--calm-radius-control); }
+@keyframes settings-search-hit { 0%, 60% { background: var(--calm-accent-soft); box-shadow: 0 0 0 6px var(--calm-accent-soft); } 100% { background: transparent; box-shadow: 0 0 0 6px transparent; } }
+@media (prefers-reduced-motion: reduce) { html .settings-dialog .settings-search-hit { animation: none; background: var(--calm-accent-soft); } }

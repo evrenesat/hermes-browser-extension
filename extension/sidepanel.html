@@ -675,55 +675,19 @@
     <section id="settingsDialog" class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
       <form id="settingsForm">
         <header>
-          <div>
-            <h2 id="settingsTitle" data-i18n="ui.settings">Settings</h2>
-          </div>
+          <h2 id="settingsTitle" data-i18n="ui.settings">Settings</h2>
           <div class="settings-header-actions">
-            <button id="saveSettingsTopButton" class="settings-button" type="submit" title="Save settings" data-i18n-title="ui.save.settings" data-i18n="ui.save">Save</button>
-            <button id="testConnectionButton" class="settings-connection-test secondary" type="button" aria-busy="false" data-signal="none" title="Test the current Hermes connection" data-i18n-title="ui.test.the.current.hermes.connection">
-              <svg class="settings-connection-test-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="cellular-signal-3"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>
-              <span class="settings-connection-test-label sr-only" data-i18n="ui.test.984816fd">TEST</span>
-            </button>
             <button id="closeSettingsButton" class="settings-button settings-close-icon" type="button" aria-label="Close settings" title="Close settings" data-i18n-aria-label="ui.close.settings" data-i18n-title="ui.close.settings">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="close"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
           </div>
-          <p id="settingsSaveStatus" class="settings-save-status" role="status" aria-live="polite" data-i18n-runtime></p>
         </header>
 
-        <section class="settings-section release-settings browser-release-card" aria-labelledby="releaseTitle">
-          <div class="release-sidecar" aria-label="Hermes Browser local sidecar" data-i18n-aria-label="ui.hermes.browser.local.sidecar">
-            <div class="release-sidecar-copy">
-              <p class="eyebrow" data-i18n="ui.local.sidecar.chrome.panel">LOCAL SIDECAR / CHROME PANEL</p>
-              <svg class="release-sidecar-wordmark release-sidecar-wordmark-ltr" viewBox="0 0 2918.77 1206.98" role="img" aria-label="Hermes Browser" data-i18n-aria-label="ui.hermes.browser">
-                <use href="assets/img/hermes-browser-logo-left.svg#Layer_1"></use>
-              </svg>
-              <svg class="release-sidecar-wordmark release-sidecar-wordmark-rtl" viewBox="0 0 2918.77 1206.98" role="img" aria-label="Hermes Browser" data-i18n-aria-label="ui.hermes.browser">
-                <use href="assets/img/hermes-browser-logo-right.svg#Layer_1"></use>
-              </svg>
-              <p data-i18n="ui.ask.about.any.page.hermes.sees.the.active.tab.selected.text.pag.b2a32c39">Ask about any page. Hermes sees the active tab, selected text, page context, and open tabs.</p>
-            </div>
-            <img class="release-sidecar-badge" src="assets/img/hermes-badge.webp" alt="Hermes Agent badge" data-i18n-alt="ui.hermes.agent.badge" />
-          </div>
-          <div class="release-control">
-            <div class="release-row">
-              <div>
-                <h3 id="releaseTitle" data-i18n="ui.browser.updates">Extension updates</h3>
-                <p><span id="versionLabel" data-i18n-runtime data-i18n="ui.version.loading">version loading…</span> <span data-i18n="settings.public_alpha_load_unpacked">· public alpha / load unpacked</span></p>
-              </div>
-              <div class="release-actions">
-                <button id="checkUpdatesButton" class="secondary" type="button" data-i18n="ui.check">Check</button>
-                <button id="reviewUpdateButton" type="button" data-i18n="ui.update">Update</button>
-              </div>
-            </div>
-            <p id="updateStatus" class="hint">Updates are checked against the public GitHub repo.</p>
-            <div id="updateReloadPending" class="update-reload-pending" hidden>
-              <p id="updateReloadPendingText" class="update-reload-pending-text">A newer build is on disk. Reload to run it.</p>
-              <button id="reloadBuildButton" class="secondary" type="button">Reload now</button>
-            </div>
-          </div>
-        </section>
         <nav id="settingsCategoryHome" class="settings-category-home" aria-labelledby="settingsCategoryHomeTitle">
+          <div class="settings-search">
+            <input id="settingsSearchInput" type="search" autocomplete="off" spellcheck="false" placeholder="Search settings" aria-label="Search settings" data-i18n-invariant />
+            <ul id="settingsSearchResults" class="settings-search-results" role="listbox" aria-label="Search results" hidden></ul>
+          </div>
           <div class="settings-section-head compact"><div><h4 id="settingsCategoryHomeTitle" data-i18n="settings.categories.home_title">Choose a category</h4><p data-i18n="settings.categories.home_copy">Everything the Hermes Browser Extension can do, grouped by what it is for.</p></div></div>
           <div class="settings-category-grid">
             <button type="button" class="settings-category-card" data-settings-category="appearance" aria-describedby="settingsCategorySummary-appearance">
@@ -772,7 +736,6 @@
               <span class="settings-category-edited" hidden data-i18n="settings.categories.edited">Edited</span>
             </button>
           </div>
-          <span class="nous-strip nous-strip-home" role="img" aria-label="Nous Research" data-i18n-invariant></span>
         </nav>
 
         <section id="settingsPane-appearance" class="settings-pane" data-settings-pane="appearance" data-settings-live aria-labelledby="settingsPaneTitle-appearance" hidden>
@@ -1010,6 +973,13 @@
           <span data-i18n="ui.api.key.browser.token">API key / browser token</span>
           <input id="apiKeyInput" name="apiKey" type="password" autocomplete="off" placeholder="API key (blank = dashboard)" data-i18n-placeholder="ui.api.key.blank.dashboard" />
         </label>
+
+        <div class="settings-test-row">
+        <button id="testConnectionButton" class="settings-connection-test secondary" type="button" aria-busy="false" data-signal="none" title="Test the current Hermes connection" data-i18n-title="ui.test.the.current.hermes.connection">
+          <svg class="settings-connection-test-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="cellular-signal-3"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg>
+          <span class="settings-connection-test-label" data-i18n="ui.test.984816fd">TEST</span>
+        </button>
+        </div>
 
         <p class="hint connection-flow-note" data-i18n="ui.public.flow.connect.to.hermes.creates.a.scoped.browser.token.wh.9184ad4d">Public flow: Connect to Hermes creates a scoped browser token when the API server supports pairing. For remote hosts, set API_SERVER_CORS_ORIGINS to this extension origin and use a strong API_SERVER_KEY or scoped token.</p>
 
@@ -1661,6 +1631,25 @@
             <div class="settings-pane-heading"><span class="settings-pane-crumb" aria-hidden="true" data-i18n="ui.settings">Settings</span><h3 id="settingsPaneTitle-about" class="settings-pane-title" tabindex="-1" data-i18n="settings.categories.about.title">About &amp; Diagnostics</h3></div>
             <span class="settings-pane-flags"><span class="settings-pane-edited" hidden data-i18n="settings.categories.edited_hint">Unsaved edits</span><span class="settings-pane-saved" role="status" aria-live="polite" hidden></span></span>
           </div>
+        <section class="settings-section release-settings" aria-labelledby="releaseTitle">
+          <div class="release-control">
+            <div class="release-row">
+              <div>
+                <h3 id="releaseTitle" data-i18n="ui.browser.updates">Extension updates</h3>
+                <p><span id="versionLabel" data-i18n-runtime data-i18n="ui.version.loading">version loading…</span> <span data-i18n="settings.public_alpha_load_unpacked">· public alpha / load unpacked</span></p>
+              </div>
+              <div class="release-actions">
+                <button id="checkUpdatesButton" class="secondary" type="button" data-i18n="ui.check">Check</button>
+                <button id="reviewUpdateButton" type="button" data-i18n="ui.update">Update</button>
+              </div>
+            </div>
+            <p id="updateStatus" class="hint">Updates are checked against the public GitHub repo.</p>
+            <div id="updateReloadPending" class="update-reload-pending" hidden>
+              <p id="updateReloadPendingText" class="update-reload-pending-text">A newer build is on disk. Reload to run it.</p>
+              <button id="reloadBuildButton" class="secondary" type="button">Reload now</button>
+            </div>
+          </div>
+        </section>
         <details id="compatibilityPanel" class="compatibility-panel" aria-labelledby="compatibilityTitle">
           <summary class="compatibility-summary" aria-controls="compatibilityList">
             <span class="compatibility-summary-copy">
@@ -1693,8 +1682,12 @@
           <button id="copyDiagnosticsButton" class="secondary" type="button" data-i18n="ui.copy.diagnostics">Copy Diagnostics</button>
           <p id="diagnosticsCopyStatus" class="hint">Use this when filing GitHub issues or support reports.</p>
         </div>
-        <span class="nous-strip nous-strip-pane" role="img" aria-label="Nous Research" data-i18n-invariant></span>
         </section>
+
+        <footer class="settings-footer">
+          <p id="settingsSaveStatus" class="settings-save-status" role="status" aria-live="polite" data-i18n-runtime></p>
+          <button id="saveSettingsTopButton" class="settings-button primary" type="submit" title="Save settings" data-i18n-title="ui.save.settings" data-i18n="ui.save" disabled>Save</button>
+        </footer>
 
         <button id="settingsBackToTop" class="settings-back-to-top" type="button" hidden aria-label="Back to top" data-i18n-aria-label="settings.back_to_top"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="arrow-up"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg><span data-i18n="settings.back_to_top">Back to top</span></button>
       </form>
