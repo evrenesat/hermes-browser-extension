@@ -131,6 +131,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   agentDiscoveryScheme: 'http',
   autoNameSessions: true,
   showMessageTimes: true,
+  classicThinkingFaces: false,
   groupRoomModelBindings: {},
   sessionStartupMode: 'new-session',
   colorMode: 'system',

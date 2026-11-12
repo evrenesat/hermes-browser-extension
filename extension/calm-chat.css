@@ -6,7 +6,7 @@
 /* ------------------------------------------------------------------ */
 /* 1. Thread                                                           */
 /* ------------------------------------------------------------------ */
-html .messages { gap: 6px; padding: 0 4px 12px; }
+html .messages { gap: 6px; padding: 0 4px 36px; }
 html .message-row { margin: 0; }
 html .message-row[data-role="user"] { margin-top: 10px; }
 html .message-row[data-role="user"]:first-child { margin-top: 0; }
@@ -350,7 +350,9 @@ html .message-day-divider { justify-content: center; margin: 8px 0 2px; color: v
 html .message-day-divider::before, html .message-day-divider::after { display: none; }
 
 html .jump-to-latest {
-  inset-block-end: calc(100% + 8px);
+  inset-inline: auto 12px;
+  margin-inline: 0;
+  inset-block-end: calc(100% + 6px);
   inline-size: 28px;
   min-inline-size: 28px;
   block-size: 28px;
@@ -706,3 +708,9 @@ html .first-prompt-chip:hover { background: var(--calm-surface-2); }
 html .first-prompt-chips { padding: 0 0 8px; gap: 6px; }
 html .first-prompt-chip { min-height: 26px; padding: 0 10px; font-weight: 500; }
 html .first-prompt-chip:hover, html .first-prompt-chip:focus-visible { background: var(--calm-surface-2); color: var(--calm-text); border-color: var(--calm-border-strong); }
+
+/* Quiet thinking label (the kaomoji faces are an opt-in setting). */
+html .thinking-quiet { display: inline-flex; gap: 0; }
+html .thinking-quiet-label { animation: calmThinkingPulse 1.8s ease-in-out infinite; }
+@keyframes calmThinkingPulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { html .thinking-quiet-label { animation: none; } }

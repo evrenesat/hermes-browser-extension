@@ -376,7 +376,7 @@ export function groupThreadMenuEntries(row = {}) {
       title: title.slice(0, 160),
       preview: preview.slice(0, 240),
       source: 'hermes_bot_group_threads',
-      sourceLabel: 'Group Chat Threads',
+      sourceLabel: 'Group chat threads',
       messageCount: 1 + thread.replies.length,
       replyCount: thread.replies.length,
       lastActive: thread.latestAt,

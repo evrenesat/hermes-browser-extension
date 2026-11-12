@@ -335,7 +335,7 @@ html .settings-dialog .settings-toggle-card.compact-toggle .settings-switch { ju
 /* ------------------------------------------------------------------ */
 /* 5. Switches (32x18)                                                 */
 /* ------------------------------------------------------------------ */
-html .settings-dialog .settings-switch-input {
+html .settings-switch-input {
   position: absolute;
   inline-size: 1px;
   block-size: 1px;
@@ -343,7 +343,7 @@ html .settings-dialog .settings-switch-input {
   opacity: 0;
   pointer-events: none;
 }
-html .settings-dialog .settings-switch {
+html .settings-switch {
   position: relative;
   display: block;
   box-sizing: border-box;
@@ -359,7 +359,7 @@ html .settings-dialog .settings-switch {
   box-shadow: none;
   transition: background-color var(--calm-ease);
 }
-html .settings-dialog .settings-switch::after {
+html .settings-switch::after {
   content: "";
   position: absolute;
   inset-block-start: 2px;
@@ -372,19 +372,19 @@ html .settings-dialog .settings-switch::after {
   transform: none;
   transition: transform var(--calm-ease);
 }
-html .settings-dialog :is(.settings-toggle-card:has(input:checked), .assist-setting-row:has(input:checked), .runtime-toggle[aria-checked="true"]) .settings-switch {
+html :is(.settings-toggle-card:has(input:checked), .assist-setting-row:has(input:checked), .runtime-toggle[aria-checked="true"]) .settings-switch {
   background: var(--calm-accent);
   border: 0;
 }
-html .settings-dialog :is(.settings-toggle-card:has(input:checked), .assist-setting-row:has(input:checked), .runtime-toggle[aria-checked="true"]) .settings-switch::after {
+html :is(.settings-toggle-card:has(input:checked), .assist-setting-row:has(input:checked), .runtime-toggle[aria-checked="true"]) .settings-switch::after {
   transform: translateX(14px);
   background: #fff;
 }
-html .settings-dialog .settings-toggle-card:has(input:focus-visible) .settings-switch {
+html .settings-toggle-card:has(input:focus-visible) .settings-switch {
   outline: 2px solid var(--calm-accent);
   outline-offset: 2px;
 }
-html .settings-dialog .settings-toggle-card:has(input:disabled) { cursor: not-allowed; opacity: 0.55; }
+html .settings-toggle-card:has(input:disabled) { cursor: not-allowed; opacity: 0.55; }
 
 /* ------------------------------------------------------------------ */
 /* 6. Segmented controls + choice rows                                 */
@@ -902,7 +902,7 @@ html .settings-dialog .settings-advanced[open] > summary::before { transform: ro
 html .settings-dialog .settings-advanced > summary:hover { color: var(--calm-text); }
 html .settings-dialog .settings-advanced-body { display: flex; flex-direction: column; gap: 8px; padding-bottom: 4px; }
 html .settings-dialog .is-prose:not(.is-prose-open) {
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; line-clamp: 1; overflow: hidden;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
 }
 html .settings-dialog .settings-prose-toggle {
   justify-self: start; align-self: flex-start; min-height: 0; margin: 2px 0 0; padding: 0; border: 0; background: none;
@@ -961,3 +961,68 @@ html .settings-dialog :is(#textZoomDecreaseButton, #textZoomIncreaseButton) { in
 html .settings-dialog .text-zoom-input-wrap { position: relative; display: block; }
 html .settings-dialog .text-zoom-input-wrap #textZoomInput { min-block-size: var(--calm-control-h); block-size: var(--calm-control-h); padding: 0 18px 0 8px; text-align: center; appearance: textfield; -moz-appearance: textfield; }
 html .settings-dialog .text-zoom-input-wrap > span:last-child { position: absolute; inset-block: 0; inset-inline-end: 6px; display: grid; place-items: center; color: var(--calm-muted); font-size: calc(12px * var(--hermes-text-zoom, 1)); pointer-events: none; }
+
+/* ------------------------------------------------------------------ */
+/* Phase 3: Models pane                                                */
+/* ------------------------------------------------------------------ */
+html .settings-dialog .models-select-card {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  box-shadow: none;
+  color: var(--calm-text);
+  text-align: start;
+}
+html .settings-dialog .models-select-card:hover,
+html .settings-dialog .models-select-card:focus-visible { background: var(--calm-surface-2); border-color: var(--calm-border-strong); box-shadow: none; }
+html .settings-dialog .models-select-copy { gap: 1px; }
+html .settings-dialog .models-select-label { font: 500 11px/1.3 var(--calm-font-ui); letter-spacing: normal; text-transform: none; color: var(--calm-muted); }
+html .settings-dialog .models-select-name { font: 600 13px/1.4 var(--calm-font-ui); color: var(--calm-text); }
+html .settings-dialog .models-select-meta { font: 400 12px/1.4 var(--calm-font-ui); color: var(--calm-muted); }
+html .settings-dialog .models-select-mark { inline-size: auto; block-size: auto; min-width: 0; border: 0; background: transparent; box-shadow: none; color: var(--calm-muted); }
+
+/* Reasoning effort: compact wrapping chips instead of seven stacked rows. */
+html .settings-dialog .models-effort-grid {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 4px;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+html .settings-dialog .models-effort-grid .runtime-effort {
+  display: inline-flex;
+  min-height: var(--calm-control-h);
+  padding: 0 10px;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-pill);
+  background: transparent;
+}
+html .settings-dialog .models-effort-grid .runtime-effort:hover { background: var(--calm-surface-2); }
+html .settings-dialog .models-effort-grid .runtime-effort[aria-checked="true"] { background: var(--calm-accent-soft); border-color: var(--calm-accent); }
+html .settings-dialog .models-effort-grid .settings-choice-mark { display: none; }
+html .settings-dialog .models-effort-grid .settings-choice-copy strong { font: 500 12px/1 var(--calm-font-ui); }
+
+/* Phase 3: permissions pane */
+html .settings-dialog .status-card .status-copy #activeUrl { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; word-break: normal; }
+html .settings-dialog .browser-control-state { min-width: 0; min-height: 0; gap: 6px; padding: 2px 8px; }
+html .settings-dialog .browser-control-state[data-state="active"], html .settings-dialog .browser-control-state[data-state="ready"] { color: var(--calm-ok); background: color-mix(in srgb, var(--calm-ok) 14%, transparent); }
+html .settings-dialog .browser-control-field > span:first-child { color: var(--calm-text); font: 500 calc(12px * var(--hermes-text-zoom, 1)) var(--calm-font-ui); letter-spacing: normal; text-transform: none; }
+
+/* Phase 3: diagnostics rows */
+html .settings-dialog .compatibility-toggle::after {
+  content: "\203A";
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  color: var(--calm-muted);
+  font-size: 16px;
+  transition: transform var(--calm-ease);
+}
+html .settings-dialog .compatibility-panel[open] .compatibility-toggle::after { content: "\203A"; transform: rotate(90deg); border: 0; color: var(--calm-muted); }
+html .settings-dialog .compatibility-row .compatibility-meta { display: none; }
+html .settings-dialog .compatibility-row:is(:hover, :focus-within) .compatibility-meta { display: block; }

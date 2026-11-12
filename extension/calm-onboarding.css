@@ -348,6 +348,8 @@ body.startup-active .startup-actions #startupTestConnectionButton .settings-conn
   text-align: center;
   font: 500 13px/1 var(--calm-font-ui);
 }
+.profile-switch-actions:has(> button:nth-child(3)) { flex-direction: column-reverse; align-items: stretch; }
+.profile-switch-actions:has(> button:nth-child(3)) > button { inline-size: 100%; }
 .profile-switch-actions .ghost { order: -1; border-color: transparent; background: transparent; color: var(--calm-muted); }
 .profile-switch-actions .ghost:hover,
 .profile-switch-actions .ghost:focus-visible { border-color: transparent; background: var(--calm-surface-2); color: var(--calm-text); }
@@ -361,7 +363,7 @@ body.startup-active .startup-actions #startupTestConnectionButton .settings-conn
 .operation-toast {
   --toast-tone: var(--calm-ok);
   top: auto;
-  bottom: 16px;
+  bottom: calc(var(--hermes-bottom-dock-height, 112px) + 8px);
   grid-template-columns: 16px minmax(0, 1fr) 24px;
   gap: 8px;
   inline-size: min(340px, calc(100% - 24px));
@@ -532,3 +534,22 @@ html body.voice-page .voice-status { font: 400 13px/1.5 var(--calm-font-ui); col
 html body.voice-page .voice-actions { justify-content: flex-end; gap: 6px; }
 html body.voice-page .voice-actions button { flex: 0 1 auto; min-height: var(--calm-control-h); padding: 0 12px; border: 0; border-radius: var(--calm-radius-control); background: var(--calm-surface-2); color: var(--calm-text); font: 500 13px/1 var(--calm-font-ui); text-transform: none; letter-spacing: normal; }
 html body.voice-page .voice-actions #startVoiceButton { background: var(--calm-accent); color: var(--calm-accent-fg); }
+
+/* Error card: one-line summary, technical text behind Details, labelled actions. */
+.startup-details { margin: 2px 0 0; color: var(--calm-muted); font: 400 12px/1.5 var(--calm-font-ui); }
+.startup-details[hidden] { display: none; }
+.startup-details > summary { cursor: pointer; display: inline-block; padding: 2px 0; color: var(--calm-muted); list-style: none; }
+.startup-details > summary::-webkit-details-marker { display: none; }
+.startup-details > summary::before { content: '›'; display: inline-block; margin-inline-end: 4px; transition: transform 120ms ease; }
+.startup-details[open] > summary::before { transform: rotate(90deg); }
+.startup-details > summary:hover { color: var(--calm-text); }
+.startup-details-body { margin: 4px 0 0; padding: 6px 8px; border-radius: var(--calm-radius-control); background: var(--calm-surface-2); overflow-wrap: anywhere; user-select: text; }
+.startup-settings-label { display: none; }
+body.startup-active .startup-actions #settingsButton { inline-size: auto; padding: 0 10px; }
+body.startup-active .startup-actions #settingsButton :is(svg, .sr-only) { display: none; }
+body.startup-active .startup-actions #settingsButton .startup-settings-label { display: inline; }
+
+/* Hermes Control light: off is neutral, on is ok-green (off is a choice, not an error). */
+html .browser-control-dialog .browser-control-light { --light-color: var(--calm-muted); }
+html .browser-control-dialog .browser-control-light[data-state="on"] { --light-color: var(--calm-ok); color: var(--calm-text); }
+html .browser-control-dialog .browser-control-light-dot { box-shadow: none; }

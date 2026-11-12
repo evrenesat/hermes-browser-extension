@@ -153,7 +153,7 @@ test('sidepanel uses one persistent seeded diffusion placeholder per image call'
   assert.match(source, /image-gen-phase-track/);
   assert.match(source, /image-gen-vhs/);
   assert.doesNotMatch(source, /image-gen-reticle|image-gen-scanline/);
-  assert.match(source, /LATENT FIELD/);
+  assert.match(source, /Latent field/);
   assert.match(source, /DENOISING/);
   assert.match(source, /RESOLVING/);
   assert.match(source, /FINALIZING/);

@@ -90,6 +90,7 @@ test('the thinking indicator announces itself in the panel language', async () =
   const { document } = new JSDOM('<!doctype html><body><div id="host"></div></body>').window;
   const host = document.getElementById('host');
   const context = run('renderThinkingIndicator', {
+    settings: { classicThinkingFaces: true },
     scheduleClassicThinkingFaces: () => {},
     THINKING_STATUSES: ['thinking'],
     classicThinkingFace: () => '(•‿•)',
@@ -200,6 +201,7 @@ test('controls built before a language change are relabelled by the panel pass',
     t: runtime.t,
     escapeHtml,
     openGeneratedImageLightbox: () => {},
+    settings: { classicThinkingFaces: true },
     scheduleClassicThinkingFaces: () => {},
     THINKING_STATUSES: ['thinking'],
     classicThinkingFace: () => '(•‿•)',

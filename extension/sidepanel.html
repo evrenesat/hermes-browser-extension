@@ -35,7 +35,7 @@
           <svg class="new-session-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="square-pen"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg>
         </button>
         <button id="botModeButton" class="settings-button icon-button bot-mode-button" type="button" data-i18n-title="bot_mode.open_title" data-i18n-aria-label="bot_mode.open_title" aria-label="Open Bot Mode" title="Open Bot Mode" aria-expanded="false" hidden>
-          <svg class="bot-mode-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="avatar-circle"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg><span class="sr-only" data-i18n="bot_mode.title">Bot Mode</span>
+          <svg class="bot-mode-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="avatar-circle"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg><span class="sr-only" data-i18n="bot_mode.title">Bot mode</span>
         </button>
         <button id="openFullViewButton" class="settings-button icon-button" type="button" title="Open Hermes Web" aria-label="Hermes Web" data-i18n-title="webapp.open_title" data-i18n-aria-label="ui.hermes.web">
           <svg class="web-view-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="external-link"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
@@ -45,7 +45,7 @@
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="settings-cog"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
           <span class="sr-only" data-i18n="ui.settings">Settings</span>
         </button>
-        <button id="startupTestConnectionButton" class="startup-test-connection" type="button"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="cellular-signal-3"><path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/></svg><span class="settings-connection-test-label" data-i18n="ui.retry">Retry</span></button>
+        <button id="startupTestConnectionButton" class="startup-test-connection" type="button"><span class="settings-connection-test-label" data-i18n="ui.retry">Retry</span></button>
         <button id="startupConnectButton" class="startup-test-connection startup-connect-action" type="button" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="plug"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></svg><span data-i18n="ui.connect.to.hermes">Connect to Hermes</span></button>
       </header>
 
@@ -61,19 +61,19 @@
           <button id="createSessionButton" class="secondary" type="button" ><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg><span data-i18n="session.new_extension_session">New session</span></button>
           <button id="refreshSessionsButton" class="secondary" type="button">
             <svg id="sessionRefreshIcon" class="session-refresh-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="refresh"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
-            <span id="refreshSessionsLabel">Refresh Sessions</span>
+            <span id="refreshSessionsLabel">Refresh</span>
           </button>
         </footer>
         <footer id="projectsFooter" hidden>
           <button id="newProjectButton" class="secondary" type="button" data-i18n="projects.new">New project</button>
-          <button id="refreshProjectsButton" class="secondary" type="button" data-i18n="projects.refresh">Refresh Projects</button>
+          <button id="refreshProjectsButton" class="secondary" type="button" data-i18n="projects.refresh">Refresh projects</button>
         </footer>
       </section>
 
       <section id="botModePanel" class="bot-mode-panel" role="dialog" data-i18n-aria-label="bot_mode.dialog_label" aria-label="Bot Mode" hidden>
         <header class="bot-mode-head">
           <div class="bot-mode-head-copy">
-            <h2 data-i18n="bot_mode.title">Bot Mode</h2>
+            <h2 data-i18n="bot_mode.title">Bot mode</h2>
             <p id="botModeStatus" role="status" aria-live="polite">Connect to load your Hermes agents.</p>
           </div>
           <div class="bot-mode-head-controls">
@@ -89,7 +89,7 @@
           <input id="botModeSearch" type="search" data-i18n-placeholder="bot_mode.search" data-i18n-aria-label="bot_mode.search" placeholder="Search agents" aria-label="Search agents" autocomplete="off" />
           <div class="bot-mode-view-toggle" role="group" data-i18n-aria-label="bot_mode.view_toggle_label" aria-label="Roster view">
             <button id="botModeViewAgents" class="bot-mode-view-tab" type="button" aria-pressed="true" data-i18n="bot_mode.agents">Agents</button>
-            <button id="botModeViewGroups" class="bot-mode-view-tab" type="button" aria-pressed="false" data-i18n="bot_mode.tab_groups">Group Chats</button>
+            <button id="botModeViewGroups" class="bot-mode-view-tab" type="button" aria-pressed="false" data-i18n="bot_mode.tab_groups">Group chats</button>
           </div>
         </div>
         <div id="botModeRoster" class="bot-mode-roster" role="listbox" data-i18n-aria-label="bot_mode.roster_label" aria-label="Hermes agents"></div>
@@ -97,10 +97,10 @@
         <footer class="bot-mode-foot">
           <span id="botModeVerify" class="bot-mode-verify" data-i18n="bot_mode.connected_instance">Current connected Hermes instance</span>
           <div class="bot-mode-actions">
-            <button id="botModeEditButton" class="bot-mode-action" type="button" disabled data-i18n="bot_mode.edit_profile">Edit Profile</button>
-            <button id="botModeNewAgentButton" class="bot-mode-action" type="button" data-i18n="bot_mode.new_agent">New Agent</button>
+            <button id="botModeEditButton" class="bot-mode-action" type="button" disabled data-i18n="bot_mode.edit_profile">Edit profile</button>
+            <button id="botModeNewAgentButton" class="bot-mode-action" type="button" data-i18n="bot_mode.new_agent">New agent</button>
             <button id="botModeNewGroupButton" class="bot-mode-action primary full-width" type="button" data-i18n="bot_mode.new_group" hidden>+ Start A New Group Chat</button>
-            <button id="botModeOpenButton" class="bot-mode-action primary" type="button" disabled data-i18n="bot_mode.open_chat">Open Bot Chat</button>
+            <button id="botModeOpenButton" class="bot-mode-action primary" type="button" disabled data-i18n="bot_mode.open_chat">Open bot chat</button>
           </div>
         </footer>
       </section>
@@ -392,7 +392,7 @@
           <h1 class="bot-chat-intro-title" id="botChatIntroTitle">ROXAS</h1>
           <p class="bot-chat-intro-subtitle" id="botChatIntroSubtitle" data-i18n="bot_mode.chat_empty">Say something to get started.</p>
           <div class="bot-chat-intro-actions">
-            <button id="botModeReturnButton" class="secondary bot-mode-return-button" type="button" data-i18n="bot_mode.return_to_sessions" data-i18n-title="bot_mode.return_to_sessions_title" data-i18n-aria-label="bot_mode.return_to_sessions_title">Regular Sessions</button>
+            <button id="botModeReturnButton" class="secondary bot-mode-return-button" type="button" data-i18n="bot_mode.return_to_sessions" data-i18n-title="bot_mode.return_to_sessions_title" data-i18n-aria-label="bot_mode.return_to_sessions_title">Regular sessions</button>
           </div>
         </div>
 
@@ -419,7 +419,7 @@
         <button id="jumpToLatestButton" class="jump-to-latest" type="button" hidden aria-label="Jump to latest" title="Jump to latest" data-i18n-aria-label="chat.jump_to_latest" data-i18n-title="chat.jump_to_latest"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="chevron-down"><path d="m6 9 6 6 6-6"/></svg><span id="jumpToLatestLabel" class="jump-to-latest-label" data-i18n="chat.jump_to_latest">Jump to latest</span></button>
         <section id="taskStack" class="task-stack" data-expanded="true" aria-label="Hermes task status" hidden data-i18n-aria-label="ui.hermes.task.status">
           <button id="taskStackToggle" class="task-stack-toggle" type="button" aria-expanded="true">
-            <span class="task-stack-title" data-i18n="ui.tasks">☑ TASKS</span>
+            <span class="task-stack-title" data-i18n="ui.tasks">Tasks</span>
             <span id="taskStackSummary" class="task-stack-summary">0 complete · 0 active</span>
             <span id="taskStackProgress" class="task-stack-progress" aria-hidden="true"><i></i></span>
             <span class="task-stack-chevron" aria-hidden="true">↑</span>
@@ -428,7 +428,7 @@
         </section>
         <section id="subagentStack" class="task-stack subagent-stack" data-expanded="true" aria-label="Hermes subagent status" data-i18n-aria-label="a11y.subagent_status" hidden>
           <button id="subagentStackToggle" class="task-stack-toggle" type="button" aria-expanded="true">
-            <span class="task-stack-title"><span class="subagent-stack-spinner" aria-hidden="true"><span class="subagent-stack-spinner-strip"><span>⠋</span><span>⠙</span><span>⠹</span><span>⠸</span><span>⠼</span><span>⠴</span><span>⠦</span><span>⠧</span><span>⠇</span><span>⠏</span></span></span> <span data-i18n="ui.subagents">SUBAGENTS</span></span>
+            <span class="task-stack-title"><span class="subagent-stack-spinner" aria-hidden="true"><span class="subagent-stack-spinner-strip"><span>⠋</span><span>⠙</span><span>⠹</span><span>⠸</span><span>⠼</span><span>⠴</span><span>⠦</span><span>⠧</span><span>⠇</span><span>⠏</span></span></span> <span data-i18n="ui.subagents">Subagents</span></span>
             <span id="subagentStackSummary" class="task-stack-summary" aria-live="polite"></span>
             <span class="task-stack-chevron" aria-hidden="true">↑</span>
           </button>
@@ -454,7 +454,7 @@
         <form id="composer" class="composer">
           <button id="statusStackToggle" class="status-stack-toggle" type="button" aria-expanded="true" aria-controls="composerStatusStack" title="Show or hide status" aria-label="Show or hide status" data-i18n-title="ui.show.or.hide.status" data-i18n-aria-label="ui.show.or.hide.status"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="chevron-down"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="composer-header" id="composerStatusStack">
-            <label class="composer-label sr-only" id="composerLabel" for="promptInput" data-i18n="ui.ask.hermes.36d55d5a">ASK HERMES</label>
+            <label class="composer-label sr-only" id="composerLabel" for="promptInput" data-i18n="ui.ask.hermes.36d55d5a">Ask Hermes</label>
             <button id="contextChip" class="context-chip" type="button" aria-expanded="false">
               <img id="contextChipIcon" class="context-chip-icon" alt="" width="14" height="14" hidden />
               <span id="contextChipLabel" class="context-chip-label" data-i18n-runtime>Loading…</span>
@@ -476,7 +476,7 @@
           <section id="agentPromptCard" class="agent-prompt-card" role="group" aria-live="polite" hidden></section>
           <section id="localDocumentApprovalNotice" class="session-ownership-notice" aria-live="polite" hidden>
             <div class="session-ownership-copy">
-              <span class="session-ownership-kicker" data-i18n="ui.local_document_access">LOCAL DOCUMENT ACCESS</span>
+              <span class="session-ownership-kicker" data-i18n="ui.local_document_access">Local document access</span>
               <strong id="localDocumentApprovalTitle">Local document detected</strong>
               <span id="localDocumentApprovalDetail" data-i18n="browser_control.local_document_detail">Approve local document access to inspect this file, extract its slides or text, and let Hermes Control use its tab.</span>
             </div>
@@ -487,7 +487,7 @@
           </section>
           <section id="sessionOwnershipNotice" class="session-ownership-notice" aria-live="polite" hidden>
             <div class="session-ownership-copy">
-              <span class="session-ownership-kicker" data-i18n="ui.shared.session">SHARED SESSION</span>
+              <span class="session-ownership-kicker" data-i18n="ui.shared.session">Shared session</span>
               <strong id="sessionOwnershipTitle">Choose where to send</strong>
               <span id="sessionOwnershipDetail"></span>
             </div>
@@ -515,7 +515,7 @@
             <span id="voiceActivityBars" class="voice-activity-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
           </div>
           <div class="composer-input-wrap" id="composerDropZone">
-            <textarea id="promptInput" rows="1" title="Enter to send, Shift+Enter for a new line, / for commands" placeholder="Ask Hermes about this page..." data-i18n-placeholder="ui.ask.hermes.about.this.page"></textarea>
+            <textarea id="promptInput" rows="1" title="Enter to send, Shift+Enter for a new line, / for commands" placeholder="Ask Hermes about this page…" data-i18n-placeholder="ui.ask.hermes.about.this.page"></textarea>
             <div class="composer-resize" aria-hidden="true"><span></span></div>
             <div id="dropOverlay" class="drop-overlay" hidden data-i18n="ui.drop.files.to.attach">Drop files to attach</div>
             <button id="attachMenuButton" class="attach-menu-button composer-plus" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Attach context" title="Attach context" data-i18n-title="ui.attach.context" data-i18n-aria-label="ui.attach.context">
@@ -551,19 +551,19 @@
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="compass"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36 6.36-2.12z"/></svg>
             </button>
             <section id="attachMenu" class="attach-menu" role="dialog" aria-label="Attach context" hidden data-i18n-aria-label="ui.attach.context">
-              <button type="button" data-attach="files"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="file"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg><span data-i18n="ui.files">Files...</span></button>
-              <button type="button" data-attach="folder"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="folder"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg><span data-i18n="ui.folder">Folder...</span></button>
-              <button type="button" data-attach="images"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="image"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg><span data-i18n="ui.images">Images...</span></button>
+              <button type="button" data-attach="files"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="file"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg><span data-i18n="ui.files">Files…</span></button>
+              <button type="button" data-attach="folder"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="folder"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg><span data-i18n="ui.folder">Folder…</span></button>
+              <button type="button" data-attach="images"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="image"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg><span data-i18n="ui.images">Images…</span></button>
               <button type="button" data-attach="paste-image"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="clipboard"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg><span data-i18n="ui.paste.image">Paste image</span></button>
               <hr />
-              <button type="button" data-attach="url"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span data-i18n="ui.url">URL...</span></button>
+              <button type="button" data-attach="url"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="link"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span data-i18n="ui.url">URL…</span></button>
               <button type="button" data-attach="tab-screenshot"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="camera"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg><span data-i18n="ui.tab.screenshot">Tab screenshot</span></button>
               <hr />
               <button type="button" data-attach="pick-element"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="crosshair"><circle cx="12" cy="12" r="10"/><path d="M22 12h-4"/><path d="M6 12H2"/><path d="M12 6V2"/><path d="M12 22v-4"/></svg><span data-i18n="ui.pick.page.element">Pick page element</span></button>
               <button type="button" data-attach="comment-page" id="commentPageAttachButton"><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="comment-text"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M13 8H7"/><path d="M17 12H7"/></svg><span data-i18n="ui.comment.on.page">Comment on page</span></button>
               <button type="button" data-attach="clear-pick" id="clearPickAttachButton" hidden><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg><span data-i18n="ui.clear.picked.element">Clear picked element</span></button>
               <hr />
-              <button type="button" data-snippet="Summarize the attached context and call out the important takeaways."><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="text-quote"><path d="M17 6H3"/><path d="M21 12H8"/><path d="M21 18H8"/><path d="M3 12v6"/></svg><span data-i18n="ui.prompt.snippets">Prompt snippets...</span></button>
+              <button type="button" data-snippet="Summarize the attached context and call out the important takeaways."><svg class="attach-menu-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="text-quote"><path d="M17 6H3"/><path d="M21 12H8"/><path d="M21 18H8"/><path d="M3 12v6"/></svg><span data-i18n="ui.prompt.snippets">Prompt snippets…</span></button>
             </section>
           </div>
           <div id="attachmentList" class="attachment-list" hidden></div>
@@ -640,7 +640,7 @@
           <section id="modelOptionsList" class="model-options-list" aria-label="Model runtime options" data-i18n-aria-label="ui.model.runtime.options"></section>
           <footer>
             <button id="refreshModelsButton" class="secondary" type="button" title="Refresh model catalog" aria-busy="false" data-i18n-title="ui.refresh.model.catalog" data-i18n-runtime>Refresh models</button>
-            <button id="editModelsButton" class="secondary" type="button" data-i18n="ui.edit.models">Edit Models...</button>
+            <button id="editModelsButton" class="secondary" type="button" data-i18n="ui.edit.models">Edit models…</button>
           </footer>
           <p id="modelRefreshStatus" class="model-refresh-status" role="status" aria-live="polite" hidden></p>
         </section>
@@ -910,7 +910,7 @@
         <section class="settings-section connection-settings" aria-labelledby="connectionTitle">
           <div class="settings-section-head">
             <div>
-              <h3 id="connectionTitle" data-i18n="ui.gateway.connection">Gateway Connection</h3>
+              <h3 id="connectionTitle" data-i18n="ui.gateway.connection">Gateway connection</h3>
               <p data-i18n="ui.choose.where.this.browser.session.reaches.hermes">Choose where the extension reaches Hermes.</p>
             </div>
           </div>
@@ -1036,7 +1036,7 @@
         <section class="settings-section profile-settings" aria-labelledby="profileTitle">
           <div class="settings-section-head">
             <div>
-              <h3 id="profileTitle" data-i18n="ui.agent.profile">Agent Profile</h3>
+              <h3 id="profileTitle" data-i18n="ui.agent.profile">Agent profile</h3>
               <p data-i18n="ui.choose.which.hermes.agent.profile.the.browser.should.use.when.t.3d3ae401">Choose which Hermes agent profile the extension should use when the local gateway exposes profiles.</p>
             </div>
           </div>
@@ -1110,7 +1110,7 @@
           <label class="settings-toggle-card bot-mode-toggle-card" for="botModeEnabledInput">
             <input id="botModeEnabledInput" class="settings-switch-input" type="checkbox" role="switch" />
             <span class="bot-mode-toggle-copy settings-toggle-copy">
-              <strong data-i18n="bot_mode.enable_label">Enable Bot Mode</strong>
+              <strong data-i18n="bot_mode.enable_label">Enable bot mode</strong>
               <small data-i18n="bot_mode.off_hint_sidepanel">Off by default. Uses the currently connected Hermes instance.</small>
             </span>
             <span class="settings-switch" aria-hidden="true"></span>
@@ -1121,7 +1121,7 @@
           <details class="bot-mode-cron-card" id="botModeCronCard">
             <summary class="bot-mode-cron-head">
               <div class="bot-mode-cron-title">
-                <h4 data-i18n="bot_mode.cron_title">Active Cron Jobs</h4>
+                <h4 data-i18n="bot_mode.cron_title">Active cron jobs</h4>
                 <small data-i18n="bot_mode.cron_copy">Scheduled tasks running on this agent's profile (review-watch, scouts, digests).</small>
               </div>
               <button id="botModeCronRefreshButton" class="icon-button bot-mode-cron-refresh" type="button" title="Refresh cron jobs" data-i18n-title="profile.refresh_title" aria-label="Refresh cron jobs" data-i18n-aria-label="profile.refresh_title">
@@ -1211,7 +1211,7 @@
         <section class="settings-subsection browser-behavior-settings" aria-labelledby="browserBehaviorTitle">
           <div class="settings-section-head compact">
             <div>
-              <h4 id="browserBehaviorTitle" data-i18n="ui.browser.behavior">Browser Behavior</h4>
+              <h4 id="browserBehaviorTitle" data-i18n="ui.browser.behavior">Browser behavior</h4>
               <p data-i18n="ui.session.naming.prompt.context.and.side.panel.residency.live.together">Session naming, prompt context, and side-panel residency live together.</p>
             </div>
           </div>
@@ -1231,6 +1231,15 @@
               <small data-i18n="ui.show.message.times.hint">Show the time on your messages when you hover or tap them.</small>
             </span>
             <input id="showMessageTimesInput" class="settings-switch-input" type="checkbox" />
+            <span class="settings-switch" aria-hidden="true"></span>
+          </label>
+
+          <label class="settings-toggle-card auto-name-toggle">
+            <span class="settings-toggle-copy">
+              <strong data-i18n="ui.playful.thinking.indicator">Playful thinking indicator</strong>
+              <small data-i18n="ui.playful.thinking.indicator.hint">Show animated faces while Hermes thinks, instead of a quiet label.</small>
+            </span>
+            <input id="classicThinkingFacesInput" class="settings-switch-input" type="checkbox" />
             <span class="settings-switch" aria-hidden="true"></span>
           </label>
 
@@ -1363,7 +1372,7 @@
           <section id="statusCard" class="status-card settings-active-tab" aria-live="polite" aria-label="Active tab status" data-i18n-aria-label="ui.active.tab.status">
             <div class="status-label">
               <span class="status-dot" id="statusDot"></span>
-              <span data-i18n="ui.active.tab.2bc454c2">ACTIVE TAB</span>
+              <span data-i18n="ui.active.tab.2bc454c2">Active tab</span>
             </div>
             <div class="status-copy">
               <strong id="activeTitle">No tab detected</strong>
@@ -1371,13 +1380,13 @@
             </div>
             <div id="statusActions" class="status-actions" hidden>
               <button id="statusRetryProbeButton" class="secondary tiny" type="button" hidden></button>
-              <button id="statusCopyDiagnosticsButton" class="secondary tiny" type="button" data-i18n="ui.copy.diagnostics">Copy Diagnostics</button>
+              <button id="statusCopyDiagnosticsButton" class="secondary tiny" type="button" data-i18n="ui.copy.diagnostics">Copy diagnostics</button>
             </div>
           </section>
 
           <section id="browserControlCard" class="browser-control-card" aria-labelledby="browserControlTitle">
             <div class="browser-control-card-head">
-              <span class="browser-control-kicker" data-i18n="browser_control.kicker">HERMES CONTROL</span>
+              <span class="browser-control-kicker" data-i18n="browser_control.kicker">Hermes Control</span>
               <div class="browser-control-title-row">
                 <h5 id="browserControlTitle" data-i18n="browser_control.title">Hermes Control</h5>
                 <span id="browserControlState" class="browser-control-state">OFF</span>
@@ -1686,7 +1695,7 @@
               <p data-i18n="ui.copy.a.redacted.compatibility.report.it.excludes.tokens.cookies.ab0019e3">Copy a redacted compatibility report. It excludes tokens, cookies, page text, selected text, tab titles, and full URLs.</p>
             </div>
           </div>
-          <button id="copyDiagnosticsButton" class="secondary" type="button" data-i18n="ui.copy.diagnostics">Copy Diagnostics</button>
+          <button id="copyDiagnosticsButton" class="secondary" type="button" data-i18n="ui.copy.diagnostics">Copy diagnostics</button>
           <p id="diagnosticsCopyStatus" class="hint">Use this when filing GitHub issues or support reports.</p>
         </div>
         </section>
@@ -1704,7 +1713,7 @@
       <div class="update-dialog-card">
         <button id="closeUpdateDialogButton" class="update-dialog-close" type="button" aria-label="Close update review" data-i18n-aria-label="ui.close.update.review">×</button>
         <span class="update-dialog-mark" aria-hidden="true"></span>
-        <p class="eyebrow" data-i18n="ui.hermes.browser.update.channel">HERMES BROWSER / UPDATE CHANNEL</p>
+        <p class="eyebrow" data-i18n="ui.hermes.browser.update.channel">Hermes Browser / update channel</p>
         <h2 id="updateDialogTitle">Checking the extension's main branch…</h2>
         <p id="updateDialogSummary" class="update-dialog-summary">Comparing this loaded build with the public GitHub repository.</p>
         <div id="updateChangeGroups" class="update-change-groups" aria-live="polite"></div>
@@ -1739,7 +1748,7 @@
       <span class="browser-control-energy" aria-hidden="true"></span>
       <span class="browser-control-flare" aria-hidden="true"></span>
       <div class="browser-control-titlebar">
-        <h2 id="browserControlDialogTitle" class="browser-control-dialog-title" tabindex="-1" autofocus data-i18n="browser_control.kicker">HERMES CONTROL</h2>
+        <h2 id="browserControlDialogTitle" class="browser-control-dialog-title" tabindex="-1" autofocus data-i18n="browser_control.kicker">Hermes Control</h2>
         <span id="browserControlLight" class="browser-control-light" role="img" tabindex="0" data-state="off" data-control-help="status" data-help-as-name>
           <span class="browser-control-light-dot" aria-hidden="true"></span>
           <span id="browserControlLightWord" class="browser-control-light-word" aria-hidden="true" data-i18n-runtime data-i18n="browser_control.state_off">Off</span>
@@ -1797,7 +1806,7 @@
         <div class="add-connection-head">
           <button id="addConnectionBack" class="add-connection-icon" type="button" aria-label="Back" title="Back" data-i18n-aria-label="ui.back" data-i18n-title="ui.back" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="arrow-left"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg></button>
           <div class="add-connection-heading">
-            <span id="addConnectionKicker" class="session-ownership-kicker" data-i18n="addconn.kicker">NEW CONNECTION</span>
+            <span id="addConnectionKicker" class="session-ownership-kicker" data-i18n="addconn.kicker">New connection</span>
             <h2 id="addConnectionTitle"></h2>
             <p id="addConnectionSteps" class="add-connection-steps" aria-live="polite"></p>
           </div>
@@ -1904,7 +1913,7 @@
     </section>
     <section id="profileSwitchDialog" class="profile-switch-dialog" role="dialog" aria-modal="true" aria-labelledby="profileSwitchTitle" aria-describedby="profileSwitchDetail" tabindex="-1" hidden>
       <div class="profile-switch-card">
-        <span class="session-ownership-kicker" data-i18n="profile_switch.kicker">PROFILE CHANGE</span>
+        <span class="session-ownership-kicker" data-i18n="profile_switch.kicker">Profile change</span>
         <h2 id="profileSwitchTitle" data-i18n="profile_switch.title">Start a new Hermes session?</h2>
         <p id="profileSwitchDetail"></p>
         <div class="profile-switch-actions">
@@ -1916,11 +1925,11 @@
     </section>
     <section id="botModeLeaveDialog" class="profile-switch-dialog bot-mode-leave-dialog" role="dialog" aria-modal="true" aria-labelledby="botModeLeaveTitle" aria-describedby="botModeLeaveDetail" tabindex="-1" hidden>
       <div class="profile-switch-card">
-        <span class="session-ownership-kicker" data-i18n="bot_mode.leave_kicker">REGULAR SESSIONS</span>
-        <h2 id="botModeLeaveTitle" data-i18n="bot_mode.leave_title">Exit Bot Mode?</h2>
+        <span class="session-ownership-kicker" data-i18n="bot_mode.leave_kicker">Regular sessions</span>
+        <h2 id="botModeLeaveTitle" data-i18n="bot_mode.leave_title">Exit bot mode?</h2>
         <p id="botModeLeaveDetail" data-i18n="bot_mode.leave_detail">Starting a new extension session will return you to your regular workspace.</p>
         <div class="profile-switch-actions">
-          <button id="botModeLeaveConfirmButton" class="primary" type="button" data-i18n="bot_mode.leave_confirm">Return to Regular Sessions</button>
+          <button id="botModeLeaveConfirmButton" class="primary" type="button" data-i18n="bot_mode.leave_confirm">Return to regular sessions</button>
           <button id="botModeLeaveCancelButton" class="ghost" type="button" data-i18n="ui.cancel">Cancel</button>
         </div>
       </div>
@@ -1928,7 +1937,7 @@
 
         <section id="modelSwitchDialog" class="profile-switch-dialog" role="dialog" aria-modal="true" aria-labelledby="modelSwitchTitle" aria-describedby="modelSwitchDetail" tabindex="-1" hidden>
           <div class="profile-switch-card">
-            <span class="session-ownership-kicker" data-i18n="bot_mode.model_switch_kicker">MODEL SWITCH</span>
+            <span class="session-ownership-kicker" data-i18n="bot_mode.model_switch_kicker">Model switch</span>
                         <h2 id="modelSwitchTitle">Switch models?</h2>
                         <p id="modelSwitchDetail"></p>
                         <div class="profile-switch-actions">

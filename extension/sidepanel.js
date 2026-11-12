@@ -1310,6 +1310,7 @@ const els = {
   panelResidencyInputs: Array.from(document.querySelectorAll('input[name="panelResidencyMode"]')),
   autoNameSessionsInput: $('#autoNameSessionsInput'),
   showMessageTimesInput: $('#showMessageTimesInput'),
+  classicThinkingFacesInput: $('#classicThinkingFacesInput'),
   transcriptProviderInput: $('#transcriptProviderInput'),
   transcriptProviderField: $('#transcriptProviderField'),
   transcriptModeInputs: Array.from(document.querySelectorAll('input[name="transcriptMode"]')),
@@ -2868,6 +2869,12 @@ function positionStartupSettings(active = document.body?.classList.contains('sta
   if (newChat && newSessionButtonHome && !(active && startupOffersNewChat()) && newChat.parentNode === actions) {
     const { parent, next } = newSessionButtonHome;
     parent.insertBefore(newChat, next && next.parentNode === parent ? next : null);
+  }
+  if (els.settingsButton && !els.settingsButton.querySelector('.startup-settings-label')) {
+    const label = document.createElement('span');
+    label.className = 'startup-settings-label';
+    label.textContent = translateUiText('Connection settings');
+    els.settingsButton.append(label);
   }
   if (active) {
     actions.hidden = false;
@@ -4473,10 +4480,10 @@ async function readCompanionDiagnostics() {
 
 async function copySupportDiagnostics() {
   if (!els.copyDiagnosticsButton) return;
-  const originalText = els.copyDiagnosticsButton.textContent || 'Copy Diagnostics';
+  const originalText = els.copyDiagnosticsButton.textContent || 'Copy diagnostics';
   els.copyDiagnosticsButton.disabled = true;
-  els.copyDiagnosticsButton.textContent = translateUiText('Copying...');
-  if (els.diagnosticsCopyStatus) els.diagnosticsCopyStatus.textContent = translateUiText('Building redacted diagnostics...');
+  els.copyDiagnosticsButton.textContent = translateUiText('Copying…');
+  if (els.diagnosticsCopyStatus) els.diagnosticsCopyStatus.textContent = translateUiText('Building redacted diagnostics…');
   try {
     const buildInfo = await loadExtensionBuildInfo().catch(() => ({}));
     const state = currentConnectionState();
@@ -6581,8 +6588,8 @@ async function checkForUpdates({ openReview = false, silent = false } = {}) {
     if (!els.checkUpdatesButton) return;
     els.checkUpdatesButton.disabled = true;
     if (els.reviewUpdateButton) els.reviewUpdateButton.disabled = true;
-    els.checkUpdatesButton.textContent = translateUiText('Checking...');
-    renderVersionInfo('Checking GitHub main and this loaded build commit...');
+    els.checkUpdatesButton.textContent = translateUiText('Checking…');
+    renderVersionInfo('Checking GitHub main and this loaded build commit…');
     if (openReview) renderUpdateDialog({ loading: true });
   }
   try {
@@ -6825,7 +6832,7 @@ function updateConnectionPrompt() {
   els.connectPanel.hidden = connected;
   if (!connected) {
     if (state.state === 'connecting') {
-      els.sendButton.textContent = translateUiText('Checking...');
+      els.sendButton.textContent = translateUiText('Checking…');
       els.connectStatus.textContent = t('connect.status.checking', { title: gatewayTitleText(summary), url: summary.normalizedUrl });
       setStatus('warn', 'Checking Hermes', `${gatewayTitleText(summary)}: ${summary.normalizedUrl}`, { translateDetail: false });
     } else if (state.state === 'unreachable') {
@@ -10476,7 +10483,7 @@ async function attachFolder(fileList) {
     .slice(0, 300)
     .map((file) => `${file.webkitRelativePath || file.name} (${formatBytes(file.size)})`)
     .join('\n');
-  const omitted = files.length > 300 ? `\n... ${files.length - 300} more files omitted` : '';
+  const omitted = files.length > 300 ? `\n… ${files.length - 300} more files omitted` : '';
   addAttachment({
     id: attachmentId('folder', folderName),
     kind: 'folder',
@@ -16778,7 +16785,7 @@ async function openBotProfile(row) {
     renderBotChatIntro(row);
     void refreshBotChatEarlier(row);
     if (els.composerInput) {
-      els.composerInput.placeholder = `Ask ${botProfileDisplayName(row)} anything...`;
+      els.composerInput.placeholder = `Ask ${botProfileDisplayName(row)} anything…`;
     }
   }
 }
@@ -17106,7 +17113,7 @@ function renderActiveProfileIndicator() {
   els.botChatIntro.hidden = hasMessages;
 }
 
-// Footer "Open Bot Mode" opens the selected (or first verified) agent's canonical chat.
+// Footer "Open bot mode" opens the selected (or first verified) agent's canonical chat.
 async function openBotModeSelection() {
   if (!els.botModeOpenButton || els.botModeOpenButton.disabled) return false;
   const selectedProfile = settings.botModeSelectedProfile || settings.activeProfile || '';
@@ -17127,7 +17134,7 @@ function syncBotModeFooterState() {
   const hasVerified = botModeRoster.some((entry) => entry.canonical.status === 'ready');
   const hasSelection = botModeRoster.some((entry) => entry.profileName === selectedProfile);
   // In the Group Chats view, agent actions do not apply: rooms own their own
-  // bounded runtime and composer. "Open Bot Chat" is meaningless there — hide
+  // bounded runtime and composer. "Open bot chat" is meaningless there — hide
   // it and let "+ Start A New Group Chat" be the footer's primary action.
   els.botModeOpenButton.disabled = groupsActive || !(hasVerified || hasSelection);
   els.botModeOpenButton.hidden = groupsActive;
@@ -17770,7 +17777,7 @@ function openBotProfileSheet({ mode = 'edit', profileName = '' } = {}) {
   petSelection = null;
   botSheetSaving = false;
   if (els.botModeSheetTitle) {
-    els.botModeSheetTitle.textContent = mode === 'create' ? translateUiText('New Bot') : translateUiText('Edit profile');
+    els.botModeSheetTitle.textContent = mode === 'create' ? translateUiText('New bot') : translateUiText('Edit profile');
   }
   if (els.botModeSheetMeta) {
     if (mode === 'create') {
@@ -18651,7 +18658,7 @@ async function switchAgentGateway(agent) {
   }
   settings = { ...settings, gatewayMode: 'local-api', gatewayUrl: nextUrl };
   await setPackedBrowserSettings(settings);
-  setStatus('ok', 'Switched gateway', `Reconnecting to ${agent.name} (${nextUrl})...`);
+  setStatus('ok', 'Switched gateway', `Reconnecting to ${agent.name} (${nextUrl})…`);
   // Re-run the full connect flow against the new gateway.
   try {
     await testConnection();
@@ -18909,7 +18916,12 @@ async function persistBrowserIntroSeen() {
 }
 
 function sessionDisplayName(session = {}) {
-  return String(session.title || session.id || settings.sessionTitle || 'Hermes Browser Extension');
+  return friendlySessionTitle(session.title || session.id || settings.sessionTitle || 'Hermes Browser Extension');
+}
+
+// The stored default title carries a timestamp; show "New chat" until auto-naming replaces it.
+function friendlySessionTitle(title) {
+  return isDefaultBrowserSessionTitle(title) ? translateUiText('New chat') : String(title || '');
 }
 
 function updateSessionLabel() {
@@ -18935,7 +18947,7 @@ function updateSessionLabel() {
     return;
   }
   const current = availableSessions.find((session) => session.id === settings.sessionId);
-  const label = current ? sessionDisplayName(current) : (settings.sessionTitle || settings.sessionId || 'Hermes Browser Extension');
+  const label = current ? sessionDisplayName(current) : friendlySessionTitle(settings.sessionTitle || settings.sessionId || 'Hermes Browser Extension');
   els.currentSessionName.textContent = label;
   els.currentSessionName.title = `${label} · ${settings.sessionId}`;
   if (els.input) {
@@ -18945,7 +18957,7 @@ function updateSessionLabel() {
     const botName = activeRow ? botProfileDisplayName(activeRow) : '';
     els.input.placeholder = botName
       ? `Ask ${botName}...`
-      : translateUiText('Ask Hermes about this page...');
+      : translateUiText('Ask Hermes about this page…');
   }
   updateComposerActionLabels();
   renderTaskStack();
@@ -20194,7 +20206,7 @@ async function refreshSessionsFromMenu() {
     els.refreshSessionsButton.disabled = false;
     els.refreshSessionsButton.classList.remove('is-refreshing');
     els.refreshSessionsButton.removeAttribute('aria-busy');
-    if (els.refreshSessionsLabel) els.refreshSessionsLabel.textContent = translateUiText('Refresh Sessions');
+    if (els.refreshSessionsLabel) els.refreshSessionsLabel.textContent = translateUiText('Refresh');
   }
   showOperationToast(outcome?.ok
     ? { title: 'Sessions refreshed', detail: `${outcome.count} canonical session${outcome.count === 1 ? '' : 's'} ready.` }
@@ -20717,7 +20729,7 @@ function renderSessionHistoryLoading(session = {}) {
   avatar.append(icon);
 
   const title = document.createElement('strong');
-  title.textContent = translateUiText('OPENING SESSION');
+  title.textContent = translateUiText('Opening session');
 
   const detail = document.createElement('span');
   detail.className = 'hint';
@@ -21872,7 +21884,7 @@ async function ensureDefaultBrowserSession({ focus = false, scopeRevisionId = sc
   return scopeRevision.isCurrent(scopeRevisionId);
 }
 
-const THINKING_PLACEHOLDER = 'Hermes is thinking...';
+const THINKING_PLACEHOLDER = 'Hermes is thinking…';
 const SLOW_REPLY_NOTICE_MS = 30_000;
 const SLOW_REPLY_DETAIL = 'No reply yet. The model may be rate-limited or at capacity (free models often are), and Hermes keeps retrying. You can stop this run and switch models, or wait.';
 const THINKING_STATUSES = ['thinking', 'brainstorming', 'contemplating', 'reasoning', 'processing', 'analyzing', 'reflecting', 'pondering', 'deliberating', 'formulating'];
@@ -21895,10 +21907,17 @@ function scheduleClassicThinkingFaces() {
 }
 
 function renderThinkingIndicator(element) {
-  scheduleClassicThinkingFaces();
+  const classic = settings.classicThinkingFaces === true;
+  if (classic) scheduleClassicThinkingFaces();
   // Streaming calls this every frame while the model warms up. Rebuilding the
   // indicator would restart its CSS animations — only build it once.
-  if (element.firstElementChild?.classList.contains('thinking-indicator')) return;
+  const built = element.firstElementChild;
+  if (built?.classList.contains('thinking-indicator') && built.classList.contains('thinking-quiet') === !classic) return;
+  if (!classic) {
+    const label = translateUiText('Thinking');
+    element.innerHTML = `<span class="thinking-indicator thinking-quiet" role="status" aria-live="polite" aria-label="${escapeHtml(label)}"><span class="thinking-quiet-label">${escapeHtml(label)}…</span></span>`;
+    return;
+  }
   const phrases = THINKING_STATUSES
     .map((word) => `
         <span class="thinking-line">
@@ -22462,7 +22481,7 @@ function renderImageGenPlaceholder(activity = {}) {
   status.className = 'image-gen-status';
   const phaseTrack = document.createElement('div');
   phaseTrack.className = 'image-gen-phase-track';
-  for (const phase of ['LATENT FIELD', 'DENOISING', 'RESOLVING', 'FINALIZING']) {
+  for (const phase of ['Latent field', 'DENOISING', 'RESOLVING', 'FINALIZING']) {
     const phaseLabel = document.createElement('span');
     phaseLabel.textContent = translateUiText(phase);
     phaseTrack.appendChild(phaseLabel);
@@ -23807,6 +23826,7 @@ async function loadSettings({ restoreMessages = false } = {}) {
     agentDiscoveryScheme: normalizeAgentDiscoveryScheme(settings.agentDiscoveryScheme || DEFAULT_SETTINGS.agentDiscoveryScheme),
     autoNameSessions: settings.autoNameSessions !== false,
     showMessageTimes: settings.showMessageTimes !== false,
+    classicThinkingFaces: settings.classicThinkingFaces === true,
     sessionStartupMode: normalizeSessionStartupMode(settings.sessionStartupMode),
     inlineAssistEnabled: settings.inlineAssistEnabled !== false,
     inlineAssistDefaultRoute: normalizeInlineDraftRoutePreference(settings.inlineAssistDefaultRoute),
@@ -24683,6 +24703,7 @@ function syncSettingsForm() {
   renderPanelResidencyHost();
   if (els.autoNameSessionsInput) els.autoNameSessionsInput.checked = settings.autoNameSessions !== false;
   if (els.showMessageTimesInput) els.showMessageTimesInput.checked = settings.showMessageTimes !== false;
+  if (els.classicThinkingFacesInput) els.classicThinkingFacesInput.checked = settings.classicThinkingFaces === true;
   if (els.agentHostInput) els.agentHostInput.value = settings.agentDiscoveryHost || DEFAULT_SETTINGS.agentDiscoveryHost;
   if (els.agentSchemeInput) els.agentSchemeInput.value = normalizeAgentDiscoveryScheme(settings.agentDiscoveryScheme || DEFAULT_SETTINGS.agentDiscoveryScheme);
   if (els.agentPortsInput) els.agentPortsInput.value = getAgentPorts().join(',');
@@ -24803,6 +24824,7 @@ async function saveSettingsFromForm({ lockHeld = false } = {}) {
     panelResidencyMode: normalizePanelResidencyMode(els.panelResidencyInputs?.find((input) => input.checked)?.value || settings.panelResidencyMode),
     autoNameSessions: els.autoNameSessionsInput ? els.autoNameSessionsInput.checked : settings.autoNameSessions !== false,
     showMessageTimes: els.showMessageTimesInput ? els.showMessageTimesInput.checked : settings.showMessageTimes !== false,
+    classicThinkingFaces: els.classicThinkingFacesInput ? els.classicThinkingFacesInput.checked : settings.classicThinkingFaces === true,
     agentDiscoveryHost: normalizeAgentDiscoveryHost(els.agentHostInput?.value || settings.agentDiscoveryHost || DEFAULT_SETTINGS.agentDiscoveryHost),
     agentDiscoveryScheme: normalizeAgentDiscoveryScheme(els.agentSchemeInput?.value || settings.agentDiscoveryScheme || DEFAULT_SETTINGS.agentDiscoveryScheme),
     agentPorts: parseAgentPortsInput(els.agentPortsInput?.value || '').length ? parseAgentPortsInput(els.agentPortsInput?.value || '') : getAgentPorts(),
@@ -25335,7 +25357,7 @@ function setPickButtonState() {
   const attachPick = document.querySelector('[data-attach="pick-element"]');
   if (attachPick) {
     const pickLabel = pickingActive
-      ? translateUiText('◈ Picking element...')
+      ? translateUiText('◈ Picking element…')
       : hasPick
         ? translateUiText('◈ Pick a different element')
         : translateUiText('◈ Pick page element');
@@ -27884,7 +27906,7 @@ async function pollPairing(pairingId, { attempts = 90, delay = 1500 } = {}) {
     if (payload?.error?.code === 'pairing_denied') throw new Error(t('pairing.denied'));
     if (payload.status === 'expired' || response.status === 410) throw new Error('Pairing expired. Click Connect again.');
     if (response.status === 404) throw new Error('Pairing request was not found. Click Connect again.');
-    if (!pairingApproval?.showing) els.connectStatus.textContent = translateUiText('Waiting for Hermes Desktop approval...');
+    if (!pairingApproval?.showing) els.connectStatus.textContent = translateUiText('Waiting for Hermes Desktop approval…');
     await sleep(delay);
   }
   throw new Error('Timed out waiting for Hermes Desktop approval.');
@@ -28057,7 +28079,7 @@ async function connectApiWithPairing() {
   const summary = currentGatewaySummary();
   markConnectionProbe('connecting', summary.normalizedUrl);
   els.connectButton.disabled = true;
-  els.connectButton.textContent = translateUiText('Connecting...');
+  els.connectButton.textContent = translateUiText('Connecting…');
   els.connectStatus.textContent = t('connect.status.looking', { title: gatewayTitleText(summary), url: summary.normalizedUrl });
   // A failing request can only be blamed on the origin/CORS layer when the
   // health probe already answered from this extension origin.
@@ -28726,7 +28748,7 @@ ${streamError.message}`);
             },
           });
         } else {
-          streamView.update('Hermes accepted this turn; recovering the response without retrying it...');
+          streamView.update('Hermes accepted this turn; recovering the response without retrying it…');
           const recovered = await recoverAcceptedTurn(prompt, preparedAttachments, { signal: activeAbortController.signal });
           answer = recovered?.answer || '';
           recoveredImageSources = Array.isArray(recovered?.imageSources) ? recovered.imageSources : [];

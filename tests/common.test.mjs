@@ -392,7 +392,7 @@ test('startup exposes one-click connection testing and Cloud reconnect uses the 
   const source = readFileSync(new URL('../extension/sidepanel.js', import.meta.url), 'utf8');
 
   assert.match(html, /id="settingsButton"[\s\S]*id="startupTestConnectionButton"/);
-  assert.match(html, /id="startupTestConnectionButton"[^>]*><svg[^>]*data-icon="cellular-signal-3"[\s\S]*?<span class="settings-connection-test-label"[^>]*>Retry<\/span><\/button>/);
+  assert.match(html, /id="startupTestConnectionButton"[^>]*><span class="settings-connection-test-label"[^>]*>Retry<\/span><\/button>/);
   assert.match(css, /body\.startup-active \.startup-actions #startupTestConnectionButton/);
   assert.doesNotMatch(css, /--startup-settings-top/);
   assert.match(source, /startupTestConnectionButton:\s*\$\('#startupTestConnectionButton'\)/);
@@ -1728,7 +1728,7 @@ test('model refresh control exposes compact loading state while syncing', () => 
 test('assistant thinking placeholder renders animated indicator markup and reduced-motion CSS', () => {
   const source = readFileSync(new URL('../extension/sidepanel.js', import.meta.url), 'utf8');
   const css = readFileSync(new URL('../extension/sidepanel.css', import.meta.url), 'utf8');
-  assert.match(source, /const THINKING_PLACEHOLDER = 'Hermes is thinking\.\.\.'/);
+  assert.match(source, /const THINKING_PLACEHOLDER = 'Hermes is thinking…'/);
   assert.match(source, /const THINKING_STATUSES = \['thinking', 'brainstorming', 'contemplating', 'reasoning', 'processing', 'analyzing', 'reflecting', 'pondering', 'deliberating', 'formulating'\]/);
   assert.match(source, /function renderThinkingIndicator/);
   assert.match(source, /class="thinking-indicator" role="status" aria-live="polite" data-i18n-aria-label="ui\.hermes\.is\.thinking\.brainstorming\.contemplating\.reasoning\.proces\.3e8d81c0" aria-label="\$\{escapeHtml\(t\('ui\.hermes\.is\.thinking\.brainstorming\.contemplating\.reasoning\.proces\.3e8d81c0'\)\)\}"/);
@@ -2951,7 +2951,7 @@ test('panel residency setting is present in defaults and settings UI copy', () =
   const html = readFileSync(new URL('../extension/sidepanel.html', import.meta.url), 'utf8');
   const background = readFileSync(new URL('../extension/background.js', import.meta.url), 'utf8');
   assert.equal(DEFAULT_SETTINGS.panelResidencyMode, 'tab-attached');
-  assert.match(html, /Browser Behavior/);
+  assert.match(html, /Browser behavior/);
   assert.match(html, /settings-toggle-card auto-name-toggle/);
   assert.match(html, /settings-choice-card/);
   assert.match(html, /name="panelResidencyMode"/);

@@ -50,7 +50,7 @@ test('dismissing clears both places the page can be', () => {
 
 test('polling keeps its 1.5 second beat and 90 tries, and does not talk over the page', () => {
   assert.match(poll, /attempts = 90, delay = 1500/);
-  assert.match(poll, /if \(!pairingApproval\?\.showing\) els\.connectStatus\.textContent = translateUiText\('Waiting for Hermes Desktop approval\.\.\.'\)/);
+  assert.match(poll, /if \(!pairingApproval\?\.showing\) els\.connectStatus\.textContent = translateUiText\('Waiting for Hermes Desktop approval…'\)/);
   assert.match(poll, /await sleep\(delay\)/);
 });
 
