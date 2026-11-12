@@ -35,6 +35,15 @@ The panel is built for big touchscreens with a retro-cyberpunk skin. At a
 6. Keep every existing feature reachable. Taming is about presentation,
    hierarchy and defaults, not removing capability.
 
+## Scope (owner, 2026-11-12)
+
+A real redesign, not a reskin: a sane app that respects screen real estate,
+usability and discoverability. Structural changes to markup, JS and
+information architecture are in scope wherever they help: fewer and merged
+controls, maximal vertical space for the conversation, keyboard navigation
+everywhere, tooltips that name shortcuts, searchable settings, an "Advanced"
+group per settings pane, and errors that offer the one action that fixes them.
+
 ## Design tokens (`extension/sidepanel-calm.css`, loaded after all other CSS)
 
 Map these onto the existing `--hermes-*` variables so legacy rules inherit
