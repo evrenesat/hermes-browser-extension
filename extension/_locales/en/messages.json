@@ -2420,7 +2420,7 @@
     "description": "Runtime interface message context.follow_active_tab"
   },
   "runtime_context_in": {
-    "message": "IN",
+    "message": "In",
     "description": "Runtime interface message context.in"
   },
   "runtime_context_include_all_tabs": {
@@ -2436,7 +2436,7 @@
     "description": "Runtime interface message context.no_page"
   },
   "runtime_context_out": {
-    "message": "OUT",
+    "message": "Out",
     "description": "Runtime interface message context.out"
   },
   "runtime_context_page_only": {
@@ -6767,10 +6767,6 @@
     "message": "Local setup: keep Hermes Gateway/API Server running on this machine.",
     "description": "Runtime interface message ui.local.setup.keep.hermes.gateway.api.server.running.on.this.machine"
   },
-  "runtime_ui_local_sidecar_chrome_panel": {
-    "message": "Local sidecar / Chrome panel",
-    "description": "Runtime interface message ui.local.sidecar.chrome.panel"
-  },
   "runtime_ui_longer": {
     "message": "Longer",
     "description": "Runtime interface message ui.longer"
@@ -8926,10 +8922,6 @@
   "runtime_ui_web_ui_sections": {
     "message": "Web UI sections",
     "description": "Runtime interface message ui.web.ui.sections"
-  },
-  "runtime_ui_what_hermes_saw": {
-    "message": "What Hermes saw",
-    "description": "Runtime interface message ui.what.hermes.saw"
   },
   "runtime_ui_what_should_we_work_on": {
     "message": "What should we work on?",

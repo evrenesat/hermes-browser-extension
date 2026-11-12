@@ -1316,7 +1316,7 @@
     "description": "Runtime interface message browser_control.help_stop"
   },
   "runtime_browser_control_kicker": {
-    "message": "Hermes 컨트롤",
+    "message": "Hermes Control",
     "description": "Runtime interface message browser_control.kicker"
   },
   "runtime_browser_control_local_document_detail": {
@@ -4660,7 +4660,7 @@
     "description": "Runtime interface message ui.ask.hermes"
   },
   "runtime_ui_ask_hermes_36d55d5a": {
-    "message": "Ask Hermes",
+    "message": "Hermes에게 질문",
     "description": "Runtime interface message ui.ask.hermes.36d55d5a"
   },
   "runtime_ui_ask_hermes_about_the_active_page_context": {
@@ -6036,7 +6036,7 @@
     "description": "Runtime interface message ui.explain"
   },
   "runtime_ui_explain_selection": {
-    "message": "Explain selection",
+    "message": "선택 설명",
     "description": "Runtime interface message ui.explain.selection"
   },
   "runtime_ui_extension": {
@@ -6264,11 +6264,11 @@
     "description": "Runtime interface message ui.hermes.browser"
   },
   "runtime_ui_hermes_browser_bb83b5a0": {
-    "message": "Hermes browser",
+    "message": "Hermes Browser",
     "description": "Runtime interface message ui.hermes.browser.bb83b5a0"
   },
   "runtime_ui_hermes_browser_extension": {
-    "message": "Hermes browser extension",
+    "message": "Hermes Browser Extension",
     "description": "Runtime interface message ui.hermes.browser.extension"
   },
   "runtime_ui_hermes_browser_extension_connected": {
@@ -6288,7 +6288,7 @@
     "description": "Runtime interface message ui.hermes.browser.local.sidecar"
   },
   "runtime_ui_hermes_browser_update_channel": {
-    "message": "Hermes browser / 업데이트 채널",
+    "message": "Hermes Browser / 업데이트 채널",
     "description": "Runtime interface message ui.hermes.browser.update.channel"
   },
   "runtime_ui_hermes_chat_actions": {
@@ -6468,7 +6468,7 @@
     "description": "Runtime interface message ui.hermes.web"
   },
   "runtime_ui_hermes_web_3336aa2f": {
-    "message": "Hermes web",
+    "message": "Hermes Web",
     "description": "Runtime interface message ui.hermes.web.3336aa2f"
   },
   "runtime_ui_hermes_web_could_not_start": {
@@ -6480,7 +6480,7 @@
     "description": "Runtime interface message ui.hermes.web.home"
   },
   "runtime_ui_hermes_web_ready": {
-    "message": "Hermes web // 준비 완료",
+    "message": "Hermes Web · ready",
     "description": "Runtime interface message ui.hermes.web.ready"
   },
   "runtime_ui_hermes_web_settings": {
@@ -6766,10 +6766,6 @@
   "runtime_ui_local_setup_keep_hermes_gateway_api_server_running_on_this_machine": {
     "message": "로컬 설정: 이 시스템에서 Hermes Gateway/API 서버를 계속 실행합니다.",
     "description": "Runtime interface message ui.local.setup.keep.hermes.gateway.api.server.running.on.this.machine"
-  },
-  "runtime_ui_local_sidecar_chrome_panel": {
-    "message": "로컬 사이드카 / Chrome 패널",
-    "description": "Runtime interface message ui.local.sidecar.chrome.panel"
   },
   "runtime_ui_longer": {
     "message": "더 길게",
@@ -8926,10 +8922,6 @@
   "runtime_ui_web_ui_sections": {
     "message": "Web UI 섹션",
     "description": "Runtime interface message ui.web.ui.sections"
-  },
-  "runtime_ui_what_hermes_saw": {
-    "message": "What Hermes saw",
-    "description": "Runtime interface message ui.what.hermes.saw"
   },
   "runtime_ui_what_should_we_work_on": {
     "message": "우리는 무엇을 해야 할까요?",
