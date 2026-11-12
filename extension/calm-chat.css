@@ -405,13 +405,33 @@ html .composer-header .context-chip {
 }
 html .composer-header .context-chip { padding-left: 0; }
 html .composer-header .context-chip:hover:not(:disabled) { background: var(--calm-surface-2); color: var(--calm-text); }
-html .context-chip strong { color: var(--calm-muted); opacity: 0.8; font-weight: 400; }
+html .composer-header .context-chip { min-width: 0; flex: 1 1 auto; max-width: none; }
+html .context-chip-icon { width: 14px; height: 14px; flex: 0 0 14px; border-radius: 3px; object-fit: contain; }
+html .context-chip-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--calm-text); }
+html .context-chip[data-state="restricted"] .context-chip-label,
+html .context-chip[data-state="error"] .context-chip-label,
+html .context-chip[data-state="loading"] .context-chip-label { color: var(--calm-muted); }
+html .context-chip-kind {
+  flex: 0 0 auto;
+  padding: 0 6px;
+  border-radius: var(--calm-radius-pill);
+  background: var(--calm-accent-soft);
+  color: var(--calm-accent);
+  font-size: calc(10.5px * var(--hermes-text-zoom, 1));
+  font-weight: 500;
+  line-height: 16px;
+}
+html .context-chip-kind[hidden] { display: none; }
+html .context-preview { white-space: pre-wrap; }
 html .composer-header .context-scope-button {
   flex: 0 1 auto;
   margin-left: 0;
-  max-width: 52%;
+  max-width: 40%;
   min-height: 22px;
   padding: 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   border: 0;
   border-radius: var(--calm-radius-control);
   background: transparent;

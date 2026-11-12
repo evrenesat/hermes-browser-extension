@@ -2247,37 +2247,35 @@ test('formatContextMeter renders Hermes Desktop style compact usage labels', () 
   assert.equal(million.percentLabel, '21%');
 });
 
-test('contextChipSummary separates loading, restricted, error, and captured states', () => {
-  assert.deepEqual(contextChipSummary({ pageContext: null }), {
-    label: '📎 Loading...',
-    title: 'Page context not yet loaded',
-  });
+test('contextChipSummary uses plain language for loading, restricted, error, and captured states', () => {
+  const loading = contextChipSummary({ pageContext: null, activeTab: { title: 'Docs' } });
+  assert.equal(loading.label, 'Docs');
+  assert.equal(loading.state, 'loading');
 
-  assert.deepEqual(contextChipSummary({ pageContext: { ok: false, restricted: true, reason: 'Browser internal page' } }), {
-    label: '📎 Restricted · N/A',
-    title: 'Browser internal page',
-  });
+  const restricted = contextChipSummary({ pageContext: { ok: false, restricted: true, reason: 'Browser internal page' } });
+  assert.equal(restricted.label, "This page can't be read");
+  assert.equal(restricted.state, 'restricted');
+  assert.equal(restricted.title, 'Browser internal page');
 
-  assert.deepEqual(contextChipSummary({ pageContext: { ok: false, error: 'stale content script' } }), {
-    label: '📎 Error · N/A',
-    title: 'stale content script',
-  });
+  const failed = contextChipSummary({ pageContext: { ok: false, error: 'stale content script' } });
+  assert.equal(failed.label, "This page can't be read");
+  assert.equal(failed.title, 'stale content script');
 
-  const captured = contextChipSummary({
-    pageContext: { ok: true, youtubeTranscript: { ok: true } },
-    activeTab: { url: 'https://youtube.com/watch?v=abc' },
-    parts: {
-      selectedText: { enabled: true, chars: 12, estimatedTokens: 3 },
-      pageMetadata: { enabled: true, chars: 80, estimatedTokens: 20 },
-      youtubeTranscript: { enabled: true, chars: 1000, estimatedTokens: 250 },
-      pageText: { enabled: false, chars: 500, estimatedTokens: 125 },
-    },
+  const page = contextChipSummary({
+    pageContext: { ok: true },
+    activeTab: { title: 'Release notes', url: 'https://example.com/a' },
+    parts: { pageText: { enabled: true, chars: 500, estimatedTokens: 125 } },
   });
+  assert.equal(page.label, 'Release notes');
+  assert.equal(page.kind, 'Page');
+  assert.match(page.title, /About 125 tokens/);
 
-  assert.deepEqual(captured, {
-    label: '📎 YouTube + DOM · 1,092 chars · ~273 tok',
-    title: 'https://youtube.com/watch?v=abc',
+  const selection = contextChipSummary({
+    pageContext: { ok: true },
+    activeTab: { title: 'Release notes' },
+    parts: { selectedText: { enabled: true, chars: 12, estimatedTokens: 3 }, pageText: { enabled: false } },
   });
+  assert.equal(selection.kind, 'Selection');
 });
 
 test('modelDisplayName strips only the provider prefix and preserves free model suffixes', () => {

@@ -964,6 +964,8 @@ const els = {
   contextChip: $('#contextChip'),
   statusStackToggle: $('#statusStackToggle'),
   contextChipLabel: $('#contextChipLabel'),
+  contextChipKind: $('#contextChipKind'),
+  contextChipIcon: $('#contextChipIcon'),
   contextPreview: $('#contextPreview'),
   explicitSiteCaptureWrap: $('#explicitSiteCaptureWrap'),
   explicitSiteCaptureButton: $('#explicitSiteCaptureButton'),
@@ -5456,15 +5458,23 @@ function syncSelectedTabsToContextScope() {
   saveContextScopeForInstance();
 }
 
+function renderContextChipFavicon(url) {
+  const icon = els.contextChipIcon;
+  if (!icon) return;
+  const safe = /^(https?:|data:image\/)/i.test(String(url || '')) ? String(url) : '';
+  if (safe) icon.src = safe; else icon.removeAttribute('src');
+  icon.hidden = !safe;
+}
+
 function contextScopeLabel(scope = contextScope) {
   if (scope.mode === CONTEXT_SCOPE_MODES.CHAT_ONLY) return 'Chat only';
   if (scope.mode === CONTEXT_SCOPE_MODES.PINNED_TAB) {
     if (isAttachedPanelResidency() && Number(scope.pinnedTabId) === Number(sidePanelParams.tabId)) {
-      return scope.pinnedTitle ? `Attached: ${scope.pinnedTitle}` : 'Attached tab';
+      return 'This tab only';
     }
     return scope.pinnedTitle ? `Pinned: ${scope.pinnedTitle}` : 'Pinned tab';
   }
-  return isGlobalPanelResidency() ? 'Follow active tab' : 'Attached tab';
+  return isGlobalPanelResidency() ? 'Follow active tab' : 'This tab only';
 }
 
 function renderContextScopeControls() {
@@ -11628,27 +11638,33 @@ function renderContextWindow(userText = els.input?.value || '') {
     // The composer's scope button already reads "Chat only"; the chip row
     // would only repeat it and eat vertical space.
     if (els.contextChip) els.contextChip.hidden = true;
-    els.contextChipLabel.textContent = translateUiText('💬 Chat only');
+    els.contextChipLabel.textContent = translateUiText('Chat only');
     els.contextChip.title = translateUiText('No browser tab, selected text, open tabs, metadata, transcript, or page text will be attached.');
     els.contextPreview.textContent = translateUiText('Chat only mode is active. Hermes will not read or attach browser context for this turn.');
   } else {
     if (els.contextChip) els.contextChip.hidden = false;
     const chip = contextChipSummary({ pageContext: pc, activeTab: currentContext.activeTab, parts: stats.parts });
     if (pc?.meta?.siteAdapter?.id === 'gmail' && pc.meta.siteAdapter.suppressed) {
-      chip.label = translateUiText('Thread context off');
+      chip.kind = translateUiText('Off');
+      chip.state = 'restricted';
       chip.title = translateUiText('Page text is not shared. Enable Gmail thread context once in Settings.');
     }
     els.contextChipLabel.textContent = translateUiText(chip.label);
-    // DOM means the page's structure and text; explain it rather than echo the URL the user is already on.
-    els.contextChip.title = (pc && !pc.restricted && pc.ok !== false && !pc.meta?.siteAdapter?.suppressed)
-      ? translateUiText('DOM is the page content Hermes reads: the text and structure of the tab you are on. Click to preview exactly what gets sent with your message.')
-      : translateUiText(chip.title);
+    if (els.contextChipKind) {
+      els.contextChipKind.textContent = translateUiText(chip.kind || '');
+      els.contextChipKind.hidden = !chip.kind;
+    }
+    els.contextChip.dataset.state = chip.state;
+    renderContextChipFavicon(chip.state === 'ok' || chip.state === 'loading' ? currentContext.activeTab?.favIconUrl : '');
+    els.contextChip.title = translateUiText(chip.title);
     els.contextPreview.textContent = [
+      translateUiText('What Hermes will see with your next message'),
+      '',
       currentContext.activeTab?.title || '(unknown tab)',
       currentContext.activeTab?.url || '',
       '',
       clampText(pc?.selectedText || pc?.text || pc?.reason || pc?.error || 'No readable page text captured yet.', 900),
-    ].filter(Boolean).join('\n');
+    ].filter((line, index) => line || index === 1 || index > 3).join('\n');
   }
 
   if (els.explicitSiteCaptureButton && els.explicitSiteCaptureWrap) {

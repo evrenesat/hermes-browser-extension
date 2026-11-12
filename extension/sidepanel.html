@@ -456,8 +456,9 @@
           <div class="composer-header" id="composerStatusStack">
             <label class="composer-label sr-only" id="composerLabel" for="promptInput" data-i18n="ui.ask.hermes.36d55d5a">ASK HERMES</label>
             <button id="contextChip" class="context-chip" type="button" aria-expanded="false">
-              <span id="contextChipLabel" data-i18n-runtime>📎 Loading...</span>
-              <strong data-i18n-runtime data-i18n="ui.preview.1aa787fe">preview</strong>
+              <img id="contextChipIcon" class="context-chip-icon" alt="" width="14" height="14" hidden />
+              <span id="contextChipLabel" class="context-chip-label" data-i18n-runtime>Loading…</span>
+              <span id="contextChipKind" class="context-chip-kind" data-i18n-runtime hidden></span>
             </button>
             <button id="contextScopeButton" class="context-scope-button" type="button" aria-haspopup="dialog" aria-expanded="false" title="Choose which tab Hermes reads and which open tabs appear in the prompt" data-i18n-title="ui.choose.which.tab.hermes.reads.and.which.open.tabs.appear.in.the.prompt">
               <span id="contextScopeLabel">Follow active tab</span>
