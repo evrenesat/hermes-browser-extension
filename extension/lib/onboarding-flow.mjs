@@ -9,6 +9,17 @@ import { escapeHtml } from './common.mjs';
 
 export const ONBOARDING_STEPS = Object.freeze(['connect']);
 
+// Inline check of the address typed in the Connect step. Returns '' when it
+// is usable (empty means "use the default"), else the i18n key of the error.
+export function gatewayAddressError(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  let url;
+  try { url = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : `http://${raw}`); } catch { return 'onboarding.connect.url_invalid'; }
+  if (!/^https?:$/.test(url.protocol)) return 'onboarding.connect.url_scheme';
+  return url.hostname ? '' : 'onboarding.connect.url_invalid';
+}
+
 export function onboardingSteps({ includeConnect = true } = {}) {
   return includeConnect ? [...ONBOARDING_STEPS] : [];
 }
@@ -54,6 +65,9 @@ export function createOnboardingFlow({
   // The pairing approval page, shown in the Connect step while it waits. One
   // element for the whole approval: rebuilding the step would reload it.
   let approvalNode = null;
+  // The address being typed survives the redraws a status update causes.
+  let typedUrl = null;
+  let urlError = '';
   const t = (key, values) => translate(key, values);
   const view = () => doc?.defaultView || globalThis;
 
@@ -110,6 +124,11 @@ export function createOnboardingFlow({
       <h2 class="onboarding-title" id="onboardingStepTitle" tabindex="-1">${escapeHtml(t('onboarding.connect.title'))}</h2>
       <p class="onboarding-body">${escapeHtml(t('onboarding.connect.body'))}</p>
       <div class="onboarding-connect${connected ? ' is-connected' : ''}${connection.busy ? ' is-busy' : ''}${connectFailed(connection) ? ' is-failed' : ''}${approvalNode ? ' is-approving' : ''}">
+        <div class="onboarding-field"${connected ? ' hidden' : ''}>
+          <label for="onboardingGatewayUrl">${escapeHtml(t('onboarding.connect.url_label'))}</label>
+          <input id="onboardingGatewayUrl" type="text" inputmode="url" autocomplete="off" spellcheck="false" data-onboarding-url value="${escapeHtml(typedUrl ?? connection.gatewayUrl ?? '')}" placeholder="http://127.0.0.1:8642" aria-describedby="onboardingUrlError"${urlError ? ' aria-invalid="true"' : ''}>
+          <p class="onboarding-field-error" id="onboardingUrlError" role="alert"${urlError ? '' : ' hidden'}>${escapeHtml(urlError ? t(urlError) : '')}</p>
+        </div>
         <p class="onboarding-connect-status" role="status" tabindex="-1">${connected ? ONBOARDING_ICONS.connected : ''}<span>${escapeHtml(status)}</span></p>
         ${approvalNode ? '<div class="onboarding-approval-slot"></div>' : ''}
         <div class="onboarding-connect-actions"${connected ? ' hidden' : ''}>
@@ -143,6 +162,8 @@ export function createOnboardingFlow({
     if (label) label.textContent = connected ? t('onboarding.connect.connected') : (connection.status || t('onboarding.connect.not_paired'));
     const actions = parts.stage.querySelector('.onboarding-connect-actions');
     if (actions) actions.hidden = connected;
+    const field = parts.stage.querySelector('.onboarding-field');
+    if (field) field.hidden = connected;
     const button = parts.stage.querySelector('[data-onboarding-connect]');
     if (button) button.disabled = Boolean(connection.busy);
   }
@@ -167,7 +188,7 @@ export function createOnboardingFlow({
     if (!active || !host.contains(active)) return null;
     // The status line holds the keyboard while Connect works; keep it there when the step is drawn again.
     if (active.classList?.contains('onboarding-connect-status')) return { selector: '.onboarding-connect-status' };
-    for (const attribute of ['data-onboarding-next', 'data-onboarding-connect', 'data-onboarding-manual', 'data-onboarding-start', 'data-onboarding-skip-setup']) {
+    for (const attribute of ['data-onboarding-url', 'data-onboarding-next', 'data-onboarding-connect', 'data-onboarding-manual', 'data-onboarding-start', 'data-onboarding-skip-setup']) {
       if (active.hasAttribute?.(attribute)) return { attribute };
     }
     return null;
@@ -274,12 +295,43 @@ export function createOnboardingFlow({
     void finish(steps[stepIndex] === 'connect' && !getState()?.connection?.connected ? 'later' : 'done');
   }
 
+  function connectNow() {
+    const input = host.querySelector('[data-onboarding-url]');
+    const value = input ? input.value : '';
+    urlError = gatewayAddressError(value);
+    typedUrl = value;
+    if (urlError) {
+      render();
+      host.querySelector('[data-onboarding-url]')?.focus?.({ preventScroll: true });
+      return undefined;
+    }
+    return onConnect({ gatewayUrl: String(value || '').trim() });
+  }
+
+  host?.addEventListener('input', (event) => {
+    if (!event.target?.hasAttribute?.('data-onboarding-url')) return;
+    typedUrl = event.target.value;
+    if (urlError) {
+      urlError = '';
+      const note = host.querySelector('.onboarding-field-error');
+      if (note) note.hidden = true;
+      event.target.removeAttribute('aria-invalid');
+    }
+  });
+
+  host?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && open && !exiting && event.target?.hasAttribute?.('data-onboarding-url')) {
+      event.preventDefault();
+      connectNow();
+    }
+  });
+
   host?.addEventListener('click', (event) => {
     const target = event.target?.closest?.('button');
     if (!open || exiting || !target || !host.contains(target)) return;
     if (target.hasAttribute('data-onboarding-start')) return startFromWelcome();
     if (target.hasAttribute('data-onboarding-skip-setup')) return void finish('skip');
-    if (target.hasAttribute('data-onboarding-connect')) return onConnect();
+    if (target.hasAttribute('data-onboarding-connect')) return connectNow();
     if (target.hasAttribute('data-onboarding-manual')) return onManualSetup();
     if (target.hasAttribute('data-onboarding-next')) return next();
     return undefined;
@@ -290,7 +342,7 @@ export function createOnboardingFlow({
     if (!open || exiting) return;
     if (event.key !== 'Tab') return;
     const target = event.target;
-    const focusable = [...host.querySelectorAll('button:not([disabled])')].filter((node) => node.tabIndex >= 0 && !node.closest('[hidden]'));
+    const focusable = [...host.querySelectorAll('button:not([disabled]), input:not([disabled])')].filter((node) => node.tabIndex >= 0 && !node.closest('[hidden]'));
     if (!focusable.length) return;
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
@@ -312,6 +364,8 @@ export function createOnboardingFlow({
     open({ step = 'connect', includeConnect = true, welcome = false } = {}) {
       steps = onboardingSteps({ includeConnect });
       stepIndex = Math.max(0, steps.indexOf(step));
+      typedUrl = null;
+      urlError = '';
       welcoming = Boolean(welcome) || !steps.length;
       open = true;
       exiting = false;

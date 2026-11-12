@@ -18436,6 +18436,7 @@ function onboardingState() {
       connected: isConnected(),
       busy: Boolean(els.connectButton?.disabled),
       busyLabel: els.connectButton?.textContent?.trim() || '',
+      gatewayUrl: settings.gatewayUrl || '',
       status: failed ? onboardingConnectFailure : (els.connectStatus?.textContent?.trim() || ''),
       failed,
     },
@@ -18448,7 +18449,8 @@ function ensureOnboardingFlow() {
     host: els.onboardingFlow,
     translate: (key, values) => t(key, values),
     getState: onboardingState,
-    onConnect: () => {
+    onConnect: ({ gatewayUrl = '' } = {}) => {
+      if (gatewayUrl && els.gatewayUrlInput) els.gatewayUrlInput.value = gatewayUrl;
       connectToHermes().catch((error) => {
         setStatus('warn', 'Connect failed', error?.message || String(error), { translateDetail: false });
       });

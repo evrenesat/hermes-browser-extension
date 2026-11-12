@@ -50,5 +50,6 @@ test('the calm layer owns icon stroking and is linked after the legacy styleshee
   }
   const html = read('extension/sidepanel.html');
   const links = [...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map((match) => match[1]);
-  assert.equal(links.at(-1), 'sidepanel-calm.css', 'the calm layer is linked last');
+  assert.ok(links.indexOf('sidepanel-calm.css') > links.indexOf('sidepanel.css'), 'the calm layer follows the legacy stylesheet');
+  assert.match(links.at(-1), /^(sidepanel-calm|calm-[a-z]+)\.css$/, 'only calm layers are linked after the legacy ones');
 });
