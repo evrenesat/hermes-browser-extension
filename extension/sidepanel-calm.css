@@ -404,3 +404,32 @@ svg[data-icon] {
   scale: 1;
   translate: none;
 }
+
+/* ------------------------------------------------------------------ */
+/* 10. Legacy normalization (phase 1 stopgaps; later phases replace)   */
+/* ------------------------------------------------------------------ */
+.settings-header-actions > button,
+.settings-close-icon,
+.settings-connection-test,
+.settings-pane-back {
+  border-color: transparent;
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  min-block-size: var(--calm-control-h);
+}
+.settings-close-icon, .settings-pane-back { inline-size: var(--calm-control-h); block-size: var(--calm-control-h); min-inline-size: var(--calm-control-h); background: transparent; color: var(--calm-muted); }
+.settings-header-actions > button:hover,
+.settings-close-icon:hover,
+.settings-connection-test:hover,
+.settings-pane-back:hover { background: var(--calm-surface-2); color: var(--calm-text); border-color: transparent; }
+
+/* Headings inside Settings and dialogs: one UI size, no display scale. */
+html .settings-dialog :is(h2, h3, h4),
+html .settings-pane-title,
+html [class*="-heading"] :is(h2, h3) {
+  font-family: var(--calm-font-ui);
+  font-size: calc(15px * var(--hermes-text-zoom, 1));
+  font-weight: 600;
+  line-height: 1.3;
+}
+html .settings-dialog :is(h3, h4) { font-size: calc(13px * var(--hermes-text-zoom, 1)); }
