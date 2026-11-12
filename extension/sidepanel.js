@@ -227,6 +227,7 @@ import {
 } from './lib/paste-artifact.mjs';
 import {
   APPEARANCE_THEMES,
+  migrateToCalmAppearance,
   normalizeAppearanceTheme,
   normalizeColorMode,
   themePreviewForMode,
@@ -23795,6 +23796,9 @@ async function loadSettings({ restoreMessages = false } = {}) {
   explicitLocaleStored = typeof stored[LOCALE_STORAGE_KEY] === 'string' && stored[LOCALE_STORAGE_KEY] !== '';
   onboardingStateLoaded = true;
   renderBrowserIntroVisibility();
+  const calmMigration = migrateToCalmAppearance(stored.hermesBrowserSettings);
+  const migrateCalmAppearance = Boolean(stored.hermesBrowserSettings) && calmMigration.changed;
+  if (migrateCalmAppearance) stored.hermesBrowserSettings = calmMigration.settings;
   const migrateConnectionSchema = stored.hermesBrowserSettings?.connectionSchemaVersion !== DEFAULT_SETTINGS.connectionSchemaVersion;
   const storedSettings = await hydrateSavedConnectionSecrets(
     migrateConnectionSettings(stored.hermesBrowserSettings || {}),
@@ -23914,7 +23918,7 @@ async function loadSettings({ restoreMessages = false } = {}) {
     settings.fastMode = effectiveOptions.fastMode;
   }
   applyAppearanceSettings();
-  if (migrateConnectionSchema || migrateDesktopOptionDefaults || migrateModelOptionScope || hasUnboundProfileContextHandoff) {
+  if (migrateConnectionSchema || migrateCalmAppearance || migrateDesktopOptionDefaults || migrateModelOptionScope || hasUnboundProfileContextHandoff) {
     await setPackedBrowserSettings(settings);
   }
   messages = restoreMessages && Array.isArray(stored[messageKey]) ? stored[messageKey] : [];

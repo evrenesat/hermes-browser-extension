@@ -872,7 +872,7 @@ const CONTENT_EXTRACTION_API = Object.freeze({
   hermesGlobal.HermesContentExtractor = CONTENT_EXTRACTION_API;
 })(globalThis);
 
-/* extension/lib/appearance-themes.mjs · SHA-256 f5bb8a5d9a9f83c4 */
+/* extension/lib/appearance-themes.mjs · SHA-256 c8380c9ac2d30c63 */
 (function hermesAppearanceRuntime(hermesGlobal) {
   'use strict';
 
@@ -1071,6 +1071,20 @@ const APPEARANCE_RUNTIME_API = Object.freeze({
   resolveColorMode,
   resolveInlineAssistTheme,
 });
+
+// One-time move of an existing install onto the calm look. The fork changed
+// the defaults; installs that stored the old ones would otherwise keep the
+// retro theme and display font on the new layout. Runs once per install.
+const CALM_UI_MIGRATION_VERSION = 1;
+const RETRO_FONT_PROFILES = new Set(['signature', 'collapse']);
+
+function migrateToCalmAppearance(settings) {
+  if (!settings || typeof settings !== 'object') return { settings, changed: false };
+  if (Number(settings.calmUiMigration) >= CALM_UI_MIGRATION_VERSION) return { settings, changed: false };
+  const next = { ...settings, calmUiMigration: CALM_UI_MIGRATION_VERSION, appearanceTheme: DEFAULT_APPEARANCE_THEME };
+  if (!settings.fontProfile || RETRO_FONT_PROFILES.has(settings.fontProfile)) next.fontProfile = 'system-sans';
+  return { settings: next, changed: true };
+}
 
   hermesGlobal.HermesAppearance = APPEARANCE_RUNTIME_API;
 })(globalThis);

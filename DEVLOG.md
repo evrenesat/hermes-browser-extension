@@ -14,6 +14,16 @@
 - All `data-icon` svgs are now 1.5px stroke Lucide-style line icons (HTML and JS-injected); `tests/line-icons.test.mjs` replaces the pixelarticons tests.
 - Deleted tests that only guarded the old look (caps/tracking/display-font, RTL tracking twins, pixel icons, connection-window headings); `tests/review-queue.test.mjs` "simultaneous processes" is flaky and unrelated.
 
+### Phase 2: conversation and composer (`extension/calm-chat.css`)
+
+- Assistant replies have no bubble or role label; user messages are compact right-aligned bubbles; markdown uses the UI font with compact code blocks (language header, copy on hover) and tables; tool activity is one muted expandable line; message actions show on hover.
+- Composer is one rounded box: autogrowing textarea plus one tool row (attach, `/` commands, model chip, context ring, mic, send/stop). The separate "Ask Hermes" row is gone; suggestion chips fill the empty state; Esc stops a run, ↑ on an empty composer edits the last message.
+
+### Phase 2: settings (`extension/calm-settings.css`)
+
+- Settings home is a searchable list: the search indexes every pane's DOM ("Pane › Setting", ↑/↓/Enter, jumps to and highlights the row, opens collapsed groups). Hero card and Nous strips removed; version and updates live in About.
+- Sticky footer Save (enabled only with unsaved changes); "Test connection" moved into Connections; per-pane collapsed "Advanced" groups; long hints clamp to one line with "Learn more"; switches instead of bordered checkbox cards; appearance order is theme, response style, layout, zoom, language, font.
+
 ### Phase 2: menus and sessions drawer (`extension/calm-menus.css`)
 
 - Attach menu: Lucide line icons (locale strings lost their glyph prefixes), grouped with separators. Quick commands: preview card removed, rows are `/cmd` + truncated description. Slash menu uses the same rows and gains an ↑/↓/Enter/Esc highlight driven from the composer.
@@ -37,3 +47,16 @@
 - Sentence case and "…" across English copy (caps kickers, Title Case labels, "Refresh", "Edit models…"). New English-only fallbacks were copied into the other locale packs.
 - Esc closes menus, scope menu, preview, settings and returns focus to the composer, which is focused when the panel is ready. Tooltips on attach, commands, model, mic, send.
 - Harness: `temp/harness/p3.mjs` (running state, keyboard checks, light/dark mic and voice pages), fake gateway `slowChat` flag. Shots: `temp/shots/p3f` (full), `p3e`, `p3s`.
+
+### Integration (coordinator)
+
+- Merged the four phase-2 branches; resolved the onboarding/settings overlap (setup re-run row removed, startup and settings test-button labels both kept).
+- Fixed a duplicated `ui.explain.selection` key that broke `web-ext lint` (JSON_DUPLICATE_KEY in every locale) and restored translations that the casing pass had replaced with English; product names and German nouns keep their capitals; dropped two dead hero-card keys.
+- Startup step label "Gateway transport" is now "Hermes connection".
+- One-time `migrateToCalmAppearance` (lib/appearance-themes.mjs) moves existing installs to Calm + system font; `tests/calm-migration.test.mjs`.
+- Final state: 5645/5645 unit tests, `check:js` and i18n checks pass, `web-ext lint` on `dist/firefox` 0 errors. Screenshots: `temp/shots/final1` (Chromium harness; Firefox visual QA is issue #8).
+
+### How to test (owner)
+
+- `git checkout ui/tame-revamp && npm ci && npm run build:firefox`, then load `dist/firefox/manifest.json` from about:debugging → This Firefox → Load Temporary Add-on.
+- Existing settings carry over. A one-time migration (`calmUiMigration`, persisted through the packed settings writer) switches an existing install to the Calm theme and replaces the Hermes signature/legacy display font with the system font; colour mode and other choices stay.

@@ -136,6 +136,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   sessionStartupMode: 'new-session',
   colorMode: 'system',
   appearanceTheme: 'calm',
+  calmUiMigration: 1,
   appearanceSchemaVersion: 2,
   textZoomPercent: 100,
   fontProfile: 'system-sans',
