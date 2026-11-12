@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "Các bảng đính kèm hiện có vẫn giữ nguyên như cũ. Các tab khác và tab mới sử dụng bảng chia sẻ.",
   "ui.expand": "Mở rộng",
   "ui.explain": "Giải thích",
-  "ui.explain.selection": "Giải thích sự lựa chọn",
   "ui.extension": "Tiện ích mở rộng",
   "ui.fallback": "thay thế",
   "ui.falls.back.to.review.if.the.field.changed": "Quay lại xem xét nếu trường thay đổi",

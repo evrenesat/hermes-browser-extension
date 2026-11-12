@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "Istniejące dołączone panele pozostają bez zmian. Inne i nowe karty korzystają ze wspólnego panelu.",
   "ui.expand": "Rozwiń",
   "ui.explain": "Wyjaśnij",
-  "ui.explain.selection": "Wyjaśnij wybór",
   "ui.extension": "Rozszerzenie",
   "ui.fallback": "rezerwowy",
   "ui.falls.back.to.review.if.the.field.changed": "Wraca do sprawdzenia, czy pole uległo zmianie",

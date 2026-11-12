@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "Eksisterende vedhæftede paneler forbliver som de er. Andre og nye faner bruger det delte panel.",
   "ui.expand": "Udvide",
   "ui.explain": "Forklare",
-  "ui.explain.selection": "Forklar valget",
   "ui.extension": "Forlængelse",
   "ui.fallback": "tilbagefald",
   "ui.falls.back.to.review.if.the.field.changed": "Falder tilbage til gennemgang, hvis feltet ændres",

@@ -1438,7 +1438,6 @@ export default Object.freeze({
   "ui.save": "保存",
   "ui.save.comment": "Save comment",
   "ui.send.comments": "Send comments",
-  "ui.explain.selection": "Explain selection",
   "ui.key.points": "Key points",
   "ui.save.settings": "保存设置",
   "ui.saved": "已保存",

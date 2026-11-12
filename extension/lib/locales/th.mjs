@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "แผงที่แนบมาที่มีอยู่จะคงอยู่เหมือนเดิม แท็บอื่นๆ และแท็บใหม่ใช้แผงที่ใช้ร่วมกัน",
   "ui.expand": "ขยาย",
   "ui.explain": "อธิบาย",
-  "ui.explain.selection": "อธิบายการเลือก",
   "ui.extension": "ส่วนขยาย",
   "ui.fallback": "ทางเลือก",
   "ui.falls.back.to.review.if.the.field.changed": "กลับไปให้ตรวจทานหากฟิลด์มีการเปลี่ยนแปลง",

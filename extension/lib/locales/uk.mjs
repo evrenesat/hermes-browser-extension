@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "Існуючі прикріплені панелі залишаються без змін. Інші та нові вкладки використовують спільну панель.",
   "ui.expand": "Розгорнути",
   "ui.explain": "Пояснити",
-  "ui.explain.selection": "Поясніть вибір",
   "ui.extension": "Розширення",
   "ui.fallback": "запасний варіант",
   "ui.falls.back.to.review.if.the.field.changed": "Повертається до перегляду, якщо поле змінилося",

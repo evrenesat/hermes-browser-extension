@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "Panel terpasang yang ada tetap apa adanya. Tab lain dan baru menggunakan panel bersama.",
   "ui.expand": "Memperluas",
   "ui.explain": "Menjelaskan",
-  "ui.explain.selection": "Jelaskan seleksi",
   "ui.extension": "Perpanjangan",
   "ui.fallback": "mundur",
   "ui.falls.back.to.review.if.the.field.changed": "Kembali untuk meninjau jika bidang berubah",

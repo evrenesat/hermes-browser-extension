@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "Vorhandene angebrachte Panels bleiben unverändert. Andere und neue Registerkarten verwenden das freigegebene Bedienfeld.",
   "ui.expand": "Expandieren",
   "ui.explain": "Erklären",
-  "ui.explain.selection": "Auswahl erklären",
   "ui.extension": "Verlängerung",
   "ui.fallback": "zurückgreifen",
   "ui.falls.back.to.review.if.the.field.changed": "Fällt zur Überprüfung zurück, wenn sich das Feld geändert hat",

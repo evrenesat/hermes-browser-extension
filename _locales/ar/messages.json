@@ -3051,6 +3051,18 @@
     "message": "الاتصال بـ Hermes",
     "description": "Runtime interface message onboarding.connect.title"
   },
+  "runtime_onboarding_connect_url_invalid": {
+    "message": "Enter an address like http://127.0.0.1:8642.",
+    "description": "Runtime interface message onboarding.connect.url_invalid"
+  },
+  "runtime_onboarding_connect_url_label": {
+    "message": "Gateway address",
+    "description": "Runtime interface message onboarding.connect.url_label"
+  },
+  "runtime_onboarding_connect_url_scheme": {
+    "message": "The address must start with http:// or https://.",
+    "description": "Runtime interface message onboarding.connect.url_scheme"
+  },
   "runtime_onboarding_first_prompt": {
     "message": "جرّب أول طلب",
     "description": "Runtime interface message onboarding.first_prompt"
@@ -3140,7 +3152,7 @@
     "description": "Runtime interface message onboarding.theme.title"
   },
   "runtime_onboarding_welcome_body": {
-    "message": "لنقم بإعداده معًا. يستغرق الأمر دقيقة تقريبًا.",
+    "message": "مرحبًا بك في Hermes Browser",
     "description": "Runtime interface message onboarding.welcome.body"
   },
   "runtime_onboarding_welcome_greeting": {
@@ -3152,11 +3164,11 @@
     "description": "Runtime interface message onboarding.welcome.skip"
   },
   "runtime_onboarding_welcome_start": {
-    "message": "ابدأ",
+    "message": "الاتصال بـ Hermes",
     "description": "Runtime interface message onboarding.welcome.start"
   },
   "runtime_onboarding_welcome_title": {
-    "message": "مرحبًا بك في Hermes Browser",
+    "message": "Hermes Browser",
     "description": "Runtime interface message onboarding.welcome.title"
   },
   "runtime_pairing_approve_below": {
@@ -4003,6 +4015,10 @@
     "message": "النموذج: {model}",
     "description": "Runtime interface message session.row_model"
   },
+  "runtime_settings_advanced": {
+    "message": "Advanced",
+    "description": "Runtime interface message settings.advanced"
+  },
   "runtime_settings_back_to_top": {
     "message": "العودة إلى الأعلى",
     "description": "Runtime interface message settings.back_to_top"
@@ -4139,6 +4155,10 @@
     "message": "اللغة",
     "description": "Runtime interface message settings.language.label"
   },
+  "runtime_settings_learn_more": {
+    "message": "Learn more",
+    "description": "Runtime interface message settings.learn_more"
+  },
   "runtime_settings_local_api_setup_hint": {
     "message": "خادم API المحلي (http://127.0.0.1:8642 الافتراضي). الصق مفتاحه أدناه.",
     "description": "Runtime interface message settings.local_api_setup_hint"
@@ -4270,6 +4290,26 @@
   "runtime_settings_save_sources_invalid": {
     "message": "عناوين مصادر النماذج هذه غير صالحة: {sources}",
     "description": "Runtime interface message settings.save.sources_invalid"
+  },
+  "runtime_settings_search_none": {
+    "message": "No matching settings",
+    "description": "Runtime interface message settings.search_none"
+  },
+  "runtime_settings_search_placeholder": {
+    "message": "Search settings",
+    "description": "Runtime interface message settings.search_placeholder"
+  },
+  "runtime_settings_search_results": {
+    "message": "Search results",
+    "description": "Runtime interface message settings.search_results"
+  },
+  "runtime_settings_show_less": {
+    "message": "Show less",
+    "description": "Runtime interface message settings.show_less"
+  },
+  "runtime_settings_test_connection": {
+    "message": "Test connection",
+    "description": "Runtime interface message settings.test_connection"
   },
   "runtime_settings_transcript_auto": {
     "message": "تلقائي",
@@ -5032,7 +5072,7 @@
     "description": "Runtime interface message ui.clear.comments"
   },
   "runtime_ui_clear_picked_element": {
-    "message": "✕ مسح العنصر المختار",
+    "message": "مسح العنصر المختار",
     "description": "Runtime interface message ui.clear.picked.element"
   },
   "runtime_ui_clear_stored_token": {
@@ -5832,7 +5872,7 @@
     "description": "Runtime interface message ui.edit.message"
   },
   "runtime_ui_edit_models": {
-    "message": "⚙ تعديل النماذج...",
+    "message": "تعديل النماذج...",
     "description": "Runtime interface message ui.edit.models"
   },
   "runtime_ui_edit_models_in_hermes_desktop": {
@@ -5976,7 +6016,7 @@
     "description": "Runtime interface message ui.explain"
   },
   "runtime_ui_explain_selection": {
-    "message": "شرح الاختيار",
+    "message": "Explain selection",
     "description": "Runtime interface message ui.explain.selection"
   },
   "runtime_ui_extension": {
@@ -6016,7 +6056,7 @@
     "description": "Runtime interface message ui.file"
   },
   "runtime_ui_files": {
-    "message": "▧ ملفات...",
+    "message": "ملفات...",
     "description": "Runtime interface message ui.files"
   },
   "runtime_ui_files_453f0471": {
@@ -6052,7 +6092,7 @@
     "description": "Runtime interface message ui.focused.draft"
   },
   "runtime_ui_folder": {
-    "message": "▰ المجلد...",
+    "message": "المجلد...",
     "description": "Runtime interface message ui.folder"
   },
   "runtime_ui_folder_30baa249": {
@@ -6512,7 +6552,7 @@
     "description": "Runtime interface message ui.image.stayed.inline.only"
   },
   "runtime_ui_images": {
-    "message": "▧ الصور...",
+    "message": "الصور...",
     "description": "Runtime interface message ui.images"
   },
   "runtime_ui_images_09e871c9": {
@@ -6614,6 +6654,10 @@
   "runtime_ui_key": {
     "message": "مفتاح",
     "description": "Runtime interface message ui.key"
+  },
+  "runtime_ui_key_points": {
+    "message": "Key points",
+    "description": "Runtime interface message ui.key.points"
   },
   "runtime_ui_label": {
     "message": "ملصق",
@@ -7276,7 +7320,7 @@
     "description": "Runtime interface message ui.paste.a.gateway.api.key.or.reconnect.when.you.are.ready"
   },
   "runtime_ui_paste_image": {
-    "message": "▣ لصق الصورة",
+    "message": "لصق الصورة",
     "description": "Runtime interface message ui.paste.image"
   },
   "runtime_ui_paste_this_into_the_hermes_api_server_environment_on_the_remote_machine": {
@@ -7308,7 +7352,7 @@
     "description": "Runtime interface message ui.pick.an.element"
   },
   "runtime_ui_pick_page_element": {
-    "message": "◈ اختيار عنصر الصفحة",
+    "message": "اختيار عنصر الصفحة",
     "description": "Runtime interface message ui.pick.page.element"
   },
   "runtime_ui_picked_element_cleared": {
@@ -7424,7 +7468,7 @@
     "description": "Runtime interface message ui.prompt.snippet"
   },
   "runtime_ui_prompt_snippets": {
-    "message": "▤ مقتطفات سريعة...",
+    "message": "مقتطفات سريعة...",
     "description": "Runtime interface message ui.prompt.snippets"
   },
   "runtime_ui_property": {
@@ -8364,7 +8408,7 @@
     "description": "Runtime interface message ui.tab"
   },
   "runtime_ui_tab_screenshot": {
-    "message": "▣ Tab screenshot",
+    "message": "Tab screenshot",
     "description": "Runtime interface message ui.tab.screenshot"
   },
   "runtime_ui_tabs": {
@@ -8648,7 +8692,7 @@
     "description": "Runtime interface message ui.upload"
   },
   "runtime_ui_url": {
-    "message": "↗ URL...",
+    "message": "URL...",
     "description": "Runtime interface message ui.url"
   },
   "runtime_ui_url_0e2d9b07": {

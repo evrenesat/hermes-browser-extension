@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "已有的附加面板保持不變。其他和新分頁使用共享面板。",
   "ui.expand": "展開",
   "ui.explain": "解釋",
-  "ui.explain.selection": "解釋選取內容",
   "ui.extension": "擴充功能",
   "ui.fallback": "退回",
   "ui.falls.back.to.review.if.the.field.changed": "若欄位已變更，則退回至審查",

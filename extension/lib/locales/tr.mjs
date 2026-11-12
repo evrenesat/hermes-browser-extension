@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "Mevcut ekli paneller oldukları gibi kalır. Diğer ve yeni sekmeler paylaşılan paneli kullanır.",
   "ui.expand": "Genişlet",
   "ui.explain": "Açıkla",
-  "ui.explain.selection": "Seçimi açıkla",
   "ui.extension": "Uzantı",
   "ui.fallback": "geri dönüş",
   "ui.falls.back.to.review.if.the.field.changed": "Alanın değişmesi durumunda incelemeye geri döner",

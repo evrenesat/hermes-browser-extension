@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "I pannelli allegati esistenti rimangono così come sono. Altre e nuove schede utilizzano il pannello condiviso.",
   "ui.expand": "Espandi",
   "ui.explain": "Spiega",
-  "ui.explain.selection": "Spiegare la selezione",
   "ui.extension": "Estensione",
   "ui.fallback": "ripiego",
   "ui.falls.back.to.review.if.the.field.changed": "Torna alla revisione se il campo è cambiato",

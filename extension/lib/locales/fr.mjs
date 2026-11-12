@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "Les panneaux attachés existants restent tels quels. D'autres et nouveaux onglets utilisent le panneau partagé.",
   "ui.expand": "Développer",
   "ui.explain": "Expliquer",
-  "ui.explain.selection": "Expliquer la sélection",
   "ui.extension": "Extension",
   "ui.fallback": "retomber",
   "ui.falls.back.to.review.if.the.field.changed": "Revenir à l'examen si le champ a changé",

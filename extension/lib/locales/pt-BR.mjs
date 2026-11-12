@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "Os painéis anexados existentes permanecem como estão. Outras e novas abas usam o painel compartilhado.",
   "ui.expand": "Expandir",
   "ui.explain": "Explique",
-  "ui.explain.selection": "Explique a seleção",
   "ui.extension": "Extensão",
   "ui.fallback": "reserva",
   "ui.falls.back.to.review.if.the.field.changed": "Volta para revisar se o campo mudou",

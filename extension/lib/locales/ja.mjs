@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "既存の添付パネルはそのまま維持されます。その他のタブと新しいタブは共有パネルを使用します。",
   "ui.expand": "展開",
   "ui.explain": "説明",
-  "ui.explain.selection": "選択の説明",
   "ui.extension": "拡張機能",
   "ui.fallback": "フォールバック",
   "ui.falls.back.to.review.if.the.field.changed": "フィールドが変更された場合はフォールバックしてレビューします",

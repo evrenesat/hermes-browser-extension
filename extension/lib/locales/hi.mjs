@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "मौजूदा संलग्न पैनल वैसे ही बने रहेंगे। अन्य और नए टैब साझा पैनल का उपयोग करते हैं।",
   "ui.expand": "बढ़ाना",
   "ui.explain": "व्याख्या करना",
-  "ui.explain.selection": "चयन को समझाइये",
   "ui.extension": "विस्तार",
   "ui.fallback": "मैदान छोड़ना",
   "ui.falls.back.to.review.if.the.field.changed": "यदि फ़ील्ड बदल गई है तो समीक्षा के लिए वापस आ जाता है",

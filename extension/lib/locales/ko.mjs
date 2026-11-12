@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "기존에 첨부된 패널은 그대로 유지됩니다. 다른 탭과 새 탭은 공유 패널을 사용합니다.",
   "ui.expand": "펼치기",
   "ui.explain": "설명",
-  "ui.explain.selection": "선택 설명",
   "ui.extension": "확장 프로그램",
   "ui.fallback": "폴백",
   "ui.falls.back.to.review.if.the.field.changed": "필드가 변경된 경우 검토를 위해 다시 돌아갑니다.",

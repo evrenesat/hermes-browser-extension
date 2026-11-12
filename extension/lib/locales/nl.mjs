@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "Bestaande bevestigde panelen blijven zoals ze zijn. Andere en nieuwe tabbladen gebruiken het gedeelde paneel.",
   "ui.expand": "Uitbreiden",
   "ui.explain": "Leg uit",
-  "ui.explain.selection": "Selectie uitleggen",
   "ui.extension": "Verlenging",
   "ui.fallback": "terugval",
   "ui.falls.back.to.review.if.the.field.changed": "Valt terug om te beoordelen of het veld is gewijzigd",

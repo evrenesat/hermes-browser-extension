@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "Существующие прикрепленные панели остаются без изменений. Другие и новые вкладки используют общую панель.",
   "ui.expand": "Расширять",
   "ui.explain": "Объяснить",
-  "ui.explain.selection": "Объясните выбор",
   "ui.extension": "Расширение",
   "ui.fallback": "отступать",
   "ui.falls.back.to.review.if.the.field.changed": "Возвращается к просмотру, если поле изменилось.",

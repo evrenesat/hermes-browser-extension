@@ -938,7 +938,6 @@ export default Object.freeze({
   "ui.existing.attached.panels.stay.as.they.are.other.and.new.tabs.us.fb9a0ba6": "تبقى اللوحات المرفقة الموجودة كما هي. تستخدم علامات التبويب الأخرى والجديدة اللوحة المشتركة.",
   "ui.expand": "يوسع",
   "ui.explain": "يشرح",
-  "ui.explain.selection": "شرح الاختيار",
   "ui.extension": "امتداد",
   "ui.fallback": "احتياطي",
   "ui.falls.back.to.review.if.the.field.changed": "يعود للمراجعة إذا تغير الحقل",
