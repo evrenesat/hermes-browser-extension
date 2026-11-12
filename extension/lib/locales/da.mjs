@@ -2282,4 +2282,11 @@ export default Object.freeze({
   "read_aloud.meta.gateway": "Kilde: Hermes-dashboard (/api/audio/speak)",
   "read_aloud.meta.browser": "Kilde: denne browser (speechSynthesis)",
   "read_aloud.meta.none": "Kilde: ingen",
+  "settings.advanced": "Advanced",
+  "settings.learn_more": "Learn more",
+  "settings.show_less": "Show less",
+  "settings.search_placeholder": "Search settings",
+  "settings.search_none": "No matching settings",
+  "settings.search_results": "Search results",
+  "settings.test_connection": "Test connection",
 });

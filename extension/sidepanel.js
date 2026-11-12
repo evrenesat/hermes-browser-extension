@@ -3365,7 +3365,7 @@ function showSettingsPane(pane, { field = '', focus = true } = {}) {
     void loadGatewayCapabilities({ quiet: true, healthOk: isConnected() }).catch(() => undefined);
   }
   renderSettingsEditedMarkers();
-  requestAnimationFrame(updateSettingsBackToTop);
+  requestAnimationFrame(() => { updateSettingsBackToTop(); markSettingsProse(); });
   if (!focus) return;
   if (!settingsActivePane) {
     const origin = settingsReturnFocus && home.contains(settingsReturnFocus) ? settingsReturnFocus : home.querySelector('[data-settings-category]');
@@ -3375,6 +3375,7 @@ function showSettingsPane(pane, { field = '', focus = true } = {}) {
   const paneEl = document.getElementById(`settingsPane-${settingsActivePane}`);
   const fieldEl = field ? document.getElementById(field) : null;
   if (fieldEl && paneEl.contains(fieldEl)) {
+    for (let node = fieldEl.parentElement; node; node = node.parentElement) if (node.tagName === 'DETAILS') node.open = true;
     requestAnimationFrame(() => {
       fieldEl.scrollIntoView({ block: 'center', behavior: 'auto' });
       fieldEl.focus({ preventScroll: true });
@@ -3418,7 +3419,7 @@ function renderSettingsSearch() {
   const list = els.settingsSearchResults;
   if (!input || !list) return;
   const terms = input.value.toLowerCase().split(/\s+/).filter(Boolean);
-  const grid = els.settingsCategoryHome.querySelector('.settings-category-grid');
+  const grid = document.getElementById('settingsCategoryHome').querySelector('.settings-category-grid');
   list.replaceChildren();
   list.hidden = !terms.length;
   if (grid) grid.hidden = Boolean(terms.length);
@@ -3427,7 +3428,7 @@ function renderSettingsSearch() {
   if (!hits.length) {
     const none = document.createElement('li');
     none.className = 'settings-search-empty';
-    none.textContent = 'No matching settings';
+    none.textContent = t('settings.search_none');
     list.append(none);
     return;
   }
@@ -3437,10 +3438,10 @@ function renderSettingsSearch() {
     button.type = 'button';
     button.setAttribute('role', 'option');
     const crumb = document.createElement('small');
-    crumb.textContent = hit.paneTitle;
+    crumb.textContent = `${hit.paneTitle} \u203a`;
     const title = document.createElement('span');
     title.textContent = hit.title;
-    button.append(title, crumb);
+    button.append(crumb, title);
     button.addEventListener('click', () => openSettingsSearchHit(hit));
     item.append(button);
     list.append(item);
@@ -3459,6 +3460,15 @@ function openSettingsSearchHit(hit) {
   });
 }
 
+function moveSettingsSearchSelection(step) {
+  const buttons = [...els.settingsSearchResults.querySelectorAll('button')];
+  if (!buttons.length) return;
+  const current = buttons.findIndex((button) => button.classList.contains('is-active'));
+  const next = current < 0 ? (step > 0 ? 0 : buttons.length - 1) : (current + step + buttons.length) % buttons.length;
+  buttons.forEach((button, index) => button.classList.toggle('is-active', index === next));
+  buttons[next].scrollIntoView({ block: 'nearest' });
+}
+
 function bindSettingsSearch() {
   const input = els.settingsSearchInput;
   if (!input) return;
@@ -3466,7 +3476,11 @@ function bindSettingsSearch() {
   input.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      els.settingsSearchResults.querySelector('button')?.click();
+      const results = els.settingsSearchResults;
+      (results.querySelector('button.is-active') || results.querySelector('button'))?.click();
+    } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveSettingsSearchSelection(event.key === 'ArrowDown' ? 1 : -1);
     } else if (event.key === 'Escape' && input.value) {
       event.preventDefault();
       event.stopPropagation();
@@ -3474,6 +3488,28 @@ function bindSettingsSearch() {
       renderSettingsSearch();
     }
   });
+}
+
+// Long explanatory text in a pane is clamped to one line; a "Learn more" toggle reveals the rest.
+const SETTINGS_PROSE_SELECTOR = '.settings-pane .hint, .settings-pane .settings-toggle-copy small, .settings-pane .settings-prose, .settings-pane .browser-control-note, .settings-pane .browser-control-card-head p';
+function markSettingsProse() {
+  for (const el of els.settingsForm.querySelectorAll(SETTINGS_PROSE_SELECTOR)) {
+    if (el.closest('[hidden]') || el.hidden || el.dataset.proseBound) continue;
+    el.classList.add('is-prose');
+    if (el.scrollHeight <= el.clientHeight + 1) { el.classList.remove('is-prose'); continue; }
+    el.dataset.proseBound = '1';
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'settings-prose-toggle';
+    toggle.textContent = t('settings.learn_more');
+    toggle.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const open = el.classList.toggle('is-prose-open');
+      toggle.textContent = t(open ? 'settings.show_less' : 'settings.learn_more');
+    });
+    el.insertAdjacentElement('afterend', toggle);
+  }
 }
 
 function openSettingsDialog(arg) {
@@ -30830,6 +30866,7 @@ function bindEvents() {
   });
   els.testConnectionButton.addEventListener('click', testConnection);
   bindSettingsSearch();
+  els.settingsForm.addEventListener('toggle', () => requestAnimationFrame(markSettingsProse), true);
   // Read the connection afresh whenever Settings opens, so the bars are live
   // without the button needing a click first.
   new MutationObserver(() => {

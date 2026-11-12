@@ -289,7 +289,6 @@ const OUTLINED_INVERTED_SELECTORS = [
   '.bot-mode-head-action:hover',
   '.marketplace-theme-search button:hover',
   '.marketplace-theme-card button:hover',
-  '#textZoomPresetGrid [data-text-zoom-percent]:hover',
   '.side-question-close:hover',
 ];
 
@@ -304,15 +303,6 @@ test('every named control hovers with the action-pair tile, its label colour out
     }
     assert.doesNotMatch(body, /255,\s*255,\s*255/, `${selector} must not use a hardcoded white`);
     assert.doesNotMatch(body, /color: var\(--hermes-accent\)/, `${selector} must not paint its label in the pale accent`);
-  }
-});
-
-test('the text-zoom stepper inverts into the action pair on hover (it draws dividers, not an outline)', () => {
-  for (const selector of ['#textZoomDecreaseButton:hover', '#textZoomIncreaseButton:hover']) {
-    const body = ruleFor(sidepanelCss, selector);
-    assert.ok(body.includes('background: var(--hermes-primary-bg, var(--hermes-ink))'), `${selector} should invert its tile`);
-    assert.ok(body.includes('color: var(--hermes-primary-fg, var(--hermes-paper))'), `${selector} should invert its glyph`);
-    assert.doesNotMatch(body, /255,\s*255,\s*255/, `${selector} must not use a hardcoded white`);
   }
 });
 

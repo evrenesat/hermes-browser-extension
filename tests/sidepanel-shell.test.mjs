@@ -61,8 +61,7 @@ test('side panel keeps Browser onboarding, refresh feedback, updates, and messag
   assert.match(css, /--hermes-bubble-user-alpha:\s*100%/);
   assert.match(css, /--hermes-bubble-assistant-alpha:\s*100%/);
   assert.match(css, /backdrop-filter:\s*blur\(/);
-  assert.match(html, /class="release-sidecar"/);
-  assert.match(html, /LOCAL SIDECAR \/ CHROME PANEL/);
+  assert.doesNotMatch(html, /class="release-sidecar"/, 'the hero card is gone from Settings');
   assert.match(html, /id="reviewUpdateButton"/);
   assert.match(html, /id="updateDialog"/);
   assert.match(html, /class="update-dialog-mark"\s+aria-hidden="true"/);

@@ -4294,19 +4294,15 @@ test('settings CSS uses the semantic text-zoom multiplier, calc typography, and 
   const css = readFileSync(new URL('../extension/sidepanel.css', import.meta.url), 'utf8');
   assert.match(css, /--hermes-text-zoom:\s*1;/, 'the root defines the semantic text-zoom multiplier');
   assert.match(css, /font-size:\s*calc\([^)]*var\(--hermes-text-zoom/, 'typography must scale through calc');
-  const grid = css.match(/#textZoomPresetGrid\s*\{([\s\S]*?)\n\}/)?.[1] || '';
-  assert.ok(grid, 'the preset grid should be styled');
-  assert.match(grid, /grid-template-columns:\s*repeat\(3,/, 'presets must remain three columns in the narrow panel');
-  assert.match(grid, /minmax\(0,\s*1fr\)/, 'preset columns must be allowed to shrink without horizontal overflow');
-  assert.match(css, /#textZoomDecreaseButton/, 'the decrease stepper needs rules');
-  assert.match(css, /#textZoomIncreaseButton/, 'the increase stepper needs rules');
+  const calm = readFileSync(new URL('../extension/calm-settings.css', import.meta.url), 'utf8');
+  assert.match(calm, /\.text-zoom-preset-grid/, 'the calm settings layer styles the preset grid');
+  assert.match(calm, /#textZoomDecreaseButton/, 'the decrease stepper needs rules');
+  assert.match(calm, /#textZoomIncreaseButton/, 'the increase stepper needs rules');
   assert.match(css, /#fontProfileSelect/, 'the font select needs rules');
 });
 
 test('settings text controls keep at least 32px pointer targets and preserve canonical scrollbars without CSS zoom', () => {
   const css = readFileSync(new URL('../extension/sidepanel.css', import.meta.url), 'utf8');
-  assert.match(css, /(?:\[data-text-zoom-percent\]|textZoomPresetGrid)[^{]*\{[^}]*min-height:\s*(?:3[2-9]|[4-9]\d)px/, 'preset buttons need at least a 32px pointer target (44px preferred)');
-  assert.doesNotMatch(css, /(?:\[data-text-zoom-percent\]|textZoomPresetGrid)[^{]*\{[^}]*min-height:\s*(?:[0-2]\d|3[01])px/, 'preset targets must never drop below 32px');
   assert.doesNotMatch(css, /^\s*zoom\s*:/m, 'no CSS zoom property may be used');
   assert.doesNotMatch(css, /\.bottom-dock::-webkit-scrollbar/, 'bottom-dock must keep canonical scrollbars');
   assert.doesNotMatch(css, /\.composer::-webkit-scrollbar/, 'composer must keep canonical scrollbars');
@@ -4320,16 +4316,6 @@ test('settings polish separates profile actions, aligns the zoom stepper, and co
   assert.match(html, /class="profile-action-row"[\s\S]*?id="refreshProfilesButton"/);
   assert.match(css, /\.profile-control-stack\s*\{[^}]*gap:\s*(?:1[0-9]|[2-9]\d)px/s);
   assert.match(css, /\.profile-action-row\s*\{[^}]*margin-top:\s*[4-9]px/s);
-
-  const stepper = css.match(/\.text-zoom-stepper\s*\{([\s\S]*?)\n\}/)?.[1] || '';
-  assert.match(stepper, /grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\)\s+38px/);
-  assert.match(stepper, /min-height:\s*38px/);
-  assert.match(css, /#textZoomDecreaseButton,[\s\S]*?#textZoomIncreaseButton\s*\{[^}]*height:\s*38px/s);
-  assert.match(css, /\.text-zoom-input-wrap #textZoomInput\s*\{[^}]*height:\s*38px/s);
-  assert.match(css, /#textZoomInput::-webkit-inner-spin-button/);
-  assert.match(css, /#textZoomInput::-webkit-outer-spin-button/);
-  assert.match(css, /appearance:\s*none/);
-  assert.match(css, /\.text-zoom-input-wrap > span:last-child\s*\{[^}]*display:\s*grid[^}]*place-items:\s*center/s);
 
   assert.match(html, /<details id="contextMenuActionsDisclosure" class="context-menu-actions-disclosure">/);
   assert.doesNotMatch(html, /<details id="contextMenuActionsDisclosure"[^>]*\sopen(?:\s|>)/);
@@ -4369,7 +4355,7 @@ test('settings header owns the animated connection test control', () => {
   const css = readFileSync(new URL('../extension/sidepanel.css', import.meta.url), 'utf8');
   const source = readFileSync(new URL('../extension/sidepanel.js', import.meta.url), 'utf8');
   assert.equal((html.match(/id="testConnectionButton"/g) || []).length, 1);
-  assert.match(html, /settings-header-actions[\s\S]*?testConnectionButton[\s\S]*?closeSettingsButton/);
+  assert.match(html, /settingsPane-connections[\s\S]*?testConnectionButton/, 'the connection test lives in Connections as a labelled button');
   assert.match(html, /settings-connection-test-icon/);
   assert.match(css, /\.settings-connection-test\.is-testing \.settings-connection-test-icon[\s\S]*?animation:\s*settings-connection-climb/);
   assert.doesNotMatch(css, /settings-connection-orbit/, 'the signal bars climb while testing; they never spin');

@@ -178,10 +178,9 @@ html .settings-dialog .settings-pane {
   flex-direction: column;
   gap: 20px;
   align-content: normal;
-  padding: 0 0 24px;
+  padding: 0 var(--settings-gutter) 24px;
 }
 html .settings-dialog .settings-pane[hidden] { display: none; }
-html .settings-dialog .settings-pane > :not(.settings-pane-bar) { margin-inline: var(--settings-gutter); }
 html .settings-dialog .settings-pane-bar {
   position: sticky;
   top: 0;
@@ -191,7 +190,7 @@ html .settings-dialog .settings-pane-bar {
   gap: 4px;
   block-size: var(--calm-topbar-h);
   min-block-size: var(--calm-topbar-h);
-  margin: 0 0 -8px;
+  margin: 0 calc(-1 * var(--settings-gutter)) -8px;
   padding: 0 44px 0 8px;
   background: var(--calm-bg);
   border: 0;
@@ -869,9 +868,9 @@ html .settings-dialog .settings-search-results[hidden] { display: none; }
 html .settings-dialog .settings-search-results li + li { border-top: 1px solid var(--calm-border); }
 html .settings-dialog .settings-search-results button {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
   inline-size: 100%;
   min-height: 36px;
   padding: 6px 12px;
@@ -883,10 +882,82 @@ html .settings-dialog .settings-search-results button {
   font-size: calc(13px * var(--hermes-text-zoom, 1));
   font-weight: 500;
 }
-html .settings-dialog .settings-search-results button:hover { background: var(--calm-surface-2); }
+html .settings-dialog .settings-search-results button:is(:hover, .is-active) { background: var(--calm-surface-2); }
 html .settings-dialog .settings-search-results button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 html .settings-dialog .settings-search-results small { color: var(--calm-muted); font-size: calc(12px * var(--hermes-text-zoom, 1)); font-weight: 400; white-space: nowrap; }
 html .settings-dialog .settings-search-empty { padding: 10px 12px; color: var(--calm-muted); font-size: calc(12px * var(--hermes-text-zoom, 1)); }
 html .settings-dialog .settings-search-hit { animation: settings-search-hit 2.4s ease-out; border-radius: var(--calm-radius-control); }
 @keyframes settings-search-hit { 0%, 60% { background: var(--calm-accent-soft); box-shadow: 0 0 0 6px var(--calm-accent-soft); } 100% { background: transparent; box-shadow: 0 0 0 6px transparent; } }
 @media (prefers-reduced-motion: reduce) { html .settings-dialog .settings-search-hit { animation: none; background: var(--calm-accent-soft); } }
+
+/* Advanced groups + clamped prose */
+html .settings-dialog .settings-advanced { margin-top: 12px; border-top: 1px solid var(--calm-border); }
+html .settings-dialog .settings-advanced > summary {
+  display: flex; align-items: center; gap: 6px; min-height: 36px; cursor: pointer; list-style: none;
+  font-size: calc(12px * var(--hermes-text-zoom, 1)); font-weight: 500; color: var(--calm-muted);
+}
+html .settings-dialog .settings-advanced > summary::-webkit-details-marker { display: none; }
+html .settings-dialog .settings-advanced > summary::before { content: "\203A"; display: inline-block; inline-size: 10px; transition: transform .12s; }
+html .settings-dialog .settings-advanced[open] > summary::before { transform: rotate(90deg); }
+html .settings-dialog .settings-advanced > summary:hover { color: var(--calm-text); }
+html .settings-dialog .settings-advanced-body { display: flex; flex-direction: column; gap: 8px; padding-bottom: 4px; }
+html .settings-dialog .is-prose:not(.is-prose-open) {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; line-clamp: 1; overflow: hidden;
+}
+html .settings-dialog .settings-prose-toggle {
+  justify-self: start; align-self: flex-start; min-height: 0; margin: 2px 0 0; padding: 0; border: 0; background: none;
+  color: var(--calm-accent); font-size: calc(12px * var(--hermes-text-zoom, 1)); font-weight: 400; cursor: pointer;
+}
+html .settings-dialog .settings-prose-toggle:hover { text-decoration: underline; }
+
+/* Fixes: loose labels must shrink, decorative thumbs removed, one-column choice lists */
+html .settings-dialog form label:not(.settings-toggle-card):not(.settings-choice-card):not(.assist-setting-row):not(.text-zoom-input-wrap) { grid-template-columns: minmax(0, 1fr); min-width: 0; }
+html .settings-dialog .assist-open-thumb { display: none; }
+html .settings-dialog :is(.assist-open-grid, .assist-icon-grid) { grid-template-columns: minmax(0, 1fr); }
+html .settings-dialog .settings-pane > .settings-section:first-of-type > .settings-section-head :is(h3, h4) { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+html .settings-dialog .settings-prose-toggle { display: block; text-align: start; line-height: 1.3; margin: 0 0 4px; }
+
+/* Permissions: flat rows instead of nested cards */
+html .settings-dialog :is(.status-card.settings-active-tab, .browser-control-card) {
+  display: flex; flex-direction: column; gap: 8px; margin: 12px 0 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+}
+html .settings-dialog .status-card.settings-active-tab { flex-direction: row; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--calm-border); }
+html .settings-dialog .status-card .status-label { flex: none; padding-top: 5px; }
+html .settings-dialog .status-card .status-label > span:not(.status-dot) { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+html .settings-dialog .status-card .status-copy { display: grid; gap: 2px; min-width: 0; }
+html .settings-dialog .status-card .status-copy strong { font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 500; }
+html .settings-dialog .status-card .status-copy span { font-size: calc(12px * var(--hermes-text-zoom, 1)); color: var(--calm-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--calm-font-ui, inherit); }
+html .settings-dialog .browser-control-kicker { display: none; }
+html .settings-dialog .browser-control-card-head { display: grid; gap: 2px; }
+html .settings-dialog .browser-control-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+html .settings-dialog .browser-control-title-row h5 { margin: 0; font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 600; color: var(--calm-text); text-transform: none; letter-spacing: normal; }
+html .settings-dialog .browser-control-state { padding: 1px 8px; border-radius: 999px; background: var(--calm-surface-2); color: var(--calm-muted); font: 500 calc(11px * var(--hermes-text-zoom, 1)) var(--calm-font-ui, inherit); text-transform: none; letter-spacing: normal; border: 0; }
+html .settings-dialog .browser-control-card-head p, html .settings-dialog .browser-control-note, html .settings-dialog .browser-control-field small { margin: 0; font-size: calc(12px * var(--hermes-text-zoom, 1)); color: var(--calm-muted); line-height: 1.4; }
+html .settings-dialog .browser-control-card-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+html .settings-dialog .browser-control-card-actions .browser-control-action { inline-size: auto; }
+html .settings-dialog .browser-control-config { display: grid; gap: 4px; padding: 0; border: 0; background: none; }
+/* Assist: flat lists */
+html .settings-dialog :is(.assist-setting-rows, .inline-assist-sites, .inline-assist-open-options, .inline-assist-icon-options, .settings-choice-group) { border-radius: var(--calm-radius-card); }
+html .settings-dialog :is(.inline-assist-sites) { display: grid; gap: 6px; border: 0; background: none; padding: 8px 0 0; }
+html .settings-dialog .assist-setting-rows { border: 0; background: none; border-radius: 0; }
+html .settings-dialog .assist-setting-row:first-child { border-top: 0; }
+
+/* Agents / Bot mode */
+html .settings-dialog form label.bot-mode-density-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(120px, 45%); align-items: center; gap: 12px; min-height: 44px; padding: 6px 0; border-top: 1px solid var(--calm-border); background: none; font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 500; color: var(--calm-text); }
+html .settings-dialog .bot-mode-density-row select { min-block-size: var(--calm-control-h); }
+html .settings-dialog :is(.bot-mode-settings, .bot-mode-grid, .bot-mode-controls) { border: 0; background: none; padding: 0; box-shadow: none; }
+html .settings-dialog .bot-mode-cron-card { border: 0; border-top: 1px solid var(--calm-border); border-radius: 0; background: none; padding: 8px 0 0; margin-top: 8px; }
+html .settings-dialog .bot-mode-cron-title h4 { margin: 0; font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 600; text-transform: none; letter-spacing: normal; color: var(--calm-text); }
+html .settings-dialog .bot-mode-cron-title small { font-size: calc(12px * var(--hermes-text-zoom, 1)); color: var(--calm-muted); }
+
+/* Appearance rows */
+html .settings-dialog :is(.theme-setting, .presentation-setting) > strong { display: block; margin: 0; font-size: calc(13px * var(--hermes-text-zoom, 1)); font-weight: 600; color: var(--calm-text); }
+html .settings-dialog :is(.theme-setting, .presentation-setting) > span { display: block; margin: 0 0 8px; font-size: calc(12px * var(--hermes-text-zoom, 1)); color: var(--calm-muted); }
+html .settings-dialog .custom-theme-summary { padding-inline: 0; }
+
+/* Text zoom stepper */
+html .settings-dialog .text-zoom-stepper { display: inline-grid; grid-template-columns: var(--calm-control-h) 64px var(--calm-control-h); align-items: center; justify-self: start; gap: 4px; }
+html .settings-dialog :is(#textZoomDecreaseButton, #textZoomIncreaseButton) { inline-size: var(--calm-control-h); block-size: var(--calm-control-h); min-block-size: var(--calm-control-h); padding: 0; background: var(--calm-surface-2); color: var(--calm-text); border: 0; border-radius: var(--calm-radius-control); font-size: calc(14px * var(--hermes-text-zoom, 1)); line-height: 1; }
+html .settings-dialog .text-zoom-input-wrap { position: relative; display: block; }
+html .settings-dialog .text-zoom-input-wrap #textZoomInput { min-block-size: var(--calm-control-h); block-size: var(--calm-control-h); padding: 0 18px 0 8px; text-align: center; appearance: textfield; -moz-appearance: textfield; }
+html .settings-dialog .text-zoom-input-wrap > span:last-child { position: absolute; inset-block: 0; inset-inline-end: 6px; display: grid; place-items: center; color: var(--calm-muted); font-size: calc(12px * var(--hermes-text-zoom, 1)); pointer-events: none; }

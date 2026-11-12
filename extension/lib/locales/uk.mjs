@@ -2282,4 +2282,11 @@ export default Object.freeze({
   "read_aloud.meta.gateway": "Джерело: панель керування Hermes (/api/audio/speak)",
   "read_aloud.meta.browser": "Джерело: цей браузер (speechSynthesis)",
   "read_aloud.meta.none": "Джерело: немає",
+  "settings.advanced": "Advanced",
+  "settings.learn_more": "Learn more",
+  "settings.show_less": "Show less",
+  "settings.search_placeholder": "Search settings",
+  "settings.search_none": "No matching settings",
+  "settings.search_results": "Search results",
+  "settings.test_connection": "Test connection",
 });

@@ -204,39 +204,20 @@ test('commands menu opens upward above the composer and never covers the textare
   assert.match(skillRule, /bottom:\s*calc\(100% \+ 6px\)/);
 });
 
-test('settings header keeps a top Save action, compact close icon, and centered token button', () => {
+test('settings keeps a compact close icon in the header, a sticky footer Save gated on unsaved changes, and the connection test in Connections', () => {
   const html = readFileSync(new URL('../extension/sidepanel.html', import.meta.url), 'utf8');
-  const css = readFileSync(new URL('../extension/sidepanel.css', import.meta.url), 'utf8');
+  const source = readFileSync(new URL('../extension/sidepanel.js', import.meta.url), 'utf8');
 
-  const header = html.match(/class="settings-header-actions"[\s\S]*?<\/header>/)?.[0] || '';
-  assert.match(header, /id="saveSettingsTopButton"/);
-  assert.match(header, /saveSettingsTopButton[^>]*type="submit"/);
-  assert.match(header, /saveSettingsTopButton[^>]*data-i18n="ui.save"/);
-  // Hover tooltip parity with the other header controls.
-  assert.match(header, /saveSettingsTopButton[^>]*title="Save settings"/);
-  assert.match(header, /saveSettingsTopButton[^>]*data-i18n-title="ui.save.settings"/);
-  assert.match(header, /id="testConnectionButton"/);
-  // Close stays as an icon-only button with an accessible label.
+  const header = html.match(/<form id="settingsForm"[\s\S]*?<\/header>/)?.[0] || '';
   assert.match(header, /id="closeSettingsButton"[\s\S]*?settings-close-icon/);
   assert.match(header, /closeSettingsButton[^>]*aria-label="Close settings"/);
   assert.match(header, /closeSettingsButton[\s\S]*?<svg/);
-  assert.doesNotMatch(header, /closeSettingsButton[^>]*data-i18n="ui.close.dbc87420"/);
-  // The top Save action is now the only save control: the footer button is gone.
-  assert.match(html, /<form id="settingsForm"[\s\S]*id="saveSettingsTopButton"/);
+  assert.doesNotMatch(header, /id="saveSettingsTopButton"/);
+  const footer = html.match(/<footer class="settings-footer">[\s\S]*?<\/footer>/)?.[0] || '';
+  assert.match(footer, /id="saveSettingsTopButton"[^>]*type="submit"/);
+  assert.match(footer, /saveSettingsTopButton[^>]*data-i18n="ui.save"/);
+  assert.match(footer, /saveSettingsTopButton[^>]*disabled/, 'Save starts disabled until something changes');
+  assert.match(source, /function syncSaveButtonEnabled\(\)/);
+  assert.match(html, /settingsPane-connections[\s\S]*?id="testConnectionButton"/);
   assert.doesNotMatch(html, /id="saveSettingsButton"/);
-  // Header save keeps a readable ink label and strong border at rest (it must not read as
-  // disabled on a light palette), then inverts into the action pair with a label-coloured outline.
-  assert.match(css, /#saveSettingsTopButton\s*\{[^}]*border-color:\s*var\(--hermes-line-strong\)/s);
-  assert.match(css, /#saveSettingsTopButton\s*\{[^}]*color:\s*var\(--hermes-ink\)/s);
-  assert.match(
-    css,
-    /#saveSettingsTopButton:hover,\s*#saveSettingsTopButton:focus-visible\s*\{[^}]*background:\s*var\(--hermes-primary-bg,\s*var\(--hermes-ink\)\)/s,
-  );
-  // Clear stored token and diagnostics buttons span the full card width with centered text.
-  assert.match(css, /\.connection-security button\s*\{[^}]*justify-self:\s*stretch/s);
-  assert.match(css, /\.connection-security button\s*\{[^}]*width:\s*100%/s);
-  assert.match(css, /\.support-diagnostics button\s*\{[^}]*justify-self:\s*stretch/s);
-  assert.match(css, /\.support-diagnostics button\s*\{[^}]*width:\s*100%/s);
-  assert.match(css, /\.connection-security button\s*\{[^}]*text-align:\s*center/s);
-  assert.match(css, /\.connection-security button\s*\{[^}]*align-items:\s*center/s);
 });
