@@ -39,8 +39,8 @@ function harness({ open = true, exiting = false, connected = false, failure = 'T
     renderConnectDialog: () => calls.push('renderConnectDialog'),
     renderStartupReadiness: () => calls.push('renderStartupReadiness'),
     ensureOnboardingFlow: () => flow,
-    backgroundArtRotation: { ensureOnboardingArt: () => Promise.resolve() },
-    onboardingLanguage: null,
+    trackInstantSave: () => Promise.resolve(),
+    setLocale: () => Promise.resolve(),
     explicitLocaleStored: false,
     getLocale: () => 'en',
     browserLanguageSuggestion: () => 'de',
@@ -98,8 +98,8 @@ test('storage.onChanged hands the completed flag to that follower', () => {
 
 test('a failed Connect\'s reason is cleared when setup opens and when it is completed', async () => {
   const opened = harness({ open: false });
-  vm.runInContext('openOnboarding({ rerun: true })', opened.context);
-  assert.equal(opened.context.onboardingConnectFailure, '', 'a rerun starts without the old error and the emphasised Manual setup');
+  vm.runInContext('openOnboarding()', opened.context);
+  assert.equal(opened.context.onboardingConnectFailure, '', 'a new run starts without the old error and the emphasised Manual setup');
   assert.deepEqual(opened.calls.at(-1)[0], 'open');
   const done = harness({ open: false });
   await vm.runInContext("completeOnboarding('later')", done.context);

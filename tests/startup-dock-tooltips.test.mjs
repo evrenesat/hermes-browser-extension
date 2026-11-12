@@ -30,9 +30,9 @@ function buttonFromMarkup(id) {
   return { childNodes };
 }
 
-test('the labelled Connect button shows its name, the dock icon buttons do not', () => {
+test('the labelled Connect and Retry buttons show their names, the settings icon button does not', () => {
   assert.equal(hasVisibleLabel(buttonFromMarkup('startupConnectButton')), true);
-  assert.equal(hasVisibleLabel(buttonFromMarkup('startupTestConnectionButton')), false);
+  assert.equal(hasVisibleLabel(buttonFromMarkup('startupTestConnectionButton')), true);
   assert.equal(hasVisibleLabel(buttonFromMarkup('settingsButton')), false);
 });
 

@@ -21,3 +21,9 @@
 - Sessions drawer: segmented Recents/Projects, 32px live filter, Today/Yesterday/Earlier labels (source headers only when more than one source), 30px rows with relative time, accent dot for running sessions, ID/Rename/Move behind a hover `⋯` menu (ArrowRight from a row focuses it).
 - `wireMenuKeyboard` gives attach, quick commands, profile switcher, model picker and sessions drawer ↑/↓/Home/End, Esc back to the trigger, and type-to-filter where a search box exists.
 - Tests rewritten to the new contract: commands.test (preview card), session-drawer-row.test, i18n-runtime-panel-controls (group settings now an item in the row menu), common.test (refresh label).
+### Phase 2: onboarding, startup/error screens, dialogs (`extension/calm-onboarding.css`)
+
+- First run is welcome (small icon, "Hermes Browser", one muted line, Connect to Hermes / Skip for now) then Connect only. Theme, font, style, layout and language steps are gone; the panel follows the browser language until one is chosen in Settings. "Run first-time setup again" removed from Settings > Appearance.
+- Connect step has an inline gateway address field with validation (`gatewayAddressError`); token/mode stay in Manual setup (Settings > Connections).
+- Startup/error screen is one compact card with a status icon, heading, detail and the fixing action (Retry / Connect to Hermes / settings); no CRT, dither or artwork.
+- Dialogs, toast, Hermes control dialog, new-group/bot-mode panels, voice dictation, microphone permission and the Hermes Web hand-off page are compact calm cards. Deleted the dither-hover module and its tests.

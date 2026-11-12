@@ -102,7 +102,7 @@ test('arrow keys move and select like a radio group', () => {
 test('Appearance & Themes runs Theme, Response style, Chat layout, Text zoom, Font family, Language', () => {
   const html = read('extension/sidepanel.html');
   const pane = html.slice(html.indexOf('id="settingsPane-appearance"'), html.indexOf('id="settingsPane-connections"'));
-  const order = ['class="theme-setting"', 'id="responseStyleChoices"', 'id="messageLayoutChoices"', 'text-zoom-setting', 'language-setting', 'font-profile-setting', 'id="rerunOnboardingButton"']
+  const order = ['class="theme-setting"', 'id="responseStyleChoices"', 'id="messageLayoutChoices"', 'text-zoom-setting', 'language-setting', 'font-profile-setting']
     .map((marker) => pane.indexOf(marker));
   assert.ok(order.every((index) => index > 0), `all present: ${order}`);
   assert.deepEqual([...order].sort((a, b) => a - b), order, 'in this order');
@@ -124,27 +124,10 @@ test('Language is a full-width block like Font family', () => {
   assert.match(js, /if \(select\.id === 'languageSelect'\) \{\s*mountBrandedSelect\(select, \{ language: true \}\);/);
 });
 
-test('Run first-time setup again is a quiet row with an icon and a description', () => {
-  const html = read('extension/sidepanel.html');
-  const row = html.match(/<button id="rerunOnboardingButton"[\s\S]*?<\/button>/)?.[0] || '';
-  assert.match(row, /class="settings-setup-row"/);
-  assert.doesNotMatch(row, /class="[^"]*secondary/, 'not an outlined secondary button');
-  assert.match(row, /data-icon="reload"/);
-  assert.match(row, /data-i18n="responses\.setup_again"/);
-  assert.match(row, /data-i18n="responses\.setup_again_description"/);
-  const css = read('extension/sidepanel.css');
-  assert.match(css, /\.settings-setup-row \{[^}]*border: 0;[^}]*border-top: 1px solid var\(--hermes-line\);[^}]*background: transparent;/);
-  const english = read('extension/lib/locales/en.mjs');
-  assert.match(english, /"responses\.setup_again": "Run first-time setup again"/);
-});
-
-test('setup and Settings draw the same cards', () => {
-  const flow = read('extension/lib/onboarding-flow.mjs');
+test('Settings keeps the response style and layout cards, and setup no longer draws them', () => {
   const panel = read('extension/sidepanel.js');
-  assert.match(flow, /presentationCardsHtml\('style'/);
-  assert.match(flow, /presentationCardsHtml\('layout'/);
   assert.match(panel, /syncPresentationCards\(els\.responseStyleChoices, 'style'/);
   assert.match(panel, /syncPresentationCards\(els\.messageLayoutChoices, 'layout'/);
   assert.match(panel, /handleRadioCardKeydown\(event, els\.responseStyleChoices\)/);
-  assert.match(flow, /handleRadioCardKeydown\(event, host\)/);
+  assert.doesNotMatch(read('extension/lib/onboarding-flow.mjs'), /presentationCards/);
 });

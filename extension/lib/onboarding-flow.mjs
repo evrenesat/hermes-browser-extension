@@ -1,24 +1,27 @@
 // First-run setup: a welcome screen (not a step: no count, no Back), then
-// language, theme and colour mode, font, response style, chat layout, then
-// Connect to Hermes last. It fills the whole side panel and continues the
-// startup screen's world: the Meander border (drawn as the setup's progress),
-// the logo small at the top, steps switching on like an old screen. A small
-// fake conversation at the top of every step shows each pick at once.
-// Every choice applies live through the callbacks (the same code paths the
-// Settings controls use), so leaving the flow early keeps what was picked.
+// Connect to Hermes. Language follows the browser, and theme, font, response
+// style and layout live in Settings > Appearance. The flow fills the side
+// panel as a quiet centred card; Connect shows the pairing status and, while a
+// gateway approval is pending, the approval page.
 // DOM only through the host and document passed in; no storage here.
 
 import { escapeHtml } from './common.mjs';
-import { themePreviewForMode } from './appearance-themes.mjs';
-import { fontFamilyPreview } from './appearance-preferences.mjs';
-import { handleRadioCardKeydown, presentationCardsHtml, presentationOptionLabelKey } from './presentation-previews.mjs';
-import { contrastRatio, meanderGeometry } from './startup-screen.mjs';
-import { installDitherHover } from './dither-hover.mjs';
 
-export const ONBOARDING_STEPS = Object.freeze(['language', 'theme', 'font', 'style', 'layout', 'connect']);
+export const ONBOARDING_STEPS = Object.freeze(['connect']);
+
+// Inline check of the address typed in the Connect step. Returns '' when it
+// is usable (empty means "use the default"), else the i18n key of the error.
+export function gatewayAddressError(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  let url;
+  try { url = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(raw) ? raw : `http://${raw}`); } catch { return 'onboarding.connect.url_invalid'; }
+  if (!/^https?:$/.test(url.protocol)) return 'onboarding.connect.url_scheme';
+  return url.hostname ? '' : 'onboarding.connect.url_invalid';
+}
 
 export function onboardingSteps({ includeConnect = true } = {}) {
-  return includeConnect ? [...ONBOARDING_STEPS] : ONBOARDING_STEPS.filter((step) => step !== 'connect');
+  return includeConnect ? [...ONBOARDING_STEPS] : [];
 }
 
 // Unmodified pixelarticons glyphs (tests/pixel-icons.test.mjs checks them).
@@ -32,96 +35,14 @@ export const ONBOARDING_ICONS = Object.freeze({
   connected: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="check"><path d="M20 6 9 17l-5-5"/></svg>',
 });
 
-export const ONBOARDING_COLOR_MODES = Object.freeze([
-  { value: 'light', label: 'settings.mode.light' },
-  { value: 'dark', label: 'settings.mode.dark' },
-  { value: 'system', label: 'settings.mode.system' },
-]);
 
-// Every font Settings offers except an installed local font, which needs a
-// typed family name; Hermes signature first.
-export const ONBOARDING_FONTS = Object.freeze([
-  { value: 'signature', label: 'appearance.font_signature' },
-  { value: 'collapse', label: 'appearance.font_collapse' },
-  { value: 'system-sans', label: 'appearance.font_system_sans' },
-  { value: 'high-legibility', label: 'appearance.font_high_legibility' },
-  { value: 'space-grotesk', label: 'appearance.font_space_grotesk' },
-  { value: 'ibm-plex-sans', label: 'appearance.font_ibm_plex' },
-  { value: 'source-sans-3', label: 'appearance.font_source_sans' },
-  { value: 'outfit', label: 'appearance.font_outfit' },
-  { value: 'montserrat', label: 'appearance.font_montserrat' },
-  { value: 'mono', label: 'appearance.font_monospace' },
-  { value: 'georgia', label: 'appearance.font_georgia' },
-  { value: 'libre-baskerville', label: 'appearance.font_libre_baskerville' },
-  { value: 'fraunces', label: 'appearance.font_fraunces' },
-  { value: 'playfair-display', label: 'appearance.font_playfair' },
-  { value: 'cinzel', label: 'appearance.font_cinzel' },
-  { value: 'garamond', label: 'appearance.font_garamond' },
-  { value: 'palatino', label: 'appearance.font_palatino' },
-  { value: 'times-new-roman', label: 'appearance.font_times' },
-  { value: 'cambria', label: 'appearance.font_cambria' },
-  { value: 'calibri', label: 'appearance.font_calibri' },
-  { value: 'trebuchet', label: 'appearance.font_trebuchet' },
-]);
-
-export function responseStyleLabelKey(style) {
-  return presentationOptionLabelKey('style', style);
-}
-
-export function messageLayoutLabelKey(layout) {
-  return presentationOptionLabelKey('layout', layout);
-}
-
-// The reply in the preview, as each response style would draw it. Vivid UI
-// carries a static Adaptive UI block, so the real renderer draws a real card.
-export function onboardingPreviewReply(style, t = (key) => key) {
-  const points = [t('onboarding.preview.point_1'), t('onboarding.preview.point_2'), t('onboarding.preview.point_3')];
-  if (style === 'plain') return `${t('onboarding.preview.lead')}\n\n${points.map((point, index) => `${index + 1}. ${point}`).join('\n')}`;
-  if (style === 'vivid') {
-    const envelope = {
-      schema: 'hermes.adaptive-ui',
-      version: 1,
-      blocks: [{ id: 'onboarding-chart', type: 'chart', title: t('onboarding.preview.chart'), kind: 'bar', labels: ['Q1', 'Q2', 'Q3', 'Q4'], series: [{ name: t('onboarding.preview.chart'), values: [3.1, 2.4, 1.8, 1.2] }] }],
-    };
-    return `${t('onboarding.preview.lead')}\n\n\`\`\`hermes-ui\n${JSON.stringify(envelope)}\n\`\`\``;
-  }
-  return `**${t('onboarding.preview.lead')}**\n\n${points.map((point) => `- ${point}`).join('\n')}`;
-}
-
-function themeCard(theme, selected, mode) {
-  const p = themePreviewForMode(theme, mode);
-  const style = `--preview-bg:${p.bg};--preview-panel:${p.panel};--preview-text:${p.text};--preview-muted:${p.muted};--preview-accent:${p.accent};`;
-  return `
-    <button class="theme-card${selected ? ' selected' : ''}" type="button" data-onboarding-theme="${escapeHtml(theme.value)}" data-radio-key="${escapeHtml(`theme:${theme.value}`)}" role="radio" aria-checked="${selected}" tabindex="${selected ? 0 : -1}" aria-label="${escapeHtml(theme.name)}" title="${escapeHtml(`${theme.name}: ${theme.description || ''}`)}" style="${escapeHtml(style)}">
-      <span class="theme-preview" aria-hidden="true"><span></span><span></span><span></span></span>
-      <span class="theme-card-copy"><strong>${escapeHtml(theme.name)}</strong></span>
-      <span class="theme-check" aria-hidden="true"></span>
-    </button>`;
-}
-
-const SWIPE_DISTANCE = 56;
 const CONNECTED_FINISH_MS = 1400;
+const EXIT_MS = 140;
 
 export function createOnboardingFlow({
   host,
-  themes = [],
-  // The supported locales ({ id, nativeName, direction }) from the locale
-  // registry, the same list Settings > Language shows.
-  languages = [],
-  fonts = ONBOARDING_FONTS,
   translate = (key) => key,
   getState = () => ({}),
-  renderReply = (style, text) => `<p>${escapeHtml(text)}</p>`,
-  roleLabels = { user: 'You', assistant: 'Hermes' },
-  onSelectLanguage = () => {},
-  // Called with the step's name just before setup leaves it (Next, Back or
-  // finishing), so a suggestion that was never picked can be kept.
-  onLeaveStep = () => {},
-  onSelectTheme = () => {},
-  onSelectMode = () => {},
-  onSelectFont = () => {},
-  onSelectStyle = () => {},
-  onSelectLayout = () => {},
   onConnect = () => {},
   onManualSetup = () => {},
   onFinish = () => {},
@@ -135,174 +56,56 @@ export function createOnboardingFlow({
   let stepIndex = 0;
   let open = false;
   let exiting = false;
-  // The welcome screen before the first step. It is not one of `steps`: the
-  // count and the progress start at the language step, and Back never returns.
+  // The welcome before the first step. It is not one of `steps`: no count, and
+  // Back never returns to it.
   let welcoming = false;
   let parts = null;
-  let previewKey = '';
   let wasConnected = false;
   let connectedTimer = 0;
   // The pairing approval page, shown in the Connect step while it waits. One
   // element for the whole approval: rebuilding the step would reload it.
   let approvalNode = null;
-  let meanderSize = '';
-  let meanderParts = null;
-  // The language the static shell (Skip, the nav's label) was last drawn in.
-  let shellLocale = '';
+  // The address being typed survives the redraws a status update causes.
+  let typedUrl = null;
+  let urlError = '';
   const t = (key, values) => translate(key, values);
   const view = () => doc?.defaultView || globalThis;
 
   function shellHtml() {
     return `
-      <svg class="startup-meander onboarding-meander" aria-hidden="true"></svg>
-      <header class="onboarding-top">
-        <span class="onboarding-logo" role="img" aria-label="${escapeHtml(t('manifest.extension_name'))}"></span>
-        <div class="onboarding-head">
-          <span class="onboarding-count"></span>
-          <button type="button" class="onboarding-skip secondary" data-onboarding-skip>${escapeHtml(t('onboarding.skip'))}</button>
-        </div>
-      </header>
-      <div class="onboarding-preview" aria-hidden="true"></div>
-      <div class="onboarding-stage" role="group" aria-labelledby="onboardingStepTitle"></div>
-      <nav class="onboarding-nav" aria-label="${escapeHtml(t('onboarding.aria'))}">
-        <button type="button" class="onboarding-nav-button" data-onboarding-back></button>
-        <span class="onboarding-progress" aria-hidden="true"></span>
-        <button type="button" class="onboarding-nav-button onboarding-nav-next" data-onboarding-next></button>
-      </nav>
-      <p class="onboarding-announce sr-only" aria-live="polite"></p>
-      <i class="onboarding-probe" hidden></i>`;
+      <div class="onboarding-card">
+        <div class="onboarding-stage" role="group" aria-labelledby="onboardingStepTitle"></div>
+        <nav class="onboarding-nav" aria-label="${escapeHtml(t('onboarding.aria'))}">
+          <button type="button" class="onboarding-nav-button ghost" data-onboarding-next></button>
+        </nav>
+      </div>
+      <p class="onboarding-announce sr-only" aria-live="polite"></p>`;
   }
 
-  // The language step reads before a choice: its heading and body come in the
-  // language that is about to be used (the browser's suggestion, or the one in
-  // force), with the heading repeated in English beneath it.
-  function languageView(state) {
-    const language = state.language || {};
-    const selected = language.selected || language.current || 'en';
-    const known = languages.find((entry) => entry.id === selected);
-    return {
-      selected,
-      lang: selected,
-      dir: known?.direction || 'ltr',
-      title: language.copy?.title || t('onboarding.language.title'),
-      body: language.copy?.body || t('onboarding.language.body'),
-      english: selected === 'en' ? '' : (language.english?.title || ''),
-    };
-  }
-
-  // The welcome reads before any language is chosen: in the one the browser
-  // suggests, with the English words beneath, and a row of "Welcome" in a few
-  // scripts as decoration (hidden from screen readers; the heading says it).
   function welcomeView(state) {
-    const welcome = state.welcome || {};
-    const copy = welcome.copy || {};
-    const english = welcome.english || {};
+    const copy = state.welcome?.copy || {};
     const locale = copy.locale || state.language?.selected || 'en';
-    const known = languages.find((entry) => entry.id === locale);
     return {
       lang: locale,
-      dir: known?.direction === 'rtl' ? 'rtl' : 'ltr',
+      dir: state.welcome?.direction === 'rtl' ? 'rtl' : 'ltr',
       title: copy.title || t('onboarding.welcome.title'),
       body: copy.body || t('onboarding.welcome.body'),
       start: copy.start || t('onboarding.welcome.start'),
       skip: copy.skip || t('onboarding.welcome.skip'),
-      showEnglish: locale !== 'en' && Boolean(english.title),
-      english,
-      greetings: Array.isArray(welcome.greetings) ? welcome.greetings : [],
     };
   }
 
   function welcomeHtml(state) {
-    const view = welcomeView(state);
-    const sub = (text) => (view.showEnglish && text ? `<small class="onboarding-welcome-english" lang="en" dir="ltr">${escapeHtml(text)}</small>` : '');
-    const greetings = view.greetings.map((entry) => `<span lang="${escapeHtml(entry.lang)}" dir="${entry.dir === 'rtl' ? 'rtl' : 'ltr'}">${escapeHtml(entry.text)}</span>`).join('');
+    const v = welcomeView(state);
+    const attrs = `lang="${escapeHtml(v.lang)}" dir="${v.dir}"`;
     return `
       <div class="onboarding-welcome">
-        ${greetings ? `<p class="onboarding-welcome-greetings" aria-hidden="true">${greetings}</p>` : ''}
-        <h2 class="onboarding-title" id="onboardingStepTitle" tabindex="-1" lang="${escapeHtml(view.lang)}" dir="${view.dir}">${escapeHtml(view.title)}</h2>
-        ${view.showEnglish ? `<p class="onboarding-title-english" lang="en" dir="ltr">${escapeHtml(view.english.title)}</p>` : ''}
-        <p class="onboarding-body" lang="${escapeHtml(view.lang)}" dir="${view.dir}">${escapeHtml(view.body)}</p>
-        ${view.showEnglish && view.english.body ? `<p class="onboarding-body onboarding-body-english" lang="en" dir="ltr">${escapeHtml(view.english.body)}</p>` : ''}
+        <span class="onboarding-logo" role="img" aria-label="${escapeHtml(t('manifest.extension_name'))}"></span>
+        <h2 class="onboarding-title" id="onboardingStepTitle" tabindex="-1" ${attrs}>${escapeHtml(v.title)}</h2>
+        <p class="onboarding-body" ${attrs}>${escapeHtml(v.body)}</p>
         <div class="onboarding-welcome-actions">
-          <button type="button" class="onboarding-welcome-start" data-onboarding-start lang="${escapeHtml(view.lang)}" dir="${view.dir}"><span>${escapeHtml(view.start)}</span>${sub(view.english.start)}</button>
-          <button type="button" class="secondary onboarding-welcome-skip" data-onboarding-skip-setup lang="${escapeHtml(view.lang)}" dir="${view.dir}"><span>${escapeHtml(view.skip)}</span>${sub(view.english.skip)}</button>
-        </div>
-      </div>`;
-  }
-
-  function languageHeadHtml(view) {
-    return `
-        <h2 class="onboarding-title" id="onboardingStepTitle" tabindex="-1" lang="${escapeHtml(view.lang)}" dir="${view.dir}">${escapeHtml(view.title)}</h2>
-        ${view.english ? `<p class="onboarding-title-english" lang="en" dir="ltr">${escapeHtml(view.english)}</p>` : ''}
-        <p class="onboarding-body" lang="${escapeHtml(view.lang)}" dir="${view.dir}">${escapeHtml(view.body)}</p>`;
-  }
-
-  // The heading and body follow the language in force; the cards keep their
-  // nodes (so focus and the list's scroll offset stay) and only change state.
-  // Returns false when there is no grid to patch.
-  function patchLanguageStage(view) {
-    const grid = parts.stage.querySelector('.onboarding-language-grid');
-    if (!grid) return false;
-    for (const node of [...parts.stage.children]) if (node !== grid) node.remove();
-    grid.insertAdjacentHTML('beforebegin', languageHeadHtml(view));
-    grid.setAttribute('aria-label', view.title);
-    for (const card of grid.querySelectorAll('[data-onboarding-language]')) {
-      const isSelected = card.dataset.onboardingLanguage === view.selected;
-      card.classList.toggle('selected', isSelected);
-      card.setAttribute('aria-checked', String(isSelected));
-      card.tabIndex = isSelected ? 0 : -1;
-    }
-    return true;
-  }
-
-  function stepBody(step, state) {
-    if (step === 'language') {
-      const { selected } = languageView(state);
-      const cards = languages.map((entry) => {
-        const isSelected = entry.id === selected;
-        return `<button class="onboarding-language-card${isSelected ? ' selected' : ''}" type="button" role="radio" aria-checked="${isSelected}" tabindex="${isSelected ? 0 : -1}" lang="${escapeHtml(entry.id)}" dir="${entry.direction === 'rtl' ? 'rtl' : 'ltr'}" data-onboarding-language="${escapeHtml(entry.id)}" data-radio-key="language:${escapeHtml(entry.id)}"><span class="onboarding-language-name">${escapeHtml(entry.nativeName)}</span><span class="presentation-card-check" aria-hidden="true"></span></button>`;
-      }).join('');
-      return `<div class="onboarding-language-grid" role="radiogroup" data-radio-activation="manual" aria-label="${escapeHtml(languageView(state).title)}">${cards}</div>`;
-    }
-    if (step === 'theme') {
-      const mode = state.resolvedMode === 'light' ? 'light' : 'dark';
-      const modes = ONBOARDING_COLOR_MODES.map((option) => {
-        const selected = option.value === (state.colorMode || 'dark');
-        return `<button class="mode-choice${selected ? ' selected' : ''}" type="button" role="radio" aria-checked="${selected}" tabindex="${selected ? 0 : -1}" data-onboarding-mode="${option.value}" data-radio-key="mode:${option.value}">${ONBOARDING_ICONS[option.value]}<span>${escapeHtml(t(option.label))}</span></button>`;
-      }).join('');
-      const cards = themes.map((theme) => themeCard(theme, theme.value === state.theme, mode)).join('');
-      return `
-        <div class="segmented-control mode-switch onboarding-mode" role="radiogroup" aria-label="${escapeHtml(t('ui.color.mode.588a2981'))}">${modes}</div>
-        <div class="theme-grid onboarding-theme-grid" role="radiogroup" aria-label="${escapeHtml(t('onboarding.theme.title'))}" data-preview-mode="${mode}">${cards}</div>`;
-    }
-    if (step === 'font') {
-      const cards = fonts.map((font) => {
-        const selected = font.value === (state.fontProfile || 'system-sans');
-        const family = fontFamilyPreview(font.value);
-        return `<button class="onboarding-font-card${selected ? ' selected' : ''}" type="button" role="radio" aria-checked="${selected}" tabindex="${selected ? 0 : -1}" data-onboarding-font="${escapeHtml(font.value)}" data-radio-key="font:${escapeHtml(font.value)}" style="${escapeHtml(`--onboarding-font:${family}`)}"><span class="onboarding-font-sample" aria-hidden="true">Aa</span><span class="onboarding-font-name">${escapeHtml(t(font.label))}</span><span class="presentation-card-check" aria-hidden="true"></span></button>`;
-      }).join('');
-      return `<div class="onboarding-font-grid" role="radiogroup" aria-label="${escapeHtml(t('onboarding.font.title'))}">${cards}</div>`;
-    }
-    // The same visual cards Settings shows, so setup and Settings match.
-    if (step === 'style') {
-      const cards = presentationCardsHtml('style', { selected: state.responseStyle, attribute: 'data-onboarding-style', translate: t });
-      return `<div class="presentation-choices onboarding-options" role="radiogroup" aria-label="${escapeHtml(t('onboarding.style.title'))}">${cards}</div>`;
-    }
-    if (step === 'layout') {
-      const cards = presentationCardsHtml('layout', { selected: state.messageLayout, attribute: 'data-onboarding-layout', translate: t });
-      return `<div class="presentation-choices onboarding-options" role="radiogroup" aria-label="${escapeHtml(t('onboarding.layout.title'))}">${cards}</div>`;
-    }
-    const connection = state.connection || {};
-    const connected = Boolean(connection.connected);
-    const status = connected ? t('onboarding.connect.connected') : (connection.status || t('onboarding.connect.not_paired'));
-    return `
-      <div class="onboarding-connect${connected ? ' is-connected' : ''}${connection.busy ? ' is-busy' : ''}${connectFailed(connection) ? ' is-failed' : ''}${approvalNode ? ' is-approving' : ''}">
-        <p class="onboarding-connect-status" role="status" tabindex="-1">${connected ? ONBOARDING_ICONS.connected : ''}<span>${escapeHtml(status)}</span></p>
-        ${approvalNode ? '<div class="onboarding-approval-slot"></div>' : ''}
-        <div class="onboarding-connect-actions"${connected ? ' hidden' : ''}>
-          <button type="button" class="onboarding-connect-button" data-onboarding-connect${connection.busy ? ' disabled' : ''}>${ONBOARDING_ICONS.connect}<span>${escapeHtml(connection.busy ? (connection.busyLabel || t('ui.connect.to.hermes')) : t('ui.connect.to.hermes'))}</span></button>
-          <button type="button" class="secondary" data-onboarding-manual>${escapeHtml(t('ui.manual.setup'))}</button>
-          <p class="onboarding-connect-other">${escapeHtml(t('onboarding.connect.other_hint'))}</p>
+          <button type="button" class="onboarding-welcome-start" data-onboarding-start ${attrs}>${escapeHtml(v.start)}</button>
+          <button type="button" class="ghost onboarding-welcome-skip" data-onboarding-skip-setup ${attrs}>${escapeHtml(v.skip)}</button>
         </div>
       </div>`;
   }
@@ -313,73 +116,37 @@ export function createOnboardingFlow({
     return Boolean(connection.failed) && !connection.connected && !connection.busy;
   }
 
-  function previewHtml(state) {
-    const style = state.responseStyle || 'rich';
-    const reply = renderReply(style, onboardingPreviewReply(style, t));
+  function connectHtml(state) {
+    const connection = state.connection || {};
+    const connected = Boolean(connection.connected);
+    const status = connected ? t('onboarding.connect.connected') : (connection.status || t('onboarding.connect.not_paired'));
     return `
-      <div class="onboarding-preview-thread">
-        <div class="message-row" data-role="user"><article class="message user"><div class="message-role">${escapeHtml(roleLabels.user)}</div><div class="message-content"><p>${escapeHtml(t('onboarding.preview.user'))}</p></div></article></div>
-        <div class="message-row" data-role="assistant"><article class="message assistant"><div class="message-role">${escapeHtml(roleLabels.assistant)}</div><div class="message-content">${reply}</div></article></div>
+      <h2 class="onboarding-title" id="onboardingStepTitle" tabindex="-1">${escapeHtml(t('onboarding.connect.title'))}</h2>
+      <p class="onboarding-body">${escapeHtml(t('onboarding.connect.body'))}</p>
+      <div class="onboarding-connect${connected ? ' is-connected' : ''}${connection.busy ? ' is-busy' : ''}${connectFailed(connection) ? ' is-failed' : ''}${approvalNode ? ' is-approving' : ''}">
+        <div class="onboarding-field"${connected ? ' hidden' : ''}>
+          <label for="onboardingGatewayUrl">${escapeHtml(t('onboarding.connect.url_label'))}</label>
+          <input id="onboardingGatewayUrl" type="text" inputmode="url" autocomplete="off" spellcheck="false" data-onboarding-url value="${escapeHtml(typedUrl ?? connection.gatewayUrl ?? '')}" placeholder="http://127.0.0.1:8642" aria-describedby="onboardingUrlError"${urlError ? ' aria-invalid="true"' : ''}>
+          <p class="onboarding-field-error" id="onboardingUrlError" role="alert"${urlError ? '' : ' hidden'}>${escapeHtml(urlError ? t(urlError) : '')}</p>
+        </div>
+        ${approvalNode ? '<div class="onboarding-approval-slot"></div>' : ''}
+        <div class="onboarding-connect-actions"${connected ? ' hidden' : ''}>
+          <button type="button" class="onboarding-connect-button" data-onboarding-connect${connection.busy ? ' disabled' : ''}>${escapeHtml(connection.busy ? (connection.busyLabel || t('ui.connect.to.hermes')) : t('ui.connect.to.hermes'))}</button>
+          <button type="button" class="secondary" data-onboarding-manual>${escapeHtml(t('ui.manual.setup'))}</button>
+        </div>
+        <p class="onboarding-connect-status" role="status" tabindex="-1">${connected ? ONBOARDING_ICONS.connected : ''}<span>${escapeHtml(status)}</span></p>
+        <p class="onboarding-connect-other">${escapeHtml(t('onboarding.connect.other_hint'))}</p>
       </div>`;
   }
 
-  // Replays a CSS animation by toggling its class.
-  function replay(node, className) {
-    if (!node || reducedMotion()) return;
-    node.classList.remove(className);
-    void node.offsetWidth;
-    node.classList.add(className);
-  }
-
-  function renderPreview(state, { force = false } = {}) {
-    if (!parts) return;
-    const key = JSON.stringify([state.theme, state.resolvedMode, state.fontProfile, state.responseStyle, state.messageLayout, state.language?.current || '']);
-    if (!force && key === previewKey) return;
-    const repaint = previewKey && key !== previewKey;
-    previewKey = key;
-    parts.preview.innerHTML = previewHtml(state);
-    parts.preview.dataset.style = state.responseStyle || 'rich';
-    if (repaint) replay(parts.preview, 'is-repainting');
-  }
-
-  function renderMeta(step) {
-    if (welcoming) {
-      parts.progress.innerHTML = '';
-      parts.count.textContent = '';
-      host.dataset.step = 'welcome';
-      return;
-    }
-    const total = steps.length;
-    parts.progress.innerHTML = steps.map((_, index) => `<i class="${index === stepIndex ? 'active' : ''}${index < stepIndex ? ' done' : ''}"></i>`).join('');
-    parts.count.textContent = t('onboarding.step_count', { current: stepIndex + 1, total });
-    host.dataset.step = step;
-  }
-
-  // Back and Next are icon buttons set into the border, named for screen
-  // readers and labelled on hover and focus. The last step finishes with a
-  // check, or moves on with the arrow when Connect is left for later.
-  function setNavButton(button, label, icon) {
-    button.setAttribute('aria-label', label);
-    button.dataset.tip = label;
-    if (button.dataset.icon !== icon) {
-      button.innerHTML = ONBOARDING_ICONS[icon];
-      button.dataset.icon = icon;
-    }
-  }
-
   function renderNav(step, state) {
-    // The welcome has its own buttons; Back, Next, Skip and the count belong to the steps.
-    parts.nav.hidden = welcoming;
-    parts.skip.hidden = welcoming;
-    parts.count.hidden = welcoming;
-    if (welcoming) return;
-    const last = stepIndex === steps.length - 1;
-    const later = last && step === 'connect' && !state.connection?.connected;
-    const nextLabel = !last ? t('onboarding.next') : later ? t('onboarding.connect.later') : t('onboarding.start');
-    setNavButton(parts.back, t('onboarding.back'), 'back');
-    parts.back.hidden = stepIndex === 0;
-    setNavButton(parts.next, nextLabel, last && !later ? 'connected' : 'next');
-    parts.next.classList.toggle('is-finish', last && !later);
+    // The welcome has its own buttons; the footer belongs to the Connect step.
+    parts.nav.hidden = welcoming || !steps.length;
+    if (parts.nav.hidden) return;
+    const connected = Boolean(state.connection?.connected);
+    const label = connected ? t('onboarding.start') : t('onboarding.connect.later');
+    parts.next.textContent = label;
+    parts.next.setAttribute('aria-label', label);
   }
 
   // While the approval page is up, a status update changes the words and the
@@ -395,6 +162,8 @@ export function createOnboardingFlow({
     if (label) label.textContent = connected ? t('onboarding.connect.connected') : (connection.status || t('onboarding.connect.not_paired'));
     const actions = parts.stage.querySelector('.onboarding-connect-actions');
     if (actions) actions.hidden = connected;
+    const field = parts.stage.querySelector('.onboarding-field');
+    if (field) field.hidden = connected;
     const button = parts.stage.querySelector('[data-onboarding-connect]');
     if (button) button.disabled = Boolean(connection.busy);
   }
@@ -409,34 +178,17 @@ export function createOnboardingFlow({
       patchConnectStage(state);
       return;
     }
-    const sameStep = parts.stage.dataset.step === step;
-    parts.stage.dataset.step = step;
-    if (step === 'language') {
-      const view = languageView(state);
-      // A pick changes the language, and with it the heading and the cards'
-      // state, but the list is 21 cards tall and may be scrolled: patch the
-      // step where it stands instead of drawing it again.
-      if (sameStep && patchLanguageStage(view)) return;
-      parts.stage.innerHTML = `${languageHeadHtml(view)}${stepBody(step, state)}`;
-      return;
-    }
-    // The same step drawn again (a pick) keeps its place in a long list.
-    const scrolled = sameStep ? parts.stage.scrollTop : 0;
-    parts.stage.innerHTML = `
-      <h2 class="onboarding-title" id="onboardingStepTitle" tabindex="-1">${escapeHtml(t(`onboarding.${step}.title`))}</h2>
-      <p class="onboarding-body">${escapeHtml(t(`onboarding.${step}.body`))}</p>
-      ${stepBody(step, state)}`;
+    parts.stage.dataset.step = step || '';
+    parts.stage.innerHTML = step === 'connect' ? connectHtml(state) : '';
     if (step === 'connect' && approvalNode) parts.stage.querySelector('.onboarding-approval-slot')?.append(approvalNode);
-    if (scrolled) parts.stage.scrollTop = scrolled;
   }
 
   function focusKey() {
     const active = doc?.activeElement;
     if (!active || !host.contains(active)) return null;
-    if (active.dataset?.radioKey) return { radio: active.dataset.radioKey };
     // The status line holds the keyboard while Connect works; keep it there when the step is drawn again.
     if (active.classList?.contains('onboarding-connect-status')) return { selector: '.onboarding-connect-status' };
-    for (const attribute of ['data-onboarding-next', 'data-onboarding-back', 'data-onboarding-skip', 'data-onboarding-connect', 'data-onboarding-manual', 'data-onboarding-start', 'data-onboarding-skip-setup']) {
+    for (const attribute of ['data-onboarding-url', 'data-onboarding-next', 'data-onboarding-connect', 'data-onboarding-manual', 'data-onboarding-start', 'data-onboarding-skip-setup']) {
       if (active.hasAttribute?.(attribute)) return { attribute };
     }
     return null;
@@ -444,18 +196,14 @@ export function createOnboardingFlow({
 
   function restoreFocus(key) {
     if (!key) return;
-    const target = key.radio
-      ? [...host.querySelectorAll('[data-radio-key]')].find((node) => node.dataset.radioKey === key.radio)
-      : host.querySelector(key.selector || `[${key.attribute}]`);
+    const target = host.querySelector(key.selector || `[${key.attribute}]`);
     if (target && !target.disabled && !target.closest?.('[hidden]')) {
       target.focus?.({ preventScroll: true });
       return;
     }
     // The control that had the keyboard went away or was disabled (Connect while
-    // it works, the buttons once connected). A disabled button can keep
-    // activeElement in one browser and lose it in another, and either way the
-    // keys stop reaching setup's own Tab trap, so the keyboard moves to the
-    // status line, still inside this dialog.
+    // it works, the buttons once connected). The keyboard moves to the status
+    // line, still inside this dialog.
     (host.querySelector('.onboarding-connect-status') || host.querySelector('.onboarding-title'))?.focus?.({ preventScroll: true });
   }
 
@@ -469,132 +217,40 @@ export function createOnboardingFlow({
     wasConnected = connected;
   }
 
-  // Like the startup screen: a pale accent (several light palettes) would
-  // draw a near-invisible border and Next tile, so fall back to the text
-  // colour when it lacks contrast against the field.
-  let paletteKey = '';
-  function tuneContrast() {
-    const css = view().getComputedStyle?.bind(view());
-    if (!css || !parts) return;
-    const html = doc.documentElement;
-    const key = `${html.dataset.hermesTheme}|${html.dataset.hermesMode}|${html.getAttribute('style') || ''}`;
-    if (key === paletteKey) return;
-    paletteKey = key;
-    host.style.removeProperty('--startup-line');
-    host.style.removeProperty('--startup-line-rgb');
-    const probe = parts.probe;
-    const colorOf = (value) => { probe.style.color = value; return css(probe).color; };
-    const ratio = contrastRatio(colorOf('var(--startup-line)'), colorOf('var(--startup-bg)'));
-    if (ratio < 3) {
-      host.style.setProperty('--startup-line', 'var(--startup-fg)');
-      host.style.setProperty('--startup-line-rgb', 'var(--startup-fg-rgb)');
-    }
-    host.classList.toggle('startup-quiet-accent', ratio < 4.5);
-  }
-
-  function buildMeander() {
-    const svg = parts?.meander;
-    const width = Math.round(host.clientWidth || 0);
-    const height = Math.round(host.clientHeight || 0);
-    if (!svg || width < 120 || height < 160) return;
-    const key = `${width}x${height}`;
-    if (key !== meanderSize || !meanderParts) {
-      meanderSize = key;
-      const geometry = meanderGeometry(width, height, { inset: 6, cell: 1.6, unitWidth: 16 });
-      const ns = 'http://www.w3.org/2000/svg';
-      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-      svg.textContent = '';
-      const ghost = doc.createElementNS(ns, 'path');
-      ghost.setAttribute('class', 'startup-meander-ghost');
-      ghost.setAttribute('d', geometry.d);
-      const line = doc.createElementNS(ns, 'path');
-      line.setAttribute('class', 'startup-meander-line');
-      line.setAttribute('d', geometry.d);
-      line.style.strokeDasharray = `${geometry.total.toFixed(1)} ${geometry.total.toFixed(1)}`;
-      svg.append(ghost, line);
-      meanderParts = { line, total: geometry.total };
-    }
-    paintMeander();
-  }
-
-  // The border is the setup's progress: a step's share of the loop, and the
-  // whole loop once setup is done.
-  function paintMeander(fraction = exiting ? 1 : (welcoming ? 0.04 : (stepIndex + 1) / (steps.length + 1))) {
-    if (!meanderParts) return;
-    meanderParts.line.style.strokeDashoffset = (meanderParts.total * (1 - fraction)).toFixed(1);
-  }
-
   function render() {
     if (!host) return;
     if (!open) {
       if (!exiting) {
         host.hidden = true;
-        host.classList.remove('is-entering');
         host.innerHTML = '';
         parts = null;
-        paletteKey = '';
-        meanderParts = null;
-        meanderSize = '';
-        previewKey = '';
       }
       return;
     }
     host.hidden = false;
     const state = getState() || {};
     const keep = focusKey();
-    // A new language rewords the shell in place: Skip, the nav's name and the
-    // logo's label were drawn once, in the old language. The stage keeps its
-    // node, so a scrolled language list stays where it is.
-    const localeKey = String(state.language?.current || '');
-    if (parts && localeKey !== shellLocale) {
-      parts.logo.setAttribute('aria-label', t('manifest.extension_name'));
-      parts.skip.textContent = t('onboarding.skip');
-      parts.nav.setAttribute('aria-label', t('onboarding.aria'));
-    }
-    shellLocale = localeKey;
     if (!parts) {
       host.innerHTML = shellHtml();
       parts = {
-        meander: host.querySelector('.onboarding-meander'),
-        logo: host.querySelector('.onboarding-logo'),
-        progress: host.querySelector('.onboarding-progress'),
-        count: host.querySelector('.onboarding-count'),
-        preview: host.querySelector('.onboarding-preview'),
         stage: host.querySelector('.onboarding-stage'),
         nav: host.querySelector('.onboarding-nav'),
-        back: host.querySelector('[data-onboarding-back]'),
         next: host.querySelector('[data-onboarding-next]'),
-        skip: host.querySelector('[data-onboarding-skip]'),
         announce: host.querySelector('.onboarding-announce'),
-        probe: host.querySelector('.onboarding-probe'),
       };
     }
     const step = steps[stepIndex];
+    host.dataset.step = welcoming ? 'welcome' : (step || '');
     host.classList.toggle('is-approving', Boolean(approvalNode) && step === 'connect');
-    renderMeta(step);
     renderStage(step, state);
     renderNav(step, state);
-    renderPreview(state);
     restoreFocus(keep);
     syncConnection(state);
-    tuneContrast();
-    buildMeander();
   }
 
   function announce() {
     if (!parts) return;
-    if (welcoming) {
-      parts.announce.textContent = welcomeView(getState() || {}).title;
-      return;
-    }
-    parts.announce.textContent = `${t('onboarding.step_count', { current: stepIndex + 1, total: steps.length })}: ${t(`onboarding.${steps[stepIndex]}.title`)}`;
-  }
-
-  // The language list is long: arriving on the step brings the card in force
-  // (the suggestion, or the saved language) into view.
-  function revealSelectedLanguage() {
-    if (steps[stepIndex] !== 'language') return;
-    parts?.stage.querySelector('[role="radio"][aria-checked="true"]')?.scrollIntoView?.({ block: 'nearest' });
+    parts.announce.textContent = welcoming ? welcomeView(getState() || {}).title : t(`onboarding.${steps[stepIndex]}.title`);
   }
 
   function focusTitle() {
@@ -606,175 +262,98 @@ export function createOnboardingFlow({
     host?.querySelector('.onboarding-title')?.focus({ preventScroll: true });
   }
 
-  // Welcome to the first step. Nothing is committed here: the language the
-  // welcome was drawn in is only a suggestion until the language step is left.
+  // Welcome to Connect. A panel that is already paired has no step left, so
+  // the welcome's primary button finishes setup there.
   function startFromWelcome() {
     if (!welcoming) return;
+    if (!steps.length) return void finish('done');
     welcoming = false;
     render();
-    if (parts) {
-      parts.stage.dataset.direction = 'next';
-      replay(parts.stage, 'is-switching');
-    }
     announce();
     focusTitle();
-    revealSelectedLanguage();
   }
 
-  function go(index) {
-    const next = Math.max(0, Math.min(steps.length - 1, index));
-    if (next === stepIndex) return;
-    const direction = next > stepIndex ? 'next' : 'back';
-    onLeaveStep(steps[stepIndex]);
-    stepIndex = next;
-    render();
-    if (parts) {
-      parts.stage.dataset.direction = direction;
-      replay(parts.stage, 'is-switching');
-    }
-    announce();
-    focusTitle();
-    revealSelectedLanguage();
-  }
-
-  // From the logo's place on the startup screen to its small place at the top.
-  function flyLogo(origin) {
-    const logo = parts?.logo;
-    if (!origin || !logo?.animate || reducedMotion()) return;
-    const target = logo.getBoundingClientRect();
-    if (!target.width || !origin.width) return;
-    const dx = origin.left + origin.width / 2 - (target.left + target.width / 2);
-    const dy = origin.top + origin.height / 2 - (target.top + target.height / 2);
-    const scale = origin.width / target.width;
-    logo.animate([
-      { transform: `translate(${dx}px, ${dy}px) scale(${scale})` },
-      { transform: 'none' },
-    ], { duration: 720, easing: 'cubic-bezier(0.3, 0.7, 0.2, 1)' });
-  }
-
-  // The way out: the border closes its loop, then the whole screen dithers
-  // away while the panel's own chrome comes in underneath (onReveal).
+  // The way out: setup closes and the panel's own chrome comes in (onReveal).
   async function finish(reason) {
     if (!open || exiting) return;
     view().clearTimeout?.(connectedTimer);
-    // The welcome is not a step: its language is only the browser's suggestion,
-    // and nobody has seen the language step to accept it. Skipping from there
-    // leaves the panel's language alone; Skip on a step keeps what it showed.
-    if (!welcoming) onLeaveStep(steps[stepIndex]);
     welcoming = false;
     open = false;
     exiting = true;
-    host.classList.add('is-finishing');
-    paintMeander(1);
-    onFinish({ reason });
-    const still = reducedMotion();
-    if (!still) await wait(560);
     host.classList.add('is-exiting');
+    onFinish({ reason });
     onReveal({ reason });
-    await wait(still ? 220 : 720);
+    await wait(reducedMotion() ? 0 : EXIT_MS);
     exiting = false;
-    host.classList.remove('is-finishing', 'is-exiting');
+    host.classList.remove('is-exiting');
     render();
     onExited({ reason });
   }
 
   function next() {
     if (welcoming) return startFromWelcome();
-    if (stepIndex === steps.length - 1) void finish(steps[stepIndex] === 'connect' && !getState()?.connection?.connected ? 'later' : 'done');
-    else go(stepIndex + 1);
+    void finish(steps[stepIndex] === 'connect' && !getState()?.connection?.connected ? 'later' : 'done');
   }
 
-  function choose(select, value) {
-    select(value);
-    render();
+  function connectNow() {
+    const input = host.querySelector('[data-onboarding-url]');
+    const value = input ? input.value : '';
+    urlError = gatewayAddressError(value);
+    typedUrl = value;
+    if (urlError) {
+      render();
+      host.querySelector('[data-onboarding-url]')?.focus?.({ preventScroll: true });
+      return undefined;
+    }
+    return onConnect({ gatewayUrl: String(value || '').trim() });
   }
 
-  // Hover and keyboard focus on the setup's buttons: a fine dither fill that
-  // tears a little and settles into the button's static hover state.
-  if (host) {
-    installDitherHover(host, {
-      selector: '.onboarding-welcome-start, .onboarding-connect-button, .onboarding-welcome-skip, [data-onboarding-manual], .onboarding-skip',
-      quietSelector: '.onboarding-welcome-skip, [data-onboarding-manual], .onboarding-skip',
-    });
-  }
+  host?.addEventListener('input', (event) => {
+    if (!event.target?.hasAttribute?.('data-onboarding-url')) return;
+    typedUrl = event.target.value;
+    if (urlError) {
+      urlError = '';
+      const note = host.querySelector('.onboarding-field-error');
+      if (note) note.hidden = true;
+      event.target.removeAttribute('aria-invalid');
+    }
+  });
+
+  host?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && open && !exiting && event.target?.hasAttribute?.('data-onboarding-url')) {
+      event.preventDefault();
+      connectNow();
+    }
+  });
 
   host?.addEventListener('click', (event) => {
     const target = event.target?.closest?.('button');
     if (!open || exiting || !target || !host.contains(target)) return;
-    const data = target.dataset;
     if (target.hasAttribute('data-onboarding-start')) return startFromWelcome();
     if (target.hasAttribute('data-onboarding-skip-setup')) return void finish('skip');
-    if (data.onboardingLanguage) return choose(onSelectLanguage, data.onboardingLanguage);
-    if (data.onboardingTheme) return choose(onSelectTheme, data.onboardingTheme);
-    if (data.onboardingMode) return choose(onSelectMode, data.onboardingMode);
-    if (data.onboardingFont) return choose(onSelectFont, data.onboardingFont);
-    if (data.onboardingStyle) return choose(onSelectStyle, data.onboardingStyle);
-    if (data.onboardingLayout) return choose(onSelectLayout, data.onboardingLayout);
-    if (target.hasAttribute('data-onboarding-connect')) return onConnect();
+    if (target.hasAttribute('data-onboarding-connect')) return connectNow();
     if (target.hasAttribute('data-onboarding-manual')) return onManualSetup();
-    if (target.hasAttribute('data-onboarding-back')) return go(stepIndex - 1);
-    if (target.hasAttribute('data-onboarding-skip')) return void finish('skip');
     if (target.hasAttribute('data-onboarding-next')) return next();
     return undefined;
   });
 
-  const isRtl = () => {
-    const direction = host?.closest?.('[dir]')?.getAttribute('dir') || host?.ownerDocument?.documentElement?.getAttribute('dir') || '';
-    return direction.toLowerCase() === 'rtl';
-  };
-
-  // Radio groups keep their arrow keys; elsewhere Left and Right turn the
-  // page. Tab stays inside the screen while it is up.
+  // Tab stays inside the screen while it is up.
   host?.addEventListener('keydown', (event) => {
     if (!open || exiting) return;
-    if (handleRadioCardKeydown(event, host)) return;
+    if (event.key !== 'Tab') return;
     const target = event.target;
-    // Escape closes nothing here, and the arrows do not skip past the welcome.
-    const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName || '') || target?.isContentEditable;
-    if (!typing && !welcoming && (event.key === 'ArrowRight' || event.key === 'ArrowLeft') && !event.altKey && !event.ctrlKey && !event.metaKey) {
+    const focusable = [...host.querySelectorAll('button:not([disabled]), input:not([disabled])')].filter((node) => node.tabIndex >= 0 && !node.closest('[hidden]'));
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && (target === first || !host.contains(target))) {
       event.preventDefault();
-      // The arrow that points toward the Next button: Right in left-to-right text, Left in right-to-left.
-      const forwardKey = isRtl() ? 'ArrowLeft' : 'ArrowRight';
-      if (event.key === forwardKey) next();
-      else go(stepIndex - 1);
-      return;
-    }
-    if (event.key === 'Tab') {
-      const focusable = [...host.querySelectorAll('button:not([disabled])')].filter((node) => node.tabIndex >= 0 && !node.closest('[hidden]'));
-      if (!focusable.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && (target === first || !host.contains(target))) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && target === last) {
-        event.preventDefault();
-        first.focus();
-      }
+      last.focus();
+    } else if (!event.shiftKey && target === last) {
+      event.preventDefault();
+      first.focus();
     }
   });
-
-  // A horizontal swipe turns the page; vertical movement scrolls as usual.
-  let swipe = null;
-  host?.addEventListener('pointerdown', (event) => {
-    swipe = open && !exiting && event.isPrimary !== false ? { x: event.clientX, y: event.clientY } : null;
-  });
-  host?.addEventListener('pointerup', (event) => {
-    if (!swipe) return;
-    const dx = event.clientX - swipe.x;
-    const dy = event.clientY - swipe.y;
-    swipe = null;
-    if (welcoming || Math.abs(dx) < SWIPE_DISTANCE || Math.abs(dy) > Math.abs(dx) * 0.6) return;
-    // Dragging toward the start of the line goes forward: left in LTR, right in RTL.
-    if (isRtl() ? dx > 0 : dx < 0) next();
-    else go(stepIndex - 1);
-  });
-  host?.addEventListener('pointercancel', () => { swipe = null; });
-
-  const ResizeObserverCtor = view().ResizeObserver;
-  if (host && typeof ResizeObserverCtor === 'function') {
-    new ResizeObserverCtor(() => { if (open || exiting) buildMeander(); }).observe(host);
-  }
 
   return {
     get isOpen() { return open; },
@@ -782,19 +361,18 @@ export function createOnboardingFlow({
     get step() { return welcoming ? 'welcome' : steps[stepIndex]; },
     get welcoming() { return welcoming; },
     get steps() { return [...steps]; },
-    open({ step = 'language', includeConnect = true, origin = null, welcome = false } = {}) {
+    open({ step = 'connect', includeConnect = true, welcome = false } = {}) {
       steps = onboardingSteps({ includeConnect });
       stepIndex = Math.max(0, steps.indexOf(step));
-      welcoming = Boolean(welcome);
+      typedUrl = null;
+      urlError = '';
+      welcoming = Boolean(welcome) || !steps.length;
       open = true;
       exiting = false;
       wasConnected = Boolean(getState()?.connection?.connected);
       render();
-      replay(host, 'is-entering');
-      flyLogo(origin);
       announce();
       focusTitle();
-      revealSelectedLanguage();
     },
     close() {
       view().clearTimeout?.(connectedTimer);
