@@ -30,6 +30,7 @@ const requiredFiles = [
   manifest.side_panel?.default_path,
   ...(manifest.content_scripts || []).flatMap((entry) => entry.js || []),
   'sidepanel.css',
+  'sidepanel-calm.css',
   'sidepanel.js',
   'request-permissions.html',
   'request-permissions.js',
