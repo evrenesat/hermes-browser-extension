@@ -115,7 +115,6 @@ test('the empty chat has no intro card, and New chat still marks the intro seen'
     read('extension/sidepanel.js'),
   ]);
   assert.doesNotMatch(html, /id="browserIntroHero"/, 'the panel no longer opens on the intro card');
-  assert.doesNotMatch(html, /class="release-sidecar"/, 'Settings no longer opens on a hero card');
   assert.match(source, /function renderBrowserIntroVisibility\(/);
   assert.doesNotMatch(source, /browserIntroHero/);
   assert.match(source, /newSessionButton\.addEventListener[\s\S]{0,1200}await persistBrowserIntroSeen\(\);[\s\S]{0,900}await beginHermesBrowserDraft\(\);/);

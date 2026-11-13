@@ -10,22 +10,6 @@ const NOUS_LIGHT = 'html[data-hermes-theme="nous"][data-hermes-mode="light"]';
 const ANTI_NOUS_LIGHT = 'html[data-hermes-theme="anti-nous"][data-hermes-mode="light"]';
 const HERO = '.hero-card';
 
-// The original Nous-light pin. After this change it belongs to the Settings
-// banner (.release-sidecar) alone and must stay byte-identical.
-const SETTINGS_BANNER_PIN = `${NOUS_LIGHT} .release-sidecar {
-  color: #f8faff;
-  --hermes-fg: #f8faff;
-  --hermes-fg-rgb: 248, 250, 255;
-  --hermes-ink: #0505e8;
-  --hermes-ink-rgb: 5, 5, 232;
-  --hermes-accent: #dbe6ff;
-  --hermes-accent-rgb: 219, 230, 255;
-  --hermes-panel-rgb: 5, 5, 232;
-  --hermes-bg-rgb: 5, 5, 232;
-  --hermes-app-bg: #0505e8;
-  --hermes-shadow-rgb: 0, 0, 0;
-}`;
-
 function parseRules(source) {
   const text = source.replace(/\/\*[\s\S]*?\*\//g, '');
   const rules = [];
@@ -66,18 +50,6 @@ function contrast(a, b) {
   const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
   return (hi + 0.05) / (lo + 0.05);
 }
-
-test('the Settings banner keeps the original Nous light pin verbatim', () => {
-  assert.ok(themeCss.includes(SETTINGS_BANNER_PIN), 'the .release-sidecar pin must stay byte-identical');
-});
-
-test('the shared Nous light pin no longer lists the front hero with the banner', () => {
-  for (const rule of parseRules(themeCss)) {
-    const banner = rule.selectors.some((s) => s.endsWith(' .release-sidecar'));
-    const hero = rule.selectors.some((s) => s.endsWith(' .hero-card'));
-    assert.ok(!(banner && hero), `selector list mixes hero and banner: ${rule.selectors.join(' | ')}`);
-  }
-});
 
 test('the front hero gets a light paper surface in Nous and Anti-Nous light', () => {
   for (const [label, scope, ink] of [['Nous', NOUS_LIGHT, '#0000f2'], ['Anti-Nous', ANTI_NOUS_LIGHT, '#d4182d']]) {

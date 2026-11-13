@@ -241,21 +241,6 @@ html[data-hermes-theme="nous"][data-hermes-mode="light"] .message-row.room-messa
   box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--bot-tint, transparent) 6%, transparent);
 }
 
-/* Keep the Settings banner's original blue treatment separate from the intro. */
-html[data-hermes-theme="nous"][data-hermes-mode="light"] .release-sidecar {
-  color: #f8faff;
-  --hermes-fg: #f8faff;
-  --hermes-fg-rgb: 248, 250, 255;
-  --hermes-ink: #0505e8;
-  --hermes-ink-rgb: 5, 5, 232;
-  --hermes-accent: #dbe6ff;
-  --hermes-accent-rgb: 219, 230, 255;
-  --hermes-panel-rgb: 5, 5, 232;
-  --hermes-bg-rgb: 5, 5, 232;
-  --hermes-app-bg: #0505e8;
-  --hermes-shadow-rgb: 0, 0, 0;
-}
-
 /* Front intro stays on paper; brand ink and grayscale artwork carry the theme. */
 html[data-hermes-theme="nous"][data-hermes-mode="light"] .hero-card {
   --hermes-fg: #0000f2;

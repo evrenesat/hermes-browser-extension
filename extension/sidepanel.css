@@ -550,29 +550,6 @@ button { text-transform: none; letter-spacing: normal; }
   -webkit-mask: url("assets/img/hermes-wing-mark.svg") left center / contain no-repeat;
   mask: url("assets/img/hermes-wing-mark.svg") left center / contain no-repeat;
 }
-/* The Nous three-card mark (orb and hand, NOUS badge, Hermes wing) from
-   hermes-agent.nousresearch.com, white on transparent. Masked over the theme's
-   brand colour like the wing above, so it follows light and dark. Quiet,
-   centred, at the foot of a view. */
-.nous-strip {
-  display: block;
-  height: 52px;
-  aspect-ratio: 197 / 78;
-  margin: 18px auto 6px;
-  background: var(--hermes-brand-mark, var(--hermes-fg));
-  -webkit-mask: url("assets/img/nous-boxes.png") center / contain no-repeat;
-  mask: url("assets/img/nous-boxes.png") center / contain no-repeat;
-}
-/* The middle card has two outlines: the dark-mode art suits dark surfaces and
-   this one suits light surfaces. */
-html[data-hermes-mode="light"] .nous-strip {
-  -webkit-mask-image: url("assets/img/nous-boxes-light.png");
-  mask-image: url("assets/img/nous-boxes-light.png");
-}
-/* About & Diagnostics is short, so its strip rides the foot of the screen
-   rather than sitting under the last card. */
-#settingsPane-about { min-height: calc(100dvh - 140px); grid-template-rows: auto auto auto 1fr; padding-bottom: 16px; }
-.nous-strip-pane { align-self: end; margin: 18px auto 0; }
 #currentSessionName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .app-scroll {
@@ -608,14 +585,11 @@ textarea::-webkit-scrollbar,
 .bot-mode-roster::-webkit-scrollbar,
 .bot-mode-group-list::-webkit-scrollbar,
 .bot-mode-check-grid::-webkit-scrollbar,
-.bot-mode-member-list::-webkit-scrollbar,
 .bot-mode-sheet textarea::-webkit-scrollbar,
 .new-group-bot-list::-webkit-scrollbar,
 .profile-switch-options::-webkit-scrollbar,
 .bot-mode-pet-grid::-webkit-scrollbar,
 .bot-mode-cron-list::-webkit-scrollbar,
-.group-thread-strip::-webkit-scrollbar,
-.group-thread-row::-webkit-scrollbar,
 .marketplace-theme-results::-webkit-scrollbar,
 .subagent-stack-list::-webkit-scrollbar,
 .subagent-stack-stream::-webkit-scrollbar,
@@ -649,14 +623,11 @@ textarea::-webkit-scrollbar-thumb,
 .bot-mode-roster::-webkit-scrollbar-thumb,
 .bot-mode-group-list::-webkit-scrollbar-thumb,
 .bot-mode-check-grid::-webkit-scrollbar-thumb,
-.bot-mode-member-list::-webkit-scrollbar-thumb,
 .bot-mode-sheet textarea::-webkit-scrollbar-thumb,
 .new-group-bot-list::-webkit-scrollbar-thumb,
 .profile-switch-options::-webkit-scrollbar-thumb,
 .bot-mode-pet-grid::-webkit-scrollbar-thumb,
 .bot-mode-cron-list::-webkit-scrollbar-thumb,
-.group-thread-strip::-webkit-scrollbar-thumb,
-.group-thread-row::-webkit-scrollbar-thumb,
 .marketplace-theme-results::-webkit-scrollbar-thumb,
 .subagent-stack-list::-webkit-scrollbar-thumb,
 .subagent-stack-stream::-webkit-scrollbar-thumb,
@@ -669,7 +640,6 @@ textarea::-webkit-scrollbar-thumb,
 .bot-mode-roster,
 .bot-mode-group-list,
 .bot-mode-check-grid,
-.bot-mode-member-list,
 .bot-mode-sheet textarea,
 .bot-mode-sheet-body,
 .new-group-bot-list,
@@ -690,10 +660,7 @@ textarea::-webkit-scrollbar-thumb,
 .status-label,
 .message-role,
 .hint,
-.settings-dialog label,
-.connect-panel li,
-.context-popover dt,
-.model-group-title {
+
   font-family: var(--hermes-font-ui);
   text-transform: none;
   letter-spacing: normal;
@@ -715,8 +682,7 @@ h2 {
   line-height: 0.92;
   letter-spacing: normal;
 }
-.settings-dialog #settingsTitle,
-.web-settings-dialog #settingsTitle {
+
   font-family: var(--hermes-font-ui);
   font-weight: 500;
   letter-spacing: normal;
@@ -734,8 +700,7 @@ html[data-hermes-theme="cyberpunk"] .message-content h2,
 html[data-hermes-theme="cyberpunk"] .message-content h3,
 html[data-hermes-theme="cyberpunk"] .message-content h4,
 html[data-hermes-theme="cyberpunk"] .message-content h5,
-html[data-hermes-theme="cyberpunk"] .message-content h6,
-html[data-hermes-theme="cyberpunk"] .empty-state strong {
+html[data-hermes-theme="cyberpunk"] .message-content h6 {
   font-family: var(--hermes-font-ui);
   font-weight: 700;
   line-height: 1.05;
@@ -922,19 +887,6 @@ html[data-hermes-theme="cyberpunk"] .empty-state strong {
 }
 .new-group-foot { display: grid; gap: 8px; margin-top: 0; }
 
-.history-load-more {
-  margin: 10px auto;
-  padding: 8px 16px;
-  border: 1px solid rgba(var(--hermes-fg-rgb), .3);
-  background: rgba(var(--hermes-fg-rgb), .05);
-  color: var(--hermes-fg);
-  font: 700 calc(11px * var(--hermes-text-zoom, 1)) var(--hermes-font-ui);
-  letter-spacing: normal;
-  text-transform: none;
-  cursor: pointer;
-}
-.history-load-more:hover, .history-load-more:focus-visible { border-color: var(--hermes-fg); outline: none; }
-
 .bot-chat-intro[hidden] {
   display: none;
 }
@@ -1079,20 +1031,6 @@ html[data-hermes-theme="cyberpunk"] .empty-state strong {
   filter: saturate(0.2) contrast(1.12);
 }
 .app-scroll:has(.message.user) .hero-card { display: none; }
-/* Right-to-left: the artwork and the dismiss button sit on the left (the end
-   side), the copy is aligned to the right, the fade runs the other way, and the
-   wordmark is the right-aligned variant of the same artwork (the shorter top
-   line moved flush right). The brand name stays Latin and left-to-right inside. */
-.hero-card .hero-wordmark-rtl,
-.release-sidecar .release-sidecar-wordmark-rtl { display: none; }
-html[dir="rtl"] .hero-wordmark-ltr,
-html[dir="rtl"] .release-sidecar-wordmark-ltr { display: none; }
-html[dir="rtl"] .hero-wordmark-rtl,
-html[dir="rtl"] .release-sidecar-wordmark-rtl { display: block; }
-html[dir="rtl"] .hero-card,
-html[dir="rtl"] .release-sidecar { --hero-fade-dir: 270deg; }
-html[dir="rtl"] .hero-copy .eyebrow,
-html[dir="rtl"] .release-sidecar-copy .eyebrow { white-space: normal; }
 
 
 .settings-button,
@@ -1149,10 +1087,7 @@ button:disabled { cursor: wait; opacity: 0.55; transform: none; }
 #newSessionButton:focus-visible { background: var(--hermes-primary-bg, var(--hermes-ink)); color: var(--hermes-primary-fg, var(--hermes-paper)); border-color: var(--hermes-primary-fg, var(--hermes-paper)); }
 .brand-mini img { display: block; width: 50px; max-height: 30px; object-fit: contain; object-position: left center; }
 
-.status-card,
-.composer,
-.message,
-.empty-state {
+
   border: 1px solid var(--hermes-line-strong);
   border-radius: var(--radius);
   background: var(--hermes-paper);
@@ -2065,11 +2000,7 @@ body.startup-active .startup-actions #startupConnectButton:not([hidden]):focus-v
   --strip-tone: var(--hermes-muted);
   position: relative;
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 4px 12px;
-  margin: 0 0 10px;
-  padding: 11px 38px 11px 12px;
+
   border: 1px solid color-mix(in srgb, var(--strip-tone) 34%, var(--hermes-line-strong, var(--hermes-ink)));
   border-radius: var(--radius);
   background: var(--hermes-paper);
@@ -2094,17 +2025,6 @@ body.startup-active .startup-actions #startupConnectButton:not([hidden]):focus-v
   background: var(--hermes-paper);
   color: var(--hermes-ink);
 }
-.browser-control-signal {
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  border: 0;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--strip-tone) 22%, transparent);
-  color: color-mix(in srgb, var(--strip-tone) 55%, var(--hermes-ink));
-}
-.browser-control-signal svg { width: 17px; height: 17px; }
 .browser-control-strip-copy { min-width: 0; padding-right: 0; }
 .browser-control-strip-copy strong,
 .browser-control-strip-copy span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2119,14 +2039,6 @@ body.startup-active .startup-actions #startupConnectButton:not([hidden]):focus-v
   font: 400 calc(12px * var(--hermes-text-zoom, 1))/1.4 var(--hermes-font-ui);
 }
 .browser-control-strip-actions { justify-content: flex-end; align-items: center; }
-.browser-control-strip-actions .browser-control-action.icon-only {
-  width: 30px;
-  min-width: 30px;
-  padding: 5px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
 .browser-control-action svg:not([hidden]) { display: block; }
 /* Chromium does not hide SVGs via [hidden] by default; force it. */
 .browser-control-action svg[hidden] { display: none !important; }
@@ -2436,14 +2348,14 @@ html[data-hermes-font-profile] .browser-control-dialog .browser-control-action {
   .browser-control-dialog .browser-control-light[data-state="on"] .browser-control-light-dot { animation: none; }
 }
 @media (max-width: 560px) {
-  .browser-control-strip { grid-template-columns: 32px minmax(0, 1fr); align-items: start; }
+  .browser-control-strip { grid-template-columns: minmax(0, 1fr); align-items: start; }
   .browser-control-strip-copy span {
     overflow: visible;
     text-overflow: clip;
     white-space: normal;
     overflow-wrap: anywhere;
   }
-  .browser-control-strip-actions { grid-column: 2; justify-content: flex-start; }
+  .browser-control-strip-actions { justify-content: flex-start; }
 }
 @media (prefers-reduced-motion: reduce) {
   .browser-control-action { transition: none; }
@@ -2531,11 +2443,6 @@ html[data-hermes-font-profile] .browser-control-dialog .browser-control-action {
   font-size: calc(11px * var(--hermes-text-zoom, 1));
   color: var(--hermes-accent);
 }
-.qmi-copy {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
 .qmi-description {
   min-width: 0;
   overflow: hidden;
@@ -2546,12 +2453,6 @@ html[data-hermes-font-profile] .browser-control-dialog .browser-control-action {
   font-weight: 400;
   line-height: 1.28;
   color: rgba(var(--hermes-fg-rgb),0.88);
-}
-.qmi-category {
-  color: rgba(var(--hermes-fg-rgb),0.48);
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  text-transform: none;
-  letter-spacing: normal;
 }
 
 .messages {
@@ -2573,17 +2474,6 @@ html[data-hermes-font-profile] .browser-control-dialog .browser-control-action {
   flex: 0 0 1px;
   pointer-events: none;
 }
-.session-history-loading {
-  min-height: 160px;
-  padding: 22px 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 7px;
-  border: 1px solid var(--hermes-line-strong);
-  background: var(--hermes-paper);
-  color: var(--hermes-ink);
-}
 .session-history-loading-rail {
   position: relative;
   display: block;
@@ -2601,23 +2491,6 @@ html[data-hermes-font-profile] .browser-control-dialog .browser-control-action {
   background: var(--hermes-ink);
   will-change: transform, opacity;
   animation: sessionHistoryScan 820ms cubic-bezier(0.42, 0, 0.58, 1) infinite;
-}
-.session-history-loading-label,
-.session-history-loading-detail {
-  color: var(--hermes-muted);
-  font-family: var(--hermes-font-ui);
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  line-height: 1.35;
-  letter-spacing: normal;
-  text-transform: none;
-}
-.session-history-loading strong {
-  overflow-wrap: anywhere;
-  font-family: var(--hermes-font-ui);
-  font-size: calc(24px * var(--hermes-text-zoom, 1));
-  font-weight: 300;
-  line-height: 0.98;
-  text-transform: none;
 }
 @keyframes sessionHistoryScan {
   0% { transform: translate3d(-110%, 0, 0); opacity: 0.42; }
@@ -3725,9 +3598,11 @@ html[data-hermes-theme^="custom:"] .message.user .message-content pre code.hljs 
 .message-content .hljs-attr { color: var(--syntax-string); }
 .message-content .hljs-number,
 .message-content .hljs-literal,
-.message-content .hljs-symbol,
 .message-content .hljs-bullet { color: var(--syntax-number); }
 .message-content .hljs-punctuation { color: var(--syntax-meta); }
+.message-content .hljs-meta,
+.message-content .hljs-selector-id,
+.message-content .hljs-selector-class { color: var(--syntax-meta); }
 .message-content .hljs-title,
 .message-content .hljs-section,
 .message-content .hljs-function,
@@ -3735,10 +3610,7 @@ html[data-hermes-theme^="custom:"] .message.user .message-content pre code.hljs 
 .message-content .hljs-type,
 .message-content .hljs-tag,
 .message-content .hljs-name { color: var(--syntax-title); }
-.message-content .hljs-meta,
-.message-content .hljs-meta-keyword,
-.message-content .hljs-selector-id,
-.message-content .hljs-selector-class { color: var(--syntax-meta); }
+
 .message-content .hljs-emphasis { font-style: italic; }
 .message-content .hljs-strong { font-weight: 700; }
 .message-content blockquote {
@@ -4177,7 +4049,6 @@ html[data-hermes-theme^="custom:"] .message.user .message-content pre code.hljs 
   background: rgba(var(--hermes-accent-rgb),0.12);
 }
 .context-scope-menu .context-scope-include-toggle:not(.selected) { opacity: 0.7; }
-.composer-help { margin: 6px 0 0; color: var(--hermes-muted); font-size: calc(11px * var(--hermes-text-zoom, 1)); line-height: 1.25; text-transform: none; letter-spacing: normal; }
 .session-ownership-notice {
   margin: 2px 0 8px;
   display: grid;
@@ -4801,14 +4672,6 @@ textarea::-webkit-scrollbar-track { background: transparent; }
 .skill-option.selected { background: rgba(var(--hermes-fg-rgb),0.08); color: var(--hermes-fg); }
 .skill-option-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .skill-option-command { color: rgba(var(--hermes-fg-rgb),0.62); font-size: calc(11px * var(--hermes-text-zoom, 1)); }
-.attach-menu-heading {
-  margin: 0;
-  padding: 5px 10px;
-  color: rgba(var(--hermes-fg-rgb),0.56);
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  text-transform: none;
-  letter-spacing: normal;
-}
 .attach-menu button {
   display: block;
   width: 100%;
@@ -4914,33 +4777,6 @@ textarea:focus, input:focus, select:focus { border-color: var(--hermes-accent); 
   transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1), background 120ms ease;
 }
 .composer-actions #browserControlMenuButton svg { display: block; width: 16px; height: 16px; }
-/* Commands sits beside Hermes Control. The popup anchors to the row, so it opens above the actions. */
-.composer-commands { display: inline-flex; flex: 0 0 auto; margin-left: auto; }
-.composer-actions:has(.bot-mode-threads-button:not([hidden])) .composer-commands,
-.composer-actions:has(#pageCommentTrayButton:not([hidden])) .composer-commands { margin-left: 0; }
-.composer-actions .composer-commands-button {
-  position: relative;
-  flex: 0 0 36px;
-  width: 36px;
-  height: 36px;
-  min-height: 36px;
-  margin: 0;
-  padding: 0;
-  display: inline-grid;
-  place-items: center;
-  border: 0;
-  border-radius: var(--radius);
-  color: var(--hermes-ink);
-  background: transparent;
-  box-shadow: none;
-  line-height: 1;
-  transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1), background 120ms ease;
-}
-.composer-actions .composer-commands-button svg { display: block; width: 16px; height: 16px; }
-.composer-actions .composer-commands-button:hover,
-.composer-actions .composer-commands-button[aria-expanded="true"] { background: rgba(var(--hermes-ink-rgb), 0.06); color: var(--hermes-ink); }
-.composer-actions .composer-commands-button:active { transform: scale(0.97); }
-.composer-actions .composer-commands-button:focus-visible { outline: 2px solid var(--hermes-accent); outline-offset: 2px; }
 .composer-actions #browserControlMenuButton:hover,
 .composer-actions #browserControlMenuButton[aria-expanded="true"] { background: rgba(var(--hermes-ink-rgb), 0.06); }
 .composer-actions #browserControlMenuButton:active { transform: scale(0.97); }
@@ -5460,10 +5296,10 @@ button.active-profile-indicator {
   color: var(--hermes-ink);
   border-color: var(--danger);
 }
-#sendButton, #saveSettingsButton, #connectButton { background: var(--hermes-primary-bg); color: var(--hermes-primary-fg); border-color: var(--hermes-primary-border); }
-/* send/save/connect rest on a filled action tile, so the hover outlines it: the fill flips to the
+#sendButton, #connectButton { background: var(--hermes-primary-bg); color: var(--hermes-primary-fg); border-color: var(--hermes-primary-border); }
+/* send/connect rest on a filled action tile, so the hover outlines it: the fill flips to the
    label colour and the outline/label take the action colour (visible on light and dark palettes). */
-#sendButton:hover, #saveSettingsButton:hover, #connectButton:hover, #sendButton:focus-visible, #saveSettingsButton:focus-visible, #connectButton:focus-visible { background: var(--hermes-primary-fg, var(--hermes-paper)); color: var(--hermes-primary-bg, var(--hermes-ink)); border-color: var(--hermes-primary-bg, var(--hermes-ink)); }
+#sendButton:hover, #connectButton:hover, #sendButton:focus-visible, #connectButton:focus-visible { background: var(--hermes-primary-fg, var(--hermes-paper)); color: var(--hermes-primary-bg, var(--hermes-ink)); border-color: var(--hermes-primary-bg, var(--hermes-ink)); }
 
 .model-menu-button,
 .session-menu-button {
@@ -5889,14 +5725,6 @@ html[data-hermes-mode="light"] .model-menu .model-effort-option:focus-visible st
 @media (prefers-reduced-motion: reduce) {
   .session-option-row[data-live-state="running"] .session-option-meta::before { animation: none; }
 }
-.tool-history-row .message-content:empty { display: none; }
-.tool-history-row .message-tool-activity { margin-top: 0; }
-.tool-history-row .message-rail,
-.tool-history-row .message-role,
-.tool-history-row .message-footer { display: none; }
-.tool-history-row .tool-activity *,
-.tool-history-row .tool-activity::before,
-.tool-history-row .tool-activity::after { animation: none !important; }
 .session-option-row.group-thread {
   padding-right: 0;
   border-left-color: rgba(var(--hermes-accent-rgb),0.28);
@@ -6172,17 +6000,6 @@ html[data-hermes-mode="light"] .model-menu .model-effort-option:focus-visible st
   letter-spacing: normal;
   text-transform: none;
 }
-.context-popover dl {
-  display: grid;
-  grid-template-columns: minmax(92px, 0.8fr) minmax(0, 1.2fr);
-  gap: 6px 8px;
-  margin: 10px 0 0;
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  line-height: 1.25;
-}
-.context-popover .context-runtime-breakdown { margin-top: 7px; }
-.context-popover dt { color: rgba(var(--hermes-fg-rgb),0.62); }
-.context-popover dd { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: right; }
 /* Settings repeats the popover's readout with the same rows and type. */
 .context-window-settings #settingsContextSummary { margin: 4px 0 0; color: rgba(var(--hermes-fg-rgb),0.72); font-size: calc(11px * var(--hermes-text-zoom, 1)); }
 .context-window-settings dl {
@@ -6799,61 +6616,6 @@ html[data-hermes-mode="light"] .model-menu .model-effort-option:focus-visible st
   gap: 0;
   overflow: hidden;
 }
-.release-sidecar {
-  position: relative;
-  min-height: 142px;
-  overflow: hidden;
-  padding: 14px 12px 12px;
-  border-bottom: 1px solid var(--hermes-line);
-  background:
-    linear-gradient(var(--hero-fade-dir, 90deg), rgba(var(--hermes-panel-rgb),0.98) 0%, rgba(var(--hermes-panel-rgb),0.82) 55%, rgba(var(--hermes-panel-rgb),0.24) 100%),
-    var(--sidecar-art, url("assets/img/hermes-browse.webp")) center / cover no-repeat,
-    var(--hermes-app-bg);
-  background-blend-mode: normal, luminosity, normal;
-  color: var(--hermes-fg);
-}
-.release-sidecar-copy { position: relative; z-index: 1; max-width: 100%; margin-inline-end: 52px; }
-.release-sidecar-copy .eyebrow {
-  margin: 0;
-  color: inherit;
-  max-width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  letter-spacing: normal;
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  line-height: 1.2;
-}
-.release-sidecar-copy > p:last-child {
-  max-width: 31ch;
-  margin: 8px 0 0;
-  color: inherit;
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  line-height: 1.4;
-  letter-spacing: normal;
-  text-transform: none;
-}
-.release-sidecar-wordmark {
-  display: block;
-  width: min(188px, 100%);
-  height: auto;
-  margin-top: 2px;
-  color: inherit;
-  fill: currentColor;
-}
-.release-sidecar-badge {
-  position: absolute;
-  z-index: 1;
-  inset-inline-end: 10px;
-  bottom: 10px;
-  width: 40px;
-  height: 80px;
-  object-fit: cover;
-  border: 1px solid rgba(var(--hermes-fg-rgb),0.75);
-  background: var(--hermes-accent);
-  opacity: 0.9;
-  mix-blend-mode: luminosity;
-  filter: saturate(0.2) contrast(1.12);
-}
 .release-control { display: grid; gap: 8px; padding: 10px; }
 .release-row {
   display: grid;
@@ -7160,20 +6922,12 @@ html[data-hermes-theme="nous"][data-hermes-mode="light"] .update-dialog-mark {
   text-transform: none;
   letter-spacing: normal;
 }
-.settings-section-head p,
-.appearance-row span,
-.theme-setting > span {
+
   display: block;
   margin: 4px 0 0;
   color: var(--hermes-muted);
   font-size: calc(11px * var(--hermes-text-zoom, 1));
   line-height: 1.35;
-}
-.appearance-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
 }
 .language-select {
   width: 100%;
@@ -7282,8 +7036,7 @@ html[data-hermes-theme="nous"][data-hermes-mode="light"] .update-dialog-mark {
   font-size: calc(11px * var(--hermes-text-zoom, 1));
   text-align: center;
 }
-.appearance-row strong,
-.theme-setting > strong {
+
   display: block;
   color: var(--hermes-ink);
   font-size: calc(12px * var(--hermes-text-zoom, 1));
@@ -7477,10 +7230,7 @@ html[data-hermes-theme="nous"][data-hermes-mode="light"] .update-dialog-mark {
 }
 .conn-mode-head { display: flex; align-items: center; gap: 6px; }
 .conn-mode-title { font-size: calc(11px * var(--hermes-text-zoom, 1)); font-weight: 600; }
-html[dir="rtl"] .settings-control-group-head small,
-html[dir="rtl"] .context-popover header strong,
-html[dir="rtl"] .context-popover dd,
-html[dir="rtl"] .context-receipt dd { text-align: start; }
+
 html[dir="rtl"] .composer-wake { right: auto; left: 67px; }
 html[dir="rtl"] .composer-live { right: auto; left: 67px; }
 html[dir="rtl"] .composer-wake:not([hidden]) ~ .composer-live { right: auto; left: 96px; }
@@ -7757,42 +7507,12 @@ html[data-hermes-theme="mono"][data-hermes-mode="light"] .agent-theme-status { c
 }
 
 @media (max-width: 420px) {
-  .appearance-row { grid-template-columns: 1fr; align-items: stretch; }
   .segmented-control { display: grid; grid-template-columns: repeat(3, 1fr); }
   .mode-choice { padding-inline: 5px; }
   .theme-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 .hint { color: var(--hermes-muted); margin: 0; }
 
-.empty-state {
-  position: relative;
-  margin: auto;
-  padding: 18px 12px;
-  overflow: hidden;
-}
-.empty-state::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  /* Theme-aware brand mark: the SVG is a monochrome mask, the actual color
-     follows --hermes-ink so Cyberpunk neon / Nous blue / Mono gray all
-     match the active theme instead of a hard-coded blue square. */
-  background-color: var(--hermes-ink);
-  -webkit-mask: url("assets/img/hermes-browser-mark.svg") 102% 108% / 132px 132px no-repeat;
-  mask: url("assets/img/hermes-browser-mark.svg") 102% 108% / 132px 132px no-repeat;
-  opacity: 0.12;
-  pointer-events: none;
-}
-.empty-state strong {
-  position: relative;
-  display: block;
-  font-family: var(--hermes-font-ui);
-  font-size: calc(28px * var(--hermes-text-zoom, 1));
-  line-height: 0.96;
-  font-weight: 300;
-  margin-bottom: 8px;
-}
-.empty-state span { position: relative; display: block; color: var(--hermes-muted); font-size: calc(11px * var(--hermes-text-zoom, 1)); line-height: 1.4; text-transform: none; letter-spacing: normal; }
 
 .intro,
 .status-copy span,
@@ -7808,11 +7528,7 @@ select,
 .context-scope-menu button,
 .session-option,
 .conn-mode-title,
-.profile-row button,
-.appearance-row strong,
-.theme-card-name {
-  font-size: calc(12px * var(--hermes-text-zoom, 1));
-}
+
 
 .eyebrow,
 .composer-label,
@@ -7821,10 +7537,8 @@ select,
 .hint,
 .settings-dialog label,
 .connect-panel li,
-.context-popover dt,
 .model-group-title,
 .context-chip strong,
-.composer-help,
 .queue-notice,
 .tool-activity-label,
 .tool-activity-preview,
@@ -7833,16 +7547,11 @@ select,
 .session-option-meta,
 .context-popover header span,
 .compatibility-row strong,
-.theme-card-meta,
-.appearance-row span,
 .conn-mode-desc {
   font-size: calc(11px * var(--hermes-text-zoom, 1));
 }
 
-h2,
-.empty-state strong {
-  font-size: calc(28px * var(--hermes-text-zoom, 1));
-}
+
 
 .message-content h1,
 .message-content h2,
@@ -7927,36 +7636,6 @@ h2,
   justify-self: stretch;
   margin-top: 6px;
 }
-
-/* --- Loading skeleton (v0.1.10 polish) --------------------------------- */
-@keyframes skeletonPulse {
-  0%, 100% { opacity: 0.18; transform: scaleX(1); }
-  50% { opacity: 0.4; transform: scaleX(1.02); }
-}
-@keyframes skeletonShimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(200%); }
-}
-.skeleton {
-  position: relative;
-  display: block;
-  border-radius: 4px;
-  background: rgba(var(--hermes-fg-rgb), 0.08);
-  overflow: hidden;
-}
-.skeleton::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(var(--hermes-fg-rgb), 0.12), transparent);
-  animation: skeletonShimmer 1.8s ease-in-out infinite;
-}
-.skeleton-text {
-  height: 12px;
-  margin-bottom: 6px;
-  animation: skeletonPulse 1.6s ease-in-out infinite;
-}
-.skeleton-text:last-child { width: 62%; }
 
 /* --- Shared Hermes task status stack ----------------------------------- */
 .task-stack[hidden] { display: none; }
@@ -8181,11 +7860,6 @@ h2,
 .bot-mode-pet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 6px; max-height: 220px; overflow: auto; padding: 2px; }
 .bot-mode-pet-grid > .hint,
 .bot-mode-pet-grid > .bot-mode-action { grid-column: 1 / -1; }
-.bot-mode-pet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
-.bot-mode-pet-head span { font: 650 calc(12px * var(--hermes-text-zoom, 1))/1.3 var(--hermes-font-ui); letter-spacing: normal; text-transform: none; color: var(--hermes-ink); }
-.bot-mode-pet-controls { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
-.bot-mode-pet-controls input { flex: 1 1 auto; min-width: 0; min-height: 34px; padding: 0 8px; border: 1px solid var(--hermes-line-strong); background: var(--hermes-paper); color: var(--hermes-ink); font: calc(11px * var(--hermes-text-zoom, 1)) var(--hermes-font-ui); box-sizing: border-box; }
-.bot-mode-pet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 6px; max-height: none; overflow: visible; padding: 2px; }
 .bot-mode-pet-tile { display: grid; justify-items: center; gap: 4px; padding: 6px 4px; border: 1px solid var(--hermes-line); background: var(--hermes-paper); cursor: pointer; }
 .bot-mode-pet-tile:hover { border-color: var(--hermes-line-strong); }
 .bot-mode-pet-tile[aria-selected="true"] { border-color: var(--hermes-ink); box-shadow: inset 0 0 0 1px var(--hermes-ink); }
@@ -8425,40 +8099,6 @@ details.bot-mode-cron-card summary::-webkit-details-marker { display: none; }
   40% { transform: scale(1.15); opacity: 1; }
 }
 
-.group-thread-separator {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 18px 0 10px;
-  width: 100%;
-  box-sizing: border-box;
-}
-.group-thread-separator .thread-separator-line {
-  flex: 1 1 auto;
-  height: 1px;
-  background: rgba(var(--hermes-fg-rgb), 0.18);
-}
-.group-thread-separator .thread-separator-badge {
-  font: 700 calc(11px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-ui);
-  letter-spacing: normal;
-  text-transform: none;
-  color: rgba(var(--hermes-fg-rgb), 0.7);
-  padding: 4px 10px;
-  border: 1px solid rgba(var(--hermes-fg-rgb), 0.2);
-  border-radius: 12px;
-  background: var(--hermes-app-bg);
-  white-space: nowrap;
-}
-.group-tool-tag {
-  font: 700 calc(11px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-ui);
-  letter-spacing: normal;
-  text-transform: none;
-  color: var(--hermes-blue);
-  background: rgba(5, 5, 232, 0.12);
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid rgba(5, 5, 232, 0.3);
-}
 
 .bot-mode-search-row { flex: 0 0 auto; padding: 4px 18px 12px; }
 .bot-mode-search-row input {
@@ -8517,7 +8157,6 @@ details.bot-mode-cron-card summary::-webkit-details-marker { display: none; }
   transform-style: preserve-3d;
 }
 .bot-mode-avatar svg { width: 100%; height: 100%; max-width: 100%; max-height: 100%; display: block; object-fit: contain; }
-.bot-mode-avatar-fallback { font: 700 calc(14px * var(--hermes-text-zoom, 1)) var(--hermes-font-ui); color: var(--hermes-ink); }
 .bot-mode-avatar-pet {
   width: 100%;
   height: 100%;
@@ -8662,74 +8301,6 @@ details.bot-mode-cron-card summary::-webkit-details-marker { display: none; }
   background: #25e6a2;
   box-shadow: 0 0 6px rgba(37, 230, 162, .45);
 }
-/* Desktop-parity threads strip: collapsed thread rows above the stream.
-   Never scrolls sideways — long thread titles truncate with an ellipsis. */
-.group-thread-strip {
-  display: grid;
-  gap: 6px;
-  padding: 8px 18px;
-  border-bottom: 1px solid var(--hermes-panel-border);
-  max-height: 200px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  min-width: 0;
-}
-.group-thread-strip[hidden] { display: none; }
-.group-thread-strip {
-  flex-direction: row;
-  align-items: center;
-  max-height: none;
-  overflow: visible;
-  padding: 8px 18px;
-}
-.group-thread-label {
-  flex: 0 0 auto;
-  font: 700 calc(11px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-ui);
-  letter-spacing: normal;
-  text-transform: none;
-  opacity: .7;
-}
-.group-thread-select {
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 32px;
-  border: 1px solid rgba(var(--hermes-fg-rgb), .3);
-  background: rgba(var(--hermes-fg-rgb), .05);
-  color: var(--hermes-fg);
-  font: calc(11px * var(--hermes-text-zoom, 1)) var(--hermes-font-ui);
-  padding: 0 8px;
-  cursor: pointer;
-}
-.group-thread-select:focus-visible { border-color: var(--hermes-fg); outline: none; }
-.group-thread-select option { background: var(--hermes-app-bg); color: var(--hermes-fg); }
-.group-thread-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  min-width: 0;
-  min-height: 34px;
-  padding: 4px 10px;
-  border: 1px solid rgba(var(--hermes-fg-rgb), .25);
-  background: rgba(var(--hermes-fg-rgb), .05);
-  color: var(--hermes-fg);
-  text-align: left;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-.group-thread-row:hover, .group-thread-row:focus-visible { border-color: var(--hermes-fg); outline: none; }
-.group-thread-row[aria-expanded="true"] { background: var(--hermes-paper); color: var(--hermes-ink); }
-.group-thread-chevron { flex: 0 0 auto; font: 700 calc(12px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-ui); }
-.group-thread-copy { flex: 1 1 auto; min-width: 0; }
-.group-thread-copy strong {
-  display: block;
-  font-size: calc(11px * var(--hermes-text-zoom, 1));
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
-}
-.group-thread-meta { flex: 0 0 auto; font: 400 calc(11px * var(--hermes-text-zoom, 1))/1.3 var(--hermes-font-ui); letter-spacing: normal; opacity: .6; text-transform: lowercase; white-space: nowrap; }
 .bot-mode-row[aria-selected="true"] .bot-mode-row-state.active { color: var(--hermes-ink); }
 .bot-mode-foot {
   flex: 0 0 auto;
@@ -8948,7 +8519,6 @@ body.bot-mode-compact .message.assistant .message-role .room-avatar { width: 16p
 .bot-mode-head-action.is-refreshing svg, .bot-mode-head-action.is-refreshing span, .bot-mode-head-action.is-refreshing { animation: botRefreshSpin 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
 @keyframes botRefreshSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .bot-mode-empty-note { margin-top: 4px; text-transform: none; letter-spacing: normal; opacity: .78; }
-.bot-mode-settings .settings-toggle-row { grid-template-columns: minmax(0,1fr) auto auto; }
 .bot-mode-button > span:not(.sr-only) { display: grid; place-items: center; }
 .bot-mode-button svg { width: 16px; height: 16px; display: block; }
 html[dir="rtl"] .bot-mode-row { text-align: right; }
@@ -9320,10 +8890,6 @@ html[dir="rtl"] .bot-mode-row { text-align: right; }
   height: 40px;
   display: block;
 }
-.group-avatar-crest-svg {
-  color: var(--hermes-fg);
-  opacity: .85;
-}
 .bot-mode-face-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .bot-mode-avatar-stage { display: grid; justify-items: center; gap: 8px; padding: 4px 0 2px; text-align: center; }
 .bot-mode-avatar-stage .hint { margin: 0; }
@@ -9419,8 +8985,6 @@ html[data-hermes-font-profile="signature"] .bot-mode-sheet-tab {
   text-transform: none;
   font-size: calc(15px * var(--hermes-text-zoom, 1));
 }
-.bot-mode-face-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.bot-mode-face-tools .bot-mode-sheet-label { margin: 0; }
 .bot-mode-advanced summary {
   list-style: none;
   display: flex;
@@ -9439,15 +9003,6 @@ html[data-hermes-font-profile="signature"] .bot-mode-sheet-tab {
 .bot-mode-sheet-foot .bot-mode-action { width: 100%; min-height: 42px; }
 .bot-mode-sheet-foot .bot-mode-sheet-warning.conflict { color: #b98a1c; }
 .bot-mode-sheet .bot-mode-pet-picker { margin: 0 0 14px; padding: 10px; border: 1px solid var(--hermes-line); background: var(--hermes-paper); }
-.bot-mode-pet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
-.bot-mode-pet-head span { font: 650 calc(12px * var(--hermes-text-zoom, 1))/1.3 var(--hermes-font-ui); letter-spacing: normal; text-transform: none; color: var(--hermes-ink); }
-#botModePetClear { height: 26px; padding: 0 8px; border: 1px solid var(--hermes-line); background: transparent; color: var(--hermes-ink); font: 650 calc(12px * var(--hermes-text-zoom, 1))/1.2 var(--hermes-font-ui); letter-spacing: normal; text-transform: none; cursor: pointer; display: inline-flex; align-items: center; }
-#botModePetClear:hover { border-color: var(--hermes-ink); }
-.bot-mode-pet-controls { display: flex; align-items: center; gap: 8px; margin: 8px 0 10px; }
-.bot-mode-pet-controls input { flex: 1 1 auto; min-width: 0; height: 38px; min-height: 38px; padding: 0 10px; border: 1px solid var(--hermes-line-strong); background: var(--hermes-paper); color: var(--hermes-ink); font: 500 calc(13px * var(--hermes-text-zoom, 1))/1.4 var(--hermes-font-ui); box-sizing: border-box; }
-.bot-mode-pet-controls button { flex: 0 0 auto; height: 38px; min-height: 38px; display: inline-flex; align-items: center; justify-content: center; padding: 0 12px; border: 1px solid var(--hermes-line-strong); background: transparent; color: var(--hermes-ink); font: 650 calc(12px * var(--hermes-text-zoom, 1))/1.2 var(--hermes-font-ui); letter-spacing: normal; text-transform: none; cursor: pointer; white-space: nowrap; box-sizing: border-box; }
-.bot-mode-pet-controls button:disabled { opacity: 0.45; cursor: not-allowed; }
-.bot-mode-pet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 6px; max-height: none; overflow: visible; padding: 2px; }
 @media (prefers-reduced-motion: reduce) { .bot-mode-sheet * { transition: none !important; animation: none !important; } }
 @media (prefers-reduced-motion: reduce) { .bot-mode-panel * { transition: none !important; animation: none !important; } }
 /* ── Bot Mode view toggle + Group Chats (roster separation) ────────────────── */
@@ -9480,17 +9035,7 @@ html[data-hermes-font-profile="signature"] .bot-mode-sheet-tab {
 .bot-mode-group-list[hidden] { display: none; }
 #botModeNewGroupButton[hidden] { display: none; }
 #botModeNewGroupButton { border-style: dashed; }
-/* New Group Chat sheet: 3-row grid (head / body / foot) — the shared sheet
-   template reserves its third row for the profile-editor tabs nav. */
-.bot-mode-sheet--group { grid-template-rows: auto minmax(0,1fr) auto; }
 .bot-mode-sheet-body .bot-mode-sheet-warning { margin: 0; font: calc(11px * var(--hermes-text-zoom, 1))/1.5 var(--hermes-font-ui); letter-spacing: normal; text-transform: none; color: #b98a1c; }
-.bot-mode-member-list { display: grid; gap: 8px; max-height: 240px; overflow-y: auto; padding: 6px 8px; border: 1px solid var(--hermes-line); background: var(--hermes-paper); }
-.bot-mode-member-option { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 2px 4px; font: calc(11px * var(--hermes-text-zoom, 1)) var(--hermes-font-ui); color: var(--hermes-ink); cursor: pointer; }
-.bot-mode-member-option input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--hermes-blue); flex: 0 0 auto; }
-.bot-mode-member-option .bot-mode-avatar { width: 26px; height: 26px; border-radius: 8px; box-shadow: 0 0 0 1.5px var(--hermes-ink); }
-.bot-mode-member-copy { min-width: 0; display: grid; gap: 2px; }
-.bot-mode-member-copy strong, .bot-mode-member-copy span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bot-mode-member-copy span { font-size: calc(11px * var(--hermes-text-zoom, 1)); opacity: .68; }
 /* Settings → Refresh profiles: spin the glyph for the whole sync, reduced-motion safe */
 #refreshProfilesButton.is-refreshing { opacity: .88; cursor: wait; }
 #refreshProfilesButton.is-refreshing .session-refresh-icon { animation: sessionRefreshSpin 760ms linear infinite; }
@@ -9548,23 +9093,6 @@ html[data-hermes-font-profile="signature"] .bot-mode-sheet-tab {
   padding: 6px;
   font: inherit;
 }
-.page-annotation-list {
-  display: grid;
-  gap: 6px;
-  margin-top: 8px;
-}
-.page-annotation-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 8px;
-  align-items: start;
-  padding: 6px;
-  border: 1px solid rgba(var(--hermes-fg-rgb), 0.16);
-}
-.page-annotation-row strong { font-size: calc(12px * var(--hermes-text-zoom, 1)); }
-.page-annotation-row p,
-.page-annotation-row span { margin: 0; font-size: calc(11px * var(--hermes-text-zoom, 1)); color: rgba(var(--hermes-fg-rgb), 0.76); }
-.page-annotation-row textarea { width: 100%; min-height: 48px; margin-top: 4px; }
 @media (prefers-reduced-motion: reduce) {
   .page-annotation-panel * { transition: none; }
 }
@@ -10881,38 +10409,6 @@ body.onboarding-entering .bottom-dock { animation: onboarding-chrome-up 0.6s cub
 }
 .presentation-preview .pv-reply-flow { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 1px 0; }
 
-/* Run first-time setup again: a quiet row closing the section, not a box. */
-.settings-setup-row {
-  display: grid;
-  grid-template-columns: 16px minmax(0, 1fr);
-  align-items: start;
-  gap: 10px;
-  width: 100%;
-  min-height: 0;
-  margin: 2px 0 0;
-  padding: 12px 2px 2px;
-  border: 0;
-  border-top: 1px solid var(--hermes-line);
-  border-radius: 0;
-  background: transparent;
-  color: var(--hermes-ink);
-  font: inherit;
-  text-align: left;
-  text-transform: none;
-  letter-spacing: normal;
-  cursor: pointer;
-}
-.settings-setup-row:hover,
-.settings-setup-row:focus-visible { background: transparent; color: var(--hermes-ink); }
-.settings-setup-row svg { margin-top: 1px; color: var(--hermes-muted); }
-.settings-setup-row:hover svg,
-.settings-setup-row:focus-visible svg { color: var(--hermes-ink); }
-.settings-setup-row:focus-visible { outline: 1px solid var(--hermes-accent); outline-offset: 2px; }
-.settings-setup-copy { display: grid; gap: 2px; min-width: 0; }
-.settings-setup-copy strong { font-size: calc(11.5px * var(--hermes-text-zoom, 1)); font-weight: 600; line-height: 1.25; }
-.settings-setup-row:hover .settings-setup-copy strong,
-.settings-setup-row:focus-visible .settings-setup-copy strong { text-decoration: underline; text-underline-offset: 2px; }
-.settings-setup-copy small { color: var(--hermes-muted); font-size: calc(11px * var(--hermes-text-zoom, 1)); line-height: 1.35; }
 
 /* Chat layout (Settings > Appearance & Themes). "Bubbles both sides" is the
    default bubble pair above. "User bubble only" keeps the user's bubble and

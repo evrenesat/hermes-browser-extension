@@ -802,7 +802,6 @@ html .settings-dialog .compatibility-row small.compatibility-meta { font-size: c
 html .settings-dialog .support-diagnostics { display: grid; gap: 8px; padding: 0; border: 0; background: none; }
 html .settings-dialog .support-diagnostics .settings-section-head { margin: 0; }
 html .settings-dialog .support-diagnostics > button { justify-self: start; }
-html .settings-dialog .nous-strip { display: none; }
 
 /* ------------------------------------------------------------------ */
 /* 11. Footer                                                          */

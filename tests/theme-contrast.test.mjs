@@ -311,7 +311,7 @@ test('controls whose resting tile is a filled action surface invert outward on h
   assert.match(send, /background: var\(--hermes-primary-fg, var\(--hermes-paper\)\)/, '#sendButton should flip its fill to the label colour');
   assert.match(send, /color: var\(--hermes-primary-bg, var\(--hermes-ink\)\)/, '#sendButton should take the action colour for its label');
   assert.match(send, /border-color: var\(--hermes-primary-bg, var\(--hermes-ink\)\)/, '#sendButton should draw its boundary in the action colour');
-  for (const selector of ['#saveSettingsButton:hover', '#connectButton:hover', '#startupConnectButton:not([hidden]):hover']) {
+  for (const selector of ['#connectButton:hover', '#startupConnectButton:not([hidden]):hover']) {
     const body = ruleFor(sidepanelCss, selector);
     assert.match(body, /background: var\(--hermes-primary-fg, var\(--hermes-paper\)\)/, `${selector} should flip its fill to the label colour`);
   }

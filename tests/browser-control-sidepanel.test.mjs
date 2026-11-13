@@ -165,7 +165,7 @@ test('Hermes Control shows its status as a light in the title row, after the hea
 
 test('Phase 6 approval reason remains fully readable in narrow Browser panels', () => {
   assert.match(css, /\.browser-control-strip-copy span\s*\{[^}]*white-space:\s*normal[^}]*overflow-wrap:\s*anywhere/s);
-  assert.match(css, /@media \(max-width:\s*560px\)[\s\S]*?\.browser-control-strip\s*\{[^}]*grid-template-columns:\s*32px minmax\(0,\s*1fr\)[^}]*\}[^}]*\.[\s\S]*?grid-column:\s*2/s);
+  assert.match(css, /@media \(max-width:\s*560px\)[\s\S]*?\.browser-control-strip\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)[^}]*\}[^}]*\.[\s\S]*?grid-column:\s*1/s);
 });
 
 test('local document approval does not leak attach failures as uncaught rejections', () => {
