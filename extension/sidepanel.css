@@ -660,7 +660,9 @@ textarea::-webkit-scrollbar-thumb,
 .status-label,
 .message-role,
 .hint,
-
+.settings-dialog label,
+.connect-panel li,
+.model-group-title {
   font-family: var(--hermes-font-ui);
   text-transform: none;
   letter-spacing: normal;
@@ -682,7 +684,7 @@ h2 {
   line-height: 0.92;
   letter-spacing: normal;
 }
-
+.settings-dialog #settingsTitle {
   font-family: var(--hermes-font-ui);
   font-weight: 500;
   letter-spacing: normal;
@@ -7527,7 +7529,9 @@ select,
 .context-scope-search,
 .context-scope-menu button,
 .session-option,
-.conn-mode-title,
+.conn-mode-title {
+  font-size: calc(12px * var(--hermes-text-zoom, 1));
+}
 
 
 .eyebrow,
