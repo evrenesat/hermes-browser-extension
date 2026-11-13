@@ -1,0 +1,563 @@
+/* Calm UI: onboarding, startup/error screens, dialogs and toasts.
+   See docs/design/ui-revamp.md. Loaded after sidepanel-calm.css. */
+
+/* ------------------------------------------------------------------ */
+/* 1. Shared: one centred card recipe                                  */
+/* ------------------------------------------------------------------ */
+:root {
+  --calm-scrim: rgba(12, 12, 16, 0.42);
+  --calm-dialog-w: 340px;
+}
+html[data-hermes-mode="dark"] { --calm-scrim: rgba(0, 0, 0, 0.55); }
+
+/* ------------------------------------------------------------------ */
+/* 2. First-run onboarding: welcome, then Connect                      */
+/* ------------------------------------------------------------------ */
+.onboarding {
+  display: grid;
+  place-items: center;
+  grid-template-rows: none;
+  gap: 0;
+  padding: 16px;
+  background: var(--calm-bg);
+  color: var(--calm-text);
+  overflow: auto;
+}
+.onboarding.is-exiting { opacity: 0; transition: opacity 140ms ease; }
+.onboarding-card {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 320px);
+  min-width: 0;
+}
+.onboarding-stage { display: grid; gap: 8px; padding: 0; overflow: visible; }
+.onboarding-title {
+  margin: 0;
+  font-family: var(--calm-font-ui);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: normal;
+  color: var(--calm-text);
+}
+.onboarding-body {
+  margin: 0;
+  color: var(--calm-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.onboarding-welcome { display: grid; justify-items: center; gap: 8px; text-align: center; }
+.onboarding-logo {
+  inline-size: 48px;
+  block-size: 48px;
+  margin-block-end: 4px;
+  border-radius: 12px;
+  background: url("assets/icons/icon-48.png") center / contain no-repeat;
+  -webkit-mask: none;
+  mask: none;
+}
+.onboarding-welcome-actions { display: grid; gap: 6px; inline-size: 100%; margin-block-start: 12px; }
+.onboarding .onboarding-welcome-actions button { inline-size: 100%; }
+
+/* One look for every action in setup: primary, secondary, ghost. */
+.onboarding button {
+  position: static;
+  min-height: var(--calm-control-h);
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  font: 500 13px/1 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+  box-shadow: none;
+  outline: none;
+  transition: background-color var(--calm-ease), color var(--calm-ease);
+}
+.onboarding button:hover:not(:disabled) { background: color-mix(in srgb, var(--calm-surface-2) 82%, var(--calm-text) 18%); color: var(--calm-text); }
+.onboarding :is(.onboarding-welcome-start, .onboarding-connect-button),
+.onboarding :is(.onboarding-welcome-start, .onboarding-connect-button):hover:not(:disabled) {
+  background: var(--calm-accent);
+  color: var(--calm-accent-fg);
+}
+.onboarding :is(.onboarding-welcome-start, .onboarding-connect-button):hover:not(:disabled) { background: color-mix(in srgb, var(--calm-accent) 88%, var(--calm-text) 12%); }
+.onboarding :is(.ghost, .onboarding-nav-button) { background: transparent; color: var(--calm-muted); }
+.onboarding :is(.ghost, .onboarding-nav-button):hover:not(:disabled) { background: var(--calm-surface-2); color: var(--calm-text); }
+.onboarding button:focus-visible { outline: 2px solid var(--calm-accent); outline-offset: 1px; }
+
+/* Connect */
+.onboarding-field { display: grid; gap: 4px; }
+.onboarding-field[hidden] { display: none; }
+.onboarding-field label { color: var(--calm-muted); font-size: 11px; font-weight: 600; }
+.onboarding-field input {
+  inline-size: 100%;
+  min-height: var(--calm-input-h);
+  padding: 0 10px;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-bg);
+  color: var(--calm-text);
+  font: 13px/1 var(--calm-font-ui);
+  box-sizing: border-box;
+}
+.onboarding-field input:focus-visible { outline: 2px solid var(--calm-accent); outline-offset: 1px; }
+.onboarding-field input[aria-invalid="true"] { border-color: var(--calm-danger); }
+.onboarding-field-error { margin: 0; color: var(--calm-danger); font-size: 12px; line-height: 1.4; }
+.onboarding-field-error[hidden] { display: none; }
+.onboarding-connect { display: grid; gap: 10px; padding: 0; border: 0; background: transparent; }
+.onboarding-connect-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  color: var(--calm-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.onboarding-connect.is-connected .onboarding-connect-status { color: var(--calm-ok); font-weight: 600; }
+.onboarding-connect.is-connected .onboarding-connect-status svg { color: var(--calm-ok); }
+.onboarding-connect.is-failed .onboarding-connect-status { color: var(--calm-danger); }
+.onboarding-connect-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; }
+.onboarding-connect-actions[hidden] { display: none; }
+.onboarding-connect-other { margin: 0; color: var(--calm-muted); font-size: 12px; line-height: 1.5; }
+.onboarding-approval-slot .pairing-approval-frame { height: min(340px, 48dvh); border: 1px solid var(--calm-border); border-radius: var(--calm-radius-card); }
+.onboarding-connect:not(.is-connected, .is-failed, .is-busy, .is-approving) .onboarding-connect-status { display: none; }
+.onboarding-connect.is-approving :is(.onboarding-connect-actions, .onboarding-field, .onboarding-connect-other) { display: none; }
+.onboarding-connect.is-busy .onboarding-connect-button { opacity: 0.7; }
+.onboarding-nav { display: flex; justify-content: flex-end; padding: 0; border: 0; background: transparent; }
+.onboarding-nav[hidden] { display: none; }
+.onboarding-nav-button { inline-size: auto; block-size: auto; }
+.onboarding-nav-button::after, .onboarding-nav-button::before { display: none; }
+.onboarding.is-approving { align-items: start; }
+
+/* ------------------------------------------------------------------ */
+/* 3. Startup and error screen: a compact status card                  */
+/* ------------------------------------------------------------------ */
+.startup-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--calm-bg);
+  color: var(--calm-text);
+  overflow: auto;
+}
+.startup-screen > *,
+.startup-screen:not([hidden]) > * { animation: none; }
+.startup-screen .startup-meander,
+.startup-screen .startup-backtype,
+.startup-screen .startup-logo-veil,
+.startup-screen .startup-count,
+.startup-screen .startup-state,
+.startup-screen .startup-progress { display: none; }
+.startup-stage {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  inline-size: min(100%, 320px);
+  padding: 16px;
+  border: 1px solid var(--calm-border);
+  border-radius: 12px;
+  background: var(--calm-surface);
+  box-shadow: none;
+}
+.startup-brand-lockup { display: block; text-align: start; }
+.startup-brand-icon {
+  display: block;
+  inline-size: 24px;
+  block-size: 24px;
+  border-radius: 6px;
+  background: url("assets/icons/icon-48.png") center / contain no-repeat;
+  -webkit-mask: none;
+  mask: none;
+  animation: none;
+}
+html[data-hermes-mode="light"] .startup-brand-icon { --startup-logo: none; }
+.startup-screen.is-loading .startup-brand-icon {
+  background: none;
+  border: 2px solid var(--calm-border-strong);
+  border-top-color: var(--calm-accent);
+  border-radius: 50%;
+  inline-size: 18px;
+  block-size: 18px;
+  margin: 3px;
+  animation: calm-spin 0.9s linear infinite;
+}
+.startup-screen.is-error .startup-brand-icon {
+  background: var(--calm-danger);
+  border-radius: 0;
+  inline-size: 20px;
+  block-size: 20px;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 8v4'/%3E%3Cpath d='M12 16h.01'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 8v4'/%3E%3Cpath d='M12 16h.01'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+@keyframes calm-spin { to { transform: rotate(360deg); } }
+.startup-copy {
+  inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 4px;
+}
+.startup-meta { display: none; }
+.startup-label {
+  display: block;
+  min-height: 0;
+  margin: 0;
+  font: 600 15px/1.35 var(--calm-font-ui);
+  letter-spacing: normal;
+  color: var(--calm-text);
+}
+.startup-detail {
+  display: -webkit-box;
+  margin: 0;
+  font: 400 13px/1.5 var(--calm-font-ui);
+  letter-spacing: normal;
+  color: var(--calm-muted);
+  opacity: 1;
+  -webkit-line-clamp: 6;
+}
+.startup-screen.is-error .startup-label { color: var(--calm-danger); }
+.startup-screen.is-error .startup-detail,
+.startup-screen.is-setup .startup-detail { font: 400 13px/1.5 var(--calm-font-ui); opacity: 1; color: var(--calm-muted); }
+.startup-actions {
+  position: static;
+  inset: auto;
+  inline-size: 100%;
+  margin-block-start: 4px;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.startup-actions[hidden] { display: none; }
+body.startup-active .startup-actions :is(#settingsButton, #startupTestConnectionButton:not([hidden]), #startupConnectButton:not([hidden]), #newSessionButton) {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  inline-size: auto;
+  min-inline-size: 0;
+  block-size: var(--calm-control-h);
+  min-block-size: var(--calm-control-h);
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-surface-2);
+  box-shadow: none;
+  color: var(--calm-text);
+  font: 500 13px/1 var(--calm-font-ui);
+  text-transform: none;
+  letter-spacing: normal;
+  visibility: visible;
+}
+body.startup-active .startup-actions #settingsButton { inline-size: var(--calm-control-h); padding: 0; }
+body.startup-active .startup-actions :is(#settingsButton, #startupTestConnectionButton, #startupConnectButton, #newSessionButton):is(:hover, :focus-visible) {
+  background: color-mix(in srgb, var(--calm-surface-2) 82%, var(--calm-text) 18%);
+  color: var(--calm-text);
+  border-color: transparent;
+}
+body.startup-active .startup-actions :is(#startupConnectButton:not([hidden]), .startup-screen.is-error #startupTestConnectionButton:not([hidden])),
+.startup-screen.is-error .startup-actions #startupTestConnectionButton:not([hidden]),
+body.startup-active .startup-actions #startupConnectButton:not([hidden]):is(:hover, :focus-visible),
+.startup-screen.is-error .startup-actions #startupTestConnectionButton:not([hidden]):is(:hover, :focus-visible) {
+  background: var(--calm-accent);
+  color: var(--calm-accent-fg);
+  border-color: transparent;
+}
+.startup-actions [data-tip]::after { display: none; }
+body.startup-active .startup-actions #startupTestConnectionButton .settings-connection-test-label { position: static; clip: auto; inline-size: auto; block-size: auto; overflow: visible; margin: 0; }
+
+/* ------------------------------------------------------------------ */
+/* 4. Connect pop-up                                                   */
+/* ------------------------------------------------------------------ */
+.connect-panel {
+  padding: 16px;
+  background: var(--calm-scrim);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.connect-panel-card {
+  inline-size: min(100%, var(--calm-dialog-w));
+  padding: 16px;
+  border: 1px solid var(--calm-border);
+  border-radius: 12px;
+  background: var(--calm-surface);
+  box-shadow: var(--calm-shadow-popover);
+  animation: none;
+  display: grid;
+  gap: 8px;
+}
+.connect-panel h2 { margin: 0 32px 0 0; font-size: 15px; font-weight: 600; line-height: 1.35; }
+.connect-panel-lead { margin: 0; color: var(--calm-muted); font-size: 13px; line-height: 1.5; }
+.connect-panel ol { margin: 0; padding-inline-start: 18px; gap: 2px; font-size: 12px; line-height: 1.5; }
+.connect-panel li { color: var(--calm-muted); }
+.connect-panel code { padding: 0 4px; border: 0; border-radius: 4px; background: var(--calm-surface-2); font-size: 12px; }
+.connect-panel-close {
+  inset-block-start: 8px;
+  inset-inline-end: 8px;
+  background: transparent;
+  color: var(--calm-muted);
+  inline-size: var(--calm-control-h);
+  block-size: var(--calm-control-h);
+}
+.connect-panel-close:hover { background: var(--calm-surface-2); color: var(--calm-text); }
+.connect-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.connect-actions #connectButton { background: var(--calm-accent); color: var(--calm-accent-fg); order: 2; }
+.connect-panel #connectStatus { margin: 0; font-size: 12px; color: var(--calm-muted); }
+.pairing-approval-frame { border: 1px solid var(--calm-border); border-radius: var(--calm-radius-card); background: var(--calm-bg); }
+
+/* ------------------------------------------------------------------ */
+/* 5. Dialogs: compact centred cards                                   */
+/* ------------------------------------------------------------------ */
+.profile-switch-dialog {
+  padding: 16px;
+  background: var(--calm-scrim);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.profile-switch-card {
+  inline-size: min(100%, var(--calm-dialog-w));
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--calm-border);
+  border-radius: 12px;
+  background: var(--calm-surface);
+  color: var(--calm-text);
+  box-shadow: var(--calm-shadow-popover);
+}
+.profile-switch-card .session-ownership-kicker { display: none; }
+.profile-switch-card h2 { margin: 0; font: 600 15px/1.35 var(--calm-font-ui); letter-spacing: normal; }
+.profile-switch-card p { margin: 0; color: var(--calm-muted); font: 400 13px/1.5 var(--calm-font-ui); }
+.profile-switch-actions {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-block-start: 8px;
+}
+.profile-switch-actions button {
+  min-height: var(--calm-control-h);
+  padding: 0 12px;
+  text-align: center;
+  font: 500 13px/1 var(--calm-font-ui);
+}
+.profile-switch-actions:has(> button:nth-child(3)) { flex-direction: column-reverse; align-items: stretch; }
+.profile-switch-actions:has(> button:nth-child(3)) > button { inline-size: 100%; }
+.profile-switch-actions .ghost { order: -1; border-color: transparent; background: transparent; color: var(--calm-muted); }
+.profile-switch-actions .ghost:hover,
+.profile-switch-actions .ghost:focus-visible { border-color: transparent; background: var(--calm-surface-2); color: var(--calm-text); }
+.profile-switch-actions button:first-child:not(.ghost):not(.secondary) { background: var(--calm-accent); color: var(--calm-accent-fg); order: 2; }
+.profile-switch-actions .secondary { order: 1; }
+.profile-switch-card code, .webapp-address { font-size: 12px; background: var(--calm-bg); border: 1px solid var(--calm-border); border-radius: var(--calm-radius-control); }
+
+/* ------------------------------------------------------------------ */
+/* 6. Toast: small bottom-centre card                                  */
+/* ------------------------------------------------------------------ */
+.operation-toast {
+  --toast-tone: var(--calm-ok);
+  top: auto;
+  bottom: calc(var(--hermes-bottom-dock-height, 112px) + 8px);
+  grid-template-columns: 16px minmax(0, 1fr) 24px;
+  gap: 8px;
+  inline-size: min(340px, calc(100% - 24px));
+  padding: 8px 6px 8px 12px;
+  border: 1px solid var(--calm-border);
+  border-radius: 10px;
+  background: var(--calm-surface);
+  color: var(--calm-text);
+  box-shadow: var(--calm-shadow-popover);
+  animation: calm-toast-in 160ms ease both;
+}
+.operation-toast.warn { --toast-tone: var(--calm-warn); }
+.operation-toast.error { --toast-tone: var(--calm-danger); }
+.operation-toast-signal { inline-size: 16px; block-size: 16px; border: 0; color: var(--toast-tone); }
+.operation-toast strong { font: 600 13px/1.35 var(--calm-font-ui); color: var(--calm-text); }
+.operation-toast div > span { margin-block-start: 1px; font: 400 12px/1.45 var(--calm-font-ui); color: var(--calm-muted); }
+.operation-toast button {
+  inline-size: 24px;
+  block-size: 24px;
+  min-height: 24px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-muted);
+}
+.operation-toast button:hover,
+.operation-toast button:focus-visible { border: 0; background: var(--calm-surface-2); color: var(--calm-text); }
+@keyframes calm-toast-in { from { transform: translate(-50%, 8px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .operation-toast, .startup-screen.is-loading .startup-brand-icon { animation: none; } }
+
+/* ------------------------------------------------------------------ */
+/* 7. Coarse pointer                                                   */
+/* ------------------------------------------------------------------ */
+@media (pointer: coarse) {
+  .onboarding button, .profile-switch-actions button { min-height: var(--calm-control-h); }
+}
+
+/* ------------------------------------------------------------------ */
+/* 8. Bot mode roster and profile editor (logic unchanged)             */
+/* ------------------------------------------------------------------ */
+.onboarding-title:focus, .onboarding-title:focus-visible { outline: none; }
+html .bot-mode-panel, html .bot-mode-sheet { background: var(--calm-bg); color: var(--calm-text); border: 0; border-radius: 0; box-shadow: none; font-family: var(--calm-font-ui); }
+html .bot-mode-head, html .bot-mode-sheet-head { display: flex; align-items: flex-start; gap: 8px; padding: 12px 12px 8px; border: 0; background: transparent; }
+html .bot-mode-head h2, html .bot-mode-sheet-head h2 { margin: 0; font: 600 15px/1.35 var(--calm-font-ui); letter-spacing: normal; text-transform: none; color: var(--calm-text); }
+html .bot-mode-head p, html .bot-mode-sheet-head p { margin: 0; font: 400 12px/1.4 var(--calm-font-ui); color: var(--calm-muted); text-transform: none; letter-spacing: normal; }
+html .bot-mode-head-copy, html .bot-mode-sheet-head > div { flex: 1; min-width: 0; }
+html .bot-mode-head-controls { display: flex; gap: 2px; }
+html .bot-mode-head-action, html #botModeSheetCloseButton {
+  inline-size: var(--calm-control-h); block-size: var(--calm-control-h); min-height: 0; padding: 0;
+  display: inline-grid; place-items: center; border: 0; border-radius: var(--calm-radius-control);
+  background: transparent; color: var(--calm-muted); font-size: 16px; line-height: 1;
+}
+html .bot-mode-head-action:hover, html #botModeSheetCloseButton:hover { background: var(--calm-surface-2); color: var(--calm-text); }
+html .bot-mode-search-row { display: grid; gap: 8px; padding: 0 12px 8px; background: transparent; border: 0; }
+html .bot-mode-search-row input { inline-size: 100%; min-height: var(--calm-input-h); padding: 0 10px; box-sizing: border-box; }
+/* Tabs: a compact segmented control. */
+html .bot-mode-view-toggle, html .bot-mode-face-switch, html .bot-mode-sheet-tabs {
+  display: inline-flex; gap: 2px; padding: 2px; border: 0; border-radius: 8px; background: var(--calm-surface-2); inline-size: auto; justify-self: start;
+}
+html .bot-mode-view-tab, html .bot-mode-sheet-tab, html .bot-mode-face-switch button {
+  min-height: 24px; padding: 0 10px; border: 0; border-radius: 6px; background: transparent; color: var(--calm-muted);
+  font: 500 12px/1 var(--calm-font-ui); text-transform: none; letter-spacing: normal; flex: 1 1 auto;
+}
+html .bot-mode-view-tab:hover, html .bot-mode-sheet-tab:hover, html .bot-mode-face-switch button:hover { background: transparent; color: var(--calm-text); }
+html .bot-mode-view-tab[aria-pressed="true"], html .bot-mode-sheet-tab.on, html .bot-mode-face-switch button.on, html .bot-mode-face-switch button[aria-pressed="true"] {
+  background: var(--calm-bg); color: var(--calm-text); box-shadow: 0 0 0 1px var(--calm-border);
+}
+html .bot-mode-sheet-tabs { margin: 0 12px 8px; }
+html .bot-mode-face-switch { margin-block: 4px; }
+/* Roster rows. */
+html .bot-mode-roster { padding: 0 8px; border: 0; background: transparent; gap: 2px; }
+html .bot-mode-row { min-height: 40px; padding: 6px 8px; border: 0; border-radius: var(--calm-radius-card); background: transparent; color: var(--calm-text); text-align: start; }
+html .bot-mode-row:hover { background: var(--calm-surface-2); }
+html .bot-mode-row[aria-selected="true"], html .bot-mode-row.selected, html .bot-mode-row.is-selected { background: var(--calm-accent-soft); box-shadow: none; }
+html .bot-mode-row-copy strong { font: 600 13px/1.3 var(--calm-font-ui); text-transform: none; letter-spacing: normal; }
+html .bot-mode-row-copy span, html .bot-mode-row-copy small, html .bot-mode-row-stamp, html .bot-mode-row-state { font: 400 12px/1.4 var(--calm-font-ui); color: var(--calm-muted); text-transform: none; letter-spacing: normal; }
+html .bot-mode-empty, html .bot-mode-empty-note { color: var(--calm-muted); font-size: 13px; }
+/* Footer: one primary, quiet secondaries. */
+html .bot-mode-foot { display: grid; gap: 8px; padding: 8px 12px 12px; border: 0; border-top: 1px solid var(--calm-border); background: var(--calm-bg); }
+html .bot-mode-verify { font: 400 11px/1.4 var(--calm-font-ui); color: var(--calm-muted); text-transform: none; letter-spacing: normal; }
+html .bot-mode-actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+html .bot-mode-action { min-height: var(--calm-control-h); padding: 0 12px; border: 0; border-radius: var(--calm-radius-control); background: var(--calm-surface-2); color: var(--calm-text); font: 500 13px/1 var(--calm-font-ui); text-transform: none; letter-spacing: normal; }
+html .bot-mode-action.primary { background: var(--calm-accent); color: var(--calm-accent-fg); }
+html .bot-mode-action.full-width { inline-size: 100%; }
+html .bot-mode-action:disabled { opacity: 0.45; }
+/* Profile editor: de-caps labels, flat fields, advanced stays collapsed. */
+html .bot-mode-sheet-body { padding: 0 12px 12px; }
+html .bot-mode-sheet-pane { display: grid; gap: 12px; }
+html .bot-mode-sheet-label { font: 600 12px/1.4 var(--calm-font-ui); color: var(--calm-muted); text-transform: none; letter-spacing: normal; }
+html .bot-mode-sheet-field { display: grid; gap: 4px; }
+html .bot-mode-sheet-field input, html .bot-mode-sheet-field textarea, html .bot-mode-sheet-field select { inline-size: 100%; box-sizing: border-box; padding: 6px 10px; }
+html .bot-mode-sheet-field input, html .bot-mode-sheet-field select { min-height: var(--calm-input-h); }
+html .bot-mode-avatar-stage { display: grid; justify-items: center; gap: 6px; }
+html .bot-mode-avatar-sheet { inline-size: 72px; block-size: 72px; border-radius: 16px; border: 1px solid var(--calm-border); box-shadow: none; }
+html .bot-mode-pet-picker { border: 0; border-radius: var(--calm-radius-card); background: var(--calm-surface); }
+html .bot-mode-advanced, html .bot-mode-pet-summary { border: 0; border-radius: var(--calm-radius-card); background: var(--calm-surface); padding: 0; }
+html .bot-mode-advanced summary { min-height: var(--calm-control-h); padding: 6px 10px; font: 600 13px/1.4 var(--calm-font-ui); text-transform: none; letter-spacing: normal; cursor: pointer; }
+html .bot-mode-advanced-panel { padding: 4px 10px 10px; }
+html .bot-mode-pet-summary { padding: 8px 10px; font: 500 13px/1.4 var(--calm-font-ui); }
+html .bot-mode-sheet-body .hint, html .bot-mode-panel .hint { font-size: 12px; color: var(--calm-muted); }
+html .bot-mode-sheet > footer, html .bot-mode-sheet-foot { padding: 8px 12px 12px; border: 0; border-top: 1px solid var(--calm-border); background: var(--calm-bg); display: flex; justify-content: flex-end; }
+html .bot-mode-sheet > footer button, html .bot-mode-sheet-foot button { background: var(--calm-accent); color: var(--calm-accent-fg); padding: 0 14px; }
+html .bot-mode-check-item, html .bot-mode-member-option, html .bot-mode-cron-row { border: 0; border-radius: var(--calm-radius-control); background: var(--calm-surface); }
+html .new-group-modal, html .group-settings-modal { background: var(--calm-bg); color: var(--calm-text); }
+html .new-group-modal { padding: 12px; gap: 8px; }
+html .new-group-head h2, html .group-settings-head h2, html .group-settings-title-row h2 { font: 600 15px/1.35 var(--calm-font-ui); text-transform: none; letter-spacing: normal; }
+html .new-group-head p { font: 400 12px/1.4 var(--calm-font-ui); color: var(--calm-muted); opacity: 1; }
+html .new-group-head button { border: 0; border-radius: var(--calm-radius-control); background: transparent; color: var(--calm-muted); }
+html .new-group-foot { display: flex; justify-content: flex-end; flex-wrap: wrap; }
+html .new-group-foot .new-group-secondary, html .new-group-foot .new-group-primary { inline-size: auto; min-height: var(--calm-control-h); padding: 0 12px; }
+html .new-group-foot .new-group-primary { background: var(--calm-accent); color: var(--calm-accent-fg); }
+html .new-group-body input[type=search], html .new-group-body input[type=text] { block-size: var(--calm-input-h); border: 1px solid var(--calm-border); border-radius: var(--calm-radius-card); background: var(--calm-surface); color: var(--calm-text); font: 400 13px var(--calm-font-ui); }
+html .new-group-bot-row { border: 0; border-radius: var(--calm-radius-card); background: transparent; }
+html .new-group-bot-row:hover { background: var(--calm-surface-2); }
+html .group-settings-card { border: 0; border-radius: 0; background: var(--calm-bg); box-shadow: none; }
+
+/* Hermes Control dialog: a plain centred card. */
+html .browser-control-dialog {
+  inline-size: min(100% - 24px, var(--calm-dialog-w));
+  padding: 16px;
+  border: 1px solid var(--calm-border);
+  border-radius: 12px;
+  background: var(--calm-surface);
+  color: var(--calm-text);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: var(--calm-shadow-popover);
+}
+html .browser-control-dialog::backdrop { background: var(--calm-scrim); }
+html .browser-control-dialog .browser-control-dialog-title { margin: 0; font: 600 15px/1.35 var(--calm-font-ui); text-transform: none; letter-spacing: normal; }
+html .browser-control-dialog .browser-control-light { font: 500 12px/1 var(--calm-font-ui); color: var(--calm-muted); }
+html .browser-control-dismiss { inline-size: var(--calm-control-h); block-size: var(--calm-control-h); min-height: 0; padding: 0; background: transparent; color: var(--calm-muted); border: 0; }
+html .browser-control-strip { border: 0; border-radius: var(--calm-radius-card); background: var(--calm-bg); box-shadow: none; }
+html .browser-control-strip-copy strong { font: 600 13px/1.35 var(--calm-font-ui); color: var(--calm-text); }
+html .browser-control-strip-copy span { font: 400 12px/1.4 var(--calm-font-ui); color: var(--calm-muted); white-space: normal; }
+html .browser-control-action { min-height: var(--calm-control-h); border: 0; border-radius: var(--calm-radius-control); background: var(--calm-surface-2); color: var(--calm-text); font: 500 13px/1 var(--calm-font-ui); text-transform: none; letter-spacing: normal; }
+html .browser-control-action:not(.secondary) { background: var(--calm-accent); color: var(--calm-accent-fg); }
+
+/* Specificity bumps over legacy bot mode button rules. */
+html .bot-mode-panel .bot-mode-head-action,
+html .bot-mode-sheet #botModeSheetCloseButton { border: 0; background: transparent; color: var(--calm-muted); }
+html .bot-mode-panel .bot-mode-head-action:hover,
+html .bot-mode-sheet #botModeSheetCloseButton:hover { background: var(--calm-surface-2); color: var(--calm-text); }
+html .bot-mode-panel .bot-mode-view-tab, html .bot-mode-sheet .bot-mode-sheet-tab, html .bot-mode-sheet .bot-mode-face-switch button { border: 0; background: transparent; color: var(--calm-muted); }
+html .bot-mode-panel .bot-mode-view-tab[aria-pressed="true"], html .bot-mode-sheet .bot-mode-sheet-tab.on, html .bot-mode-sheet .bot-mode-face-switch button.on { background: var(--calm-bg); color: var(--calm-text); }
+html .bot-mode-panel .bot-mode-action { border: 0; }
+html .bot-mode-panel .bot-mode-action.primary { background: var(--calm-accent); color: var(--calm-accent-fg); }
+html .bot-mode-sheet .bot-mode-pet-summary, html .bot-mode-sheet .bot-mode-advanced { border: 0; background: var(--calm-surface); }
+html .bot-mode-sheet .bot-mode-sheet-label { font-weight: 600; }
+html .browser-control-dialog .browser-control-dialog-title { text-transform: lowercase; outline: none; color: var(--calm-text); }
+html .browser-control-dialog .browser-control-dialog-title:focus-visible { outline: none; }
+html .browser-control-dialog .browser-control-dialog-title::first-letter { text-transform: uppercase; }
+
+/* ------------------------------------------------------------------ */
+/* 9. Voice dictation tab: one compact card                            */
+/* ------------------------------------------------------------------ */
+html body.voice-page { background: var(--calm-bg); color: var(--calm-text); font-family: var(--calm-font-ui); }
+html body.voice-page .voice-shell { inline-size: min(380px, 100%); gap: 8px; }
+html body.voice-page .voice-hero { min-height: 0; padding: 12px 16px; border: 1px solid var(--calm-border); border-radius: 12px; background: var(--calm-surface); box-shadow: none; }
+html body.voice-page .voice-hero :is(.hero-wordmark, .hero-badge) { display: none; }
+html body.voice-page .voice-hero .hero-copy { padding: 0; }
+html body.voice-page .voice-hero .eyebrow { margin: 0; font: 600 15px/1.35 var(--calm-font-ui); letter-spacing: normal; text-transform: none; color: var(--calm-text); }
+html body.voice-page .voice-hero .hero-dismiss { inset-block-start: 8px; inset-inline-end: 8px; inline-size: var(--calm-control-h); block-size: var(--calm-control-h); color: var(--calm-muted); background: transparent; border: 0; }
+html body.voice-page .voice-composer { padding: 12px; border: 1px solid var(--calm-border); border-radius: 12px; background: var(--calm-surface); box-shadow: none; gap: 8px; }
+html body.voice-page .voice-stage { min-height: 96px; padding: 12px; border: 1px solid var(--calm-border); border-radius: var(--calm-radius-card); background: var(--calm-bg); color: var(--calm-text); }
+html body.voice-page .voice-status-title { font: 600 12px/1.4 var(--calm-font-ui); letter-spacing: normal; text-transform: none; }
+html body.voice-page .voice-status { font: 400 13px/1.5 var(--calm-font-ui); color: var(--calm-muted); }
+html body.voice-page .voice-actions { justify-content: flex-end; gap: 6px; }
+html body.voice-page .voice-actions button { flex: 0 1 auto; min-height: var(--calm-control-h); padding: 0 12px; border: 0; border-radius: var(--calm-radius-control); background: var(--calm-surface-2); color: var(--calm-text); font: 500 13px/1 var(--calm-font-ui); text-transform: none; letter-spacing: normal; }
+html body.voice-page .voice-actions #startVoiceButton { background: var(--calm-accent); color: var(--calm-accent-fg); }
+
+/* Error card: one-line summary, technical text behind Details, labelled actions. */
+.startup-details { margin: 2px 0 0; color: var(--calm-muted); font: 400 12px/1.5 var(--calm-font-ui); }
+.startup-details[hidden] { display: none; }
+.startup-details > summary { cursor: pointer; display: inline-block; padding: 2px 0; color: var(--calm-muted); list-style: none; }
+.startup-details > summary::-webkit-details-marker { display: none; }
+.startup-details > summary::before { content: '›'; display: inline-block; margin-inline-end: 4px; transition: transform 120ms ease; }
+.startup-details[open] > summary::before { transform: rotate(90deg); }
+.startup-details > summary:hover { color: var(--calm-text); }
+.startup-details-body { margin: 4px 0 0; padding: 6px 8px; border-radius: var(--calm-radius-control); background: var(--calm-surface-2); overflow-wrap: anywhere; user-select: text; }
+.startup-settings-label { display: none; }
+body.startup-active .startup-actions #settingsButton { inline-size: auto; padding: 0 10px; }
+body.startup-active .startup-actions #settingsButton :is(svg, .sr-only) { display: none; }
+body.startup-active .startup-actions #settingsButton .startup-settings-label { display: inline; }
+
+/* Hermes Control light: off is neutral, on is ok-green (off is a choice, not an error). */
+html .browser-control-dialog .browser-control-light { --light-color: var(--calm-muted); }
+html .browser-control-dialog .browser-control-light[data-state="on"] { --light-color: var(--calm-ok); color: var(--calm-text); }
+html .browser-control-dialog .browser-control-light-dot { box-shadow: none; }
+
+/* Phase 3: microphone permission page actions on one wrapping row, primary first. */
+html .permission-card .permission-actions { display: flex; flex-flow: row wrap; justify-content: flex-end; gap: 6px; }
+html .permission-card .permission-actions button { flex: 0 1 auto; min-height: var(--calm-control-h); padding: 0 12px; border: 0; border-radius: var(--calm-radius-control); background: var(--calm-surface-2); color: var(--calm-text); font: 500 13px/1 var(--calm-font-ui); }
+html .permission-card .permission-actions #allowMicrophoneButton { order: 3; background: var(--calm-accent); color: var(--calm-accent-fg); }
+html .permission-card .permission-actions #closePermissionButton { order: 1; background: transparent; color: var(--calm-muted); }
+html .permission-card .permission-actions #openMicrophoneSettingsButton { order: 2; }
+html .permission-card .eyebrow { margin: 0; color: var(--calm-muted); font: 500 12px/1.4 var(--calm-font-ui); letter-spacing: normal; text-transform: none; }

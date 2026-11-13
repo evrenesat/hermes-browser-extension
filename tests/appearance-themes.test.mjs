@@ -63,8 +63,9 @@ test('inline Assist resolves every canonical theme in both modes with Mono parit
   assert.equal(nousLight.panel, '#ffffff');
 });
 
-test('canonical Hermes appearance themes stay ordered with Nous first', () => {
+test('canonical Hermes appearance themes stay ordered with Calm first', () => {
   assert.deepEqual(APPEARANCE_THEMES.map((theme) => theme.value), [
+    'calm',
     'nous',
     'midnight',
     'ember',
@@ -78,8 +79,8 @@ test('canonical Hermes appearance themes stay ordered with Nous first', () => {
     'classic',
     'anti-nous',
   ]);
-  assert.equal(APPEARANCE_THEMES[0].name, 'Nous');
-  assert.deepEqual(APPEARANCE_THEMES.slice(6, 9).map((theme) => theme.name), [
+  assert.equal(APPEARANCE_THEMES[0].name, 'Calm');
+  assert.deepEqual(APPEARANCE_THEMES.slice(7, 10).map((theme) => theme.name), [
     'Senter Space',
     'Aphrodite',
     'Solstice',
@@ -89,8 +90,8 @@ test('canonical Hermes appearance themes stay ordered with Nous first', () => {
     'Classic Hermes',
     'Anti-Nous',
   ]);
-  assert.equal(DEFAULT_APPEARANCE_THEME, 'nous');
-  assert.equal(DEFAULT_COLOR_MODE, 'dark');
+  assert.equal(DEFAULT_APPEARANCE_THEME, 'calm');
+  assert.equal(DEFAULT_COLOR_MODE, 'system');
 });
 
 test('Aphrodite replaces Aurora visually while preserving the stable aurora preference id', () => {
@@ -104,8 +105,8 @@ test('Aphrodite replaces Aurora visually while preserving the stable aurora pref
 });
 
 test('appearance normalization never falls through to system implicitly', () => {
-  assert.equal(normalizeAppearanceTheme('unknown'), 'nous');
-  assert.equal(normalizeColorMode('unknown'), 'dark');
+  assert.equal(normalizeAppearanceTheme('unknown'), 'calm');
+  assert.equal(normalizeColorMode('unknown'), 'system');
   assert.equal(resolveColorMode('system', false), 'light');
   assert.equal(resolveColorMode('system', true), 'dark');
 });
@@ -120,7 +121,13 @@ test('sidepanel implements every canonical palette and the Nous Light treatment'
   assert.match(sidepanelHtml, /<link rel="stylesheet" href="sidepanel-themes\.css" \/>/);
   assert.ok(fs.existsSync(sidepanelThemeCssPath), 'sidepanel must load a dedicated canonical theme layer');
 
+  const calmCss = read('extension/sidepanel-calm.css');
+  assert.match(sidepanelHtml, /<link rel="stylesheet" href="sidepanel-calm\.css" \/>/);
+  assert.ok(cssBlock(calmCss, 'html[data-hermes-mode="dark"]'), 'calm defines dark tokens');
+  assert.match(calmCss, /html\[data-hermes-theme="calm"\]/);
+
   for (const theme of APPEARANCE_THEMES) {
+    if (theme.value === 'calm') continue;
     for (const mode of ['light', 'dark']) {
       const selector = `html[data-hermes-theme="${theme.value}"][data-hermes-mode="${mode}"]`;
       assert.ok(cssBlock(sidepanelCss, selector), `sidepanel must define ${theme.value} ${mode}`);

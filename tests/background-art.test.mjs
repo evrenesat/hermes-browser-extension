@@ -254,7 +254,7 @@ if (existsSync(moduleUrl)) {
     assert.match(panel, /import \{ createBackgroundArtRotation, isFirstRunStorage \} from '\.\/lib\/background-art\.mjs';/);
     assert.match(panel, /const backgroundArtRotation = createBackgroundArtRotation\(\{[\s\S]*?firstRun: async \(\) => isFirstRunStorage\(\s*await browserApi\.storage\.local\.get\(\[ONBOARDING_COMPLETED_STORAGE_KEY, HERMES_BROWSER_INTRO_SEEN_STORAGE_KEY\]\)/);
     const open = panel.match(/function openOnboarding\([\s\S]*?\n\}/)?.[0] || '';
-    assert.match(open, /void backgroundArtRotation\.ensureOnboardingArt\(\);/);
+    assert.doesNotMatch(open, /backgroundArt/, 'the calm first run draws no artwork');
     const complete = panel.match(/async function completeOnboarding\([\s\S]*?\n\}/)?.[0] || '';
     assert.doesNotMatch(complete, /backgroundArt|--background-art/, 'finishing or skipping keeps the picture on screen until the next open');
   });

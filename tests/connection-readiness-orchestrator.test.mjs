@@ -13,7 +13,7 @@ import {
 function successfulOperations(overrides = {}) {
   return {
     restoreSettings: async () => ({ mode: 'local', transport: 'local-api' }),
-    connectGateway: async () => ({ state: 'connected', detail: 'Gateway transport connected.' }),
+    connectGateway: async () => ({ state: 'connected', detail: 'Hermes connection connected.' }),
     loadCapabilities: async () => ({ status: 'ready', detail: 'Capabilities loaded.' }),
     loadModels: async () => ({ status: 'ready', detail: '2 models loaded.' }),
     selectModel: async () => ({ status: 'ready', detail: 'Selected model is requestable.' }),

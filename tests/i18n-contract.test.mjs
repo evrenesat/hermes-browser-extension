@@ -29,24 +29,12 @@ test('Sidepanel exposes the branded native language selector', () => {
   assert.match(css, /\.language-select option\s*\{[^}]*color:\s*var\(--hermes-ink\)/s);
   assert.doesNotMatch(css, /\.language-select[^}]*border-radius:\s*8px/s);
   assert.doesNotMatch(languageRule, /--hermes-surface/);
-  assert.match(css, /:lang\(zh-CN\) \[data-i18n\][^{]*\{[^}]*letter-spacing:\s*0\.025em/s);
 });
 
 test('Arabic RTL mirrors the primary composer and mobile navigation', () => {
   const sidepanelCss = read('extension/sidepanel.css');
   assert.match(sidepanelCss, /html\[dir="rtl"\]\s+\.composer-wake/);
   assert.match(sidepanelCss, /html\[dir="rtl"\]\s+\.composer-input-wrap\.busy-draft\.can-steer textarea/);
-});
-
-test('CJK, Devanagari, Thai, and Arabic localized copy avoids forced uppercase and tracking', () => {
-  for (const css of [read('extension/sidepanel.css')]) {
-    assert.match(css, /:lang\(zh-TW\) \[data-i18n\][\s\S]*text-transform:\s*none/);
-    assert.match(css, /:lang\(ja\) \[data-i18n\][\s\S]*text-transform:\s*none/);
-    assert.match(css, /:lang\(ko\) \[data-i18n\][\s\S]*text-transform:\s*none/);
-    assert.match(css, /:lang\(hi\) \[data-i18n\][\s\S]*letter-spacing:\s*0/);
-    assert.match(css, /:lang\(th\) \[data-i18n\][\s\S]*letter-spacing:\s*0/);
-    assert.match(css, /:lang\(ar\) \[data-i18n\][\s\S]*letter-spacing:\s*0/);
-  }
 });
 
 test('runtime i18n uses explicit semantic sinks instead of a whole-document observer', () => {

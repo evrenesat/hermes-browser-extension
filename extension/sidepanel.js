@@ -176,7 +176,6 @@ import { contextPreviewEventApplies, createContextPreviewScheduler, previewKeeps
 import { enhanceMarkdownCodeBlocks } from './lib/markdown-code-copy.mjs';
 import {
   ONBOARDING_COMPLETED_STORAGE_KEY,
-  RESPONSE_STYLE_SETUP_DEFAULT,
   explicitResponseStyle,
   lockAssistantResponseStyles,
   preserveAssistantResponseStyles,
@@ -199,8 +198,7 @@ import {
   revealSlice,
   trailingNewMessages,
 } from './lib/completion-reveal.mjs';
-import { LOCALE_STORAGE_KEY, formatMessage, getLocale, initI18n, populateLanguageSelect, setLocale, subscribeLocale, suggestLocale, t, translateUiText } from './lib/i18n.mjs';
-import { SUPPORTED_LOCALES, localeMetadata } from './lib/i18n-registry.mjs';
+import { LOCALE_STORAGE_KEY, getLocale, initI18n, populateLanguageSelect, setLocale, subscribeLocale, suggestLocale, t, translateUiText } from './lib/i18n.mjs';
 import {
   buildContextMenuTurn,
   contextMenuRequestMatchesTab,
@@ -229,6 +227,7 @@ import {
 } from './lib/paste-artifact.mjs';
 import {
   APPEARANCE_THEMES,
+  migrateToCalmAppearance,
   normalizeAppearanceTheme,
   normalizeColorMode,
   themePreviewForMode,
@@ -931,7 +930,6 @@ const els = {
   firstPromptChip: $('#firstPromptChip'),
   responseStyleChoices: $('#responseStyleChoices'),
   messageLayoutChoices: $('#messageLayoutChoices'),
-  rerunOnboardingButton: $('#rerunOnboardingButton'),
   sessionMenuButton: $('#sessionMenuButton'),
   currentSessionName: $('#currentSessionName'),
   newSessionButton: $('#newSessionButton'),
@@ -967,6 +965,8 @@ const els = {
   contextChip: $('#contextChip'),
   statusStackToggle: $('#statusStackToggle'),
   contextChipLabel: $('#contextChipLabel'),
+  contextChipKind: $('#contextChipKind'),
+  contextChipIcon: $('#contextChipIcon'),
   contextPreview: $('#contextPreview'),
   explicitSiteCaptureWrap: $('#explicitSiteCaptureWrap'),
   explicitSiteCaptureButton: $('#explicitSiteCaptureButton'),
@@ -1311,6 +1311,7 @@ const els = {
   panelResidencyInputs: Array.from(document.querySelectorAll('input[name="panelResidencyMode"]')),
   autoNameSessionsInput: $('#autoNameSessionsInput'),
   showMessageTimesInput: $('#showMessageTimesInput'),
+  classicThinkingFacesInput: $('#classicThinkingFacesInput'),
   transcriptProviderInput: $('#transcriptProviderInput'),
   transcriptProviderField: $('#transcriptProviderField'),
   transcriptModeInputs: Array.from(document.querySelectorAll('input[name="transcriptMode"]')),
@@ -1367,6 +1368,8 @@ const els = {
   customFontFamilyInput: $('#customFontFamilyInput'),
   appearanceSaveStatus: $('#appearanceSaveStatus'),
   settingsSaveStatus: $('#settingsSaveStatus'),
+  settingsSearchInput: $('#settingsSearchInput'),
+  settingsSearchResults: $('#settingsSearchResults'),
   signatureFontFallbackNote: $('#signatureFontFallbackNote'),
   quickMoreMenu: $('#quickMoreMenu'),
   commandMenuButton: $('#commandMenuButton'),
@@ -2052,7 +2055,6 @@ let onboardingConnectFailure = '';
 // language on a rerun); `suggestionActive` while it is only a suggestion that
 // nothing has picked or kept yet; `picked` once a card was chosen. A stored
 // choice means the person (or an earlier run) already chose.
-let onboardingLanguage = { suggested: '', picked: '', suggestionActive: false };
 let explicitLocaleStored = false;
 // Setup ended without a connection: the startup screen steps aside for this
 // panel session instead of holding at "Not paired".
@@ -2869,6 +2871,12 @@ function positionStartupSettings(active = document.body?.classList.contains('sta
     const { parent, next } = newSessionButtonHome;
     parent.insertBefore(newChat, next && next.parentNode === parent ? next : null);
   }
+  if (els.settingsButton && !els.settingsButton.querySelector('.startup-settings-label')) {
+    const label = document.createElement('span');
+    label.className = 'startup-settings-label';
+    label.textContent = translateUiText('Connection settings');
+    els.settingsButton.append(label);
+  }
   if (active) {
     actions.hidden = false;
     for (const button of buttons) actions.append(button);
@@ -2926,6 +2934,7 @@ function startupScreenUi() {
   return startupScreenView;
 }
 
+let composerAutoFocused = false;
 function renderStartupReadiness() {
   const view = deriveStartupView(startupReadiness);
   // First-run setup takes over while the screen is still up, so its logo can
@@ -2944,6 +2953,13 @@ function renderStartupReadiness() {
     els.startupTestConnectionButton.hidden = view.phase === 'setup-needed';
   }
   document.body?.classList.toggle('startup-active', view.visible);
+  if (!view.visible && !composerAutoFocused && els.input) {
+    composerAutoFocused = true;
+    globalThis.setTimeout(() => {
+      const active = document.activeElement;
+      if (!active || active === document.body) els.input.focus({ preventScroll: true });
+    }, 0);
+  }
   positionStartupSettings(view.visible);
   startupScreenUi()?.render(view);
   els.composer?.classList.toggle('startup-blocked', view.visible);
@@ -3162,8 +3178,17 @@ function adoptInlineAssistAutoReplaceChange(value) {
   adoptSettingsBaselineValue(box);
 }
 
+function syncSaveButtonEnabled() {
+  const button = els.saveSettingsTopButton;
+  if (!button) return;
+  const dirty = els.settingsDialog.dataset.dirty === 'true';
+  button.disabled = button.getAttribute('aria-busy') === 'true' || !dirty;
+}
+
 function renderSettingsEditedMarkers() {
   const dirty = settingsBaseline ? changedPanes(settingsBaseline, settingsControlEntries()) : new Set();
+  els.settingsDialog.dataset.dirty = String(dirty.size > 0);
+  syncSaveButtonEnabled();
   for (const card of els.settingsForm.querySelectorAll('[data-settings-category]')) {
     const edited = dirty.has(card.dataset.settingsCategory);
     card.classList.toggle('is-edited', edited);
@@ -3331,10 +3356,8 @@ function openSettingsModelPicker(event) {
 
 function showSettingsPane(pane, { field = '', focus = true } = {}) {
   const home = document.getElementById('settingsCategoryHome');
-  const release = els.settingsForm.querySelector('.release-settings');
   settingsActivePane = SETTINGS_PANES.includes(pane) ? pane : '';
   home.hidden = Boolean(settingsActivePane);
-  if (release) release.hidden = Boolean(settingsActivePane);
   for (const paneEl of els.settingsForm.querySelectorAll('[data-settings-pane]')) {
     paneEl.hidden = paneEl.dataset.settingsPane !== settingsActivePane;
   }
@@ -3356,7 +3379,7 @@ function showSettingsPane(pane, { field = '', focus = true } = {}) {
     void loadGatewayCapabilities({ quiet: true, healthOk: isConnected() }).catch(() => undefined);
   }
   renderSettingsEditedMarkers();
-  requestAnimationFrame(updateSettingsBackToTop);
+  requestAnimationFrame(() => { updateSettingsBackToTop(); markSettingsProse(); });
   if (!focus) return;
   if (!settingsActivePane) {
     const origin = settingsReturnFocus && home.contains(settingsReturnFocus) ? settingsReturnFocus : home.querySelector('[data-settings-category]');
@@ -3366,6 +3389,7 @@ function showSettingsPane(pane, { field = '', focus = true } = {}) {
   const paneEl = document.getElementById(`settingsPane-${settingsActivePane}`);
   const fieldEl = field ? document.getElementById(field) : null;
   if (fieldEl && paneEl.contains(fieldEl)) {
+    for (let node = fieldEl.parentElement; node; node = node.parentElement) if (node.tagName === 'DETAILS') node.open = true;
     requestAnimationFrame(() => {
       fieldEl.scrollIntoView({ block: 'center', behavior: 'auto' });
       fieldEl.focus({ preventScroll: true });
@@ -3373,6 +3397,133 @@ function showSettingsPane(pane, { field = '', focus = true } = {}) {
     return;
   }
   paneEl.querySelector('.settings-pane-title')?.focus({ preventScroll: true });
+}
+
+// Settings search: indexes the live DOM of every pane (label and description text of each row or section),
+// so a setting added to any pane is found without registering it anywhere.
+const SETTINGS_SEARCH_ROW_SELECTOR = [
+  '.settings-toggle-card', '.assist-setting-row', 'button.runtime-toggle', '.settings-choice-group', '.appearance-control-stack',
+  '.theme-setting', '.saved-connections', '.settings-section-head', '.settings-control-group-head', '.compatibility-panel',
+  '.release-row', 'form label:not(.settings-choice-card):not(.settings-toggle-card):not(.assist-setting-row)', '.custom-theme-manager',
+].join(', ');
+const SETTINGS_SEARCH_MAX_RESULTS = 40;
+const SETTINGS_SEARCH_HIT_MS = 2400;
+
+function settingsSearchIndex() {
+  const entries = [];
+  for (const paneEl of els.settingsForm.querySelectorAll('[data-settings-pane]')) {
+    const pane = paneEl.dataset.settingsPane;
+    const paneTitle = paneEl.querySelector('.settings-pane-title')?.textContent.trim() || pane;
+    const seen = new Set();
+    for (const row of paneEl.querySelectorAll(SETTINGS_SEARCH_ROW_SELECTOR)) {
+      if (row.closest('.settings-pane-bar')) continue;
+      const labelEl = row.querySelector('strong, h3, h4, legend, summary .compatibility-title, .custom-theme-title') || row.querySelector('span:not(.sr-only)') || row;
+      const title = (labelEl.textContent || '').replace(/\s+/g, ' ').trim();
+      const text = (row.textContent || '').replace(/\s+/g, ' ').trim();
+      if (!title || title.length > 90 || seen.has(title.toLowerCase())) continue;
+      seen.add(title.toLowerCase());
+      entries.push({ pane, paneTitle, title, haystack: `${title} ${text}`.toLowerCase(), row });
+    }
+  }
+  return entries;
+}
+
+function renderSettingsSearch() {
+  const input = els.settingsSearchInput;
+  const list = els.settingsSearchResults;
+  if (!input || !list) return;
+  const terms = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+  const grid = document.getElementById('settingsCategoryHome').querySelector('.settings-category-grid');
+  list.replaceChildren();
+  list.hidden = !terms.length;
+  if (grid) grid.hidden = Boolean(terms.length);
+  if (!terms.length) return;
+  const hits = settingsSearchIndex().filter((entry) => terms.every((term) => entry.haystack.includes(term))).slice(0, SETTINGS_SEARCH_MAX_RESULTS);
+  if (!hits.length) {
+    const none = document.createElement('li');
+    none.className = 'settings-search-empty';
+    none.textContent = t('settings.search_none');
+    list.append(none);
+    return;
+  }
+  for (const hit of hits) {
+    const item = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.setAttribute('role', 'option');
+    const crumb = document.createElement('small');
+    crumb.textContent = `${hit.paneTitle} \u203a`;
+    const title = document.createElement('span');
+    title.textContent = hit.title;
+    button.append(crumb, title);
+    button.addEventListener('click', () => openSettingsSearchHit(hit));
+    item.append(button);
+    list.append(item);
+  }
+}
+
+function openSettingsSearchHit(hit) {
+  els.settingsSearchInput.value = '';
+  renderSettingsSearch();
+  showSettingsPane(hit.pane, { focus: false });
+  for (let node = hit.row.parentElement; node; node = node.parentElement) if (node.tagName === 'DETAILS') node.open = true;
+  requestAnimationFrame(() => {
+    hit.row.scrollIntoView({ block: 'center', behavior: 'auto' });
+    hit.row.classList.add('settings-search-hit');
+    setTimeout(() => hit.row.classList.remove('settings-search-hit'), SETTINGS_SEARCH_HIT_MS);
+  });
+}
+
+function moveSettingsSearchSelection(step) {
+  const buttons = [...els.settingsSearchResults.querySelectorAll('button')];
+  if (!buttons.length) return;
+  const current = buttons.findIndex((button) => button.classList.contains('is-active'));
+  const next = current < 0 ? (step > 0 ? 0 : buttons.length - 1) : (current + step + buttons.length) % buttons.length;
+  buttons.forEach((button, index) => button.classList.toggle('is-active', index === next));
+  buttons[next].scrollIntoView({ block: 'nearest' });
+}
+
+function bindSettingsSearch() {
+  const input = els.settingsSearchInput;
+  if (!input) return;
+  input.addEventListener('input', renderSettingsSearch);
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const results = els.settingsSearchResults;
+      (results.querySelector('button.is-active') || results.querySelector('button'))?.click();
+    } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveSettingsSearchSelection(event.key === 'ArrowDown' ? 1 : -1);
+    } else if (event.key === 'Escape' && input.value) {
+      event.preventDefault();
+      event.stopPropagation();
+      input.value = '';
+      renderSettingsSearch();
+    }
+  });
+}
+
+// Long explanatory text in a pane is clamped to one line; a "Learn more" toggle reveals the rest.
+const SETTINGS_PROSE_SELECTOR = '.settings-pane .hint, .settings-pane .settings-toggle-copy small, .settings-pane .settings-prose, .settings-pane .browser-control-note, .settings-pane .browser-control-card-head p';
+function markSettingsProse() {
+  for (const el of els.settingsForm.querySelectorAll(SETTINGS_PROSE_SELECTOR)) {
+    if (el.closest('[hidden]') || el.hidden || el.dataset.proseBound) continue;
+    el.classList.add('is-prose');
+    if (el.scrollHeight <= el.clientHeight + 1) { el.classList.remove('is-prose'); continue; }
+    el.dataset.proseBound = '1';
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'settings-prose-toggle';
+    toggle.textContent = t('settings.learn_more');
+    toggle.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const open = el.classList.toggle('is-prose-open');
+      toggle.textContent = t(open ? 'settings.show_less' : 'settings.learn_more');
+    });
+    el.insertAdjacentElement('afterend', toggle);
+  }
 }
 
 function openSettingsDialog(arg) {
@@ -3389,6 +3540,7 @@ function openSettingsDialog(arg) {
   // no jobs route (empty state, no fake rows).
   if (isConnected()) void loadCronJobs({ quiet: true });
   els.settingsDialog.hidden = false;
+  if (els.settingsSearchInput) { els.settingsSearchInput.value = ''; renderSettingsSearch(); }
   els.settingsDialog.setAttribute('aria-hidden', 'false');
   settingsReturnFocus = null;
   showSettingsPane(target.pane, { field: target.field, focus: false });
@@ -3426,8 +3578,8 @@ function setSaveSettingsState(state) {
   if (!button) return;
   clearTimeout(saveSettingsResetTimer);
   const saving = state === 'saving';
-  button.disabled = saving;
   button.setAttribute('aria-busy', String(saving));
+  syncSaveButtonEnabled();
   button.classList.toggle('is-saving', saving);
   button.classList.toggle('is-saved', state === 'saved');
   button.classList.toggle('is-failed', state === 'failed');
@@ -4337,10 +4489,10 @@ async function readCompanionDiagnostics() {
 
 async function copySupportDiagnostics() {
   if (!els.copyDiagnosticsButton) return;
-  const originalText = els.copyDiagnosticsButton.textContent || 'Copy Diagnostics';
+  const originalText = els.copyDiagnosticsButton.textContent || 'Copy diagnostics';
   els.copyDiagnosticsButton.disabled = true;
-  els.copyDiagnosticsButton.textContent = translateUiText('Copying...');
-  if (els.diagnosticsCopyStatus) els.diagnosticsCopyStatus.textContent = translateUiText('Building redacted diagnostics...');
+  els.copyDiagnosticsButton.textContent = translateUiText('Copying…');
+  if (els.diagnosticsCopyStatus) els.diagnosticsCopyStatus.textContent = translateUiText('Building redacted diagnostics…');
   try {
     const buildInfo = await loadExtensionBuildInfo().catch(() => ({}));
     const state = currentConnectionState();
@@ -5322,15 +5474,23 @@ function syncSelectedTabsToContextScope() {
   saveContextScopeForInstance();
 }
 
+function renderContextChipFavicon(url) {
+  const icon = els.contextChipIcon;
+  if (!icon) return;
+  const safe = /^(https?:|data:image\/)/i.test(String(url || '')) ? String(url) : '';
+  if (safe) icon.src = safe; else icon.removeAttribute('src');
+  icon.hidden = !safe;
+}
+
 function contextScopeLabel(scope = contextScope) {
   if (scope.mode === CONTEXT_SCOPE_MODES.CHAT_ONLY) return 'Chat only';
   if (scope.mode === CONTEXT_SCOPE_MODES.PINNED_TAB) {
     if (isAttachedPanelResidency() && Number(scope.pinnedTabId) === Number(sidePanelParams.tabId)) {
-      return scope.pinnedTitle ? `Attached: ${scope.pinnedTitle}` : 'Attached tab';
+      return 'This tab only';
     }
     return scope.pinnedTitle ? `Pinned: ${scope.pinnedTitle}` : 'Pinned tab';
   }
-  return isGlobalPanelResidency() ? 'Follow active tab' : 'Attached tab';
+  return isGlobalPanelResidency() ? 'Follow active tab' : 'This tab only';
 }
 
 function renderContextScopeControls() {
@@ -5479,7 +5639,7 @@ function renderContextScopeTabList(query = '') {
     toggle.dataset.promptTabToggle = String(tab.id);
     toggle.setAttribute('aria-pressed', String(isIncluded));
     toggle.title = translateUiText(isIncluded ? 'Remove this tab from the prompt tab list' : 'Include this tab in the prompt tab list');
-    toggle.textContent = translateUiText(isIncluded ? 'IN' : 'OUT');
+    toggle.textContent = translateUiText(isIncluded ? 'In' : 'Out');
     if (isIncluded) toggle.classList.add('selected');
     row.appendChild(toggle);
     list.appendChild(row);
@@ -5541,7 +5701,7 @@ function renderContextScopePromptControls(tabs = currentContext.tabs || []) {
   });
   appendContextScopeMenuButton({
     action: 'prompt-tabs-triage',
-    label: translateUiText('AI Triage Tabs'),
+    label: translateUiText('AI triage tabs'),
     detail: 'sort',
     title: translateUiText('Use AI to scan, categorize, and cluster all open tabs by topic, detect duplicates, and recommend tabs to close.'),
     parent: actions,
@@ -6437,8 +6597,8 @@ async function checkForUpdates({ openReview = false, silent = false } = {}) {
     if (!els.checkUpdatesButton) return;
     els.checkUpdatesButton.disabled = true;
     if (els.reviewUpdateButton) els.reviewUpdateButton.disabled = true;
-    els.checkUpdatesButton.textContent = translateUiText('Checking...');
-    renderVersionInfo('Checking GitHub main and this loaded build commit...');
+    els.checkUpdatesButton.textContent = translateUiText('Checking…');
+    renderVersionInfo('Checking GitHub main and this loaded build commit…');
     if (openReview) renderUpdateDialog({ loading: true });
   }
   try {
@@ -6681,7 +6841,7 @@ function updateConnectionPrompt() {
   els.connectPanel.hidden = connected;
   if (!connected) {
     if (state.state === 'connecting') {
-      els.sendButton.textContent = translateUiText('Checking...');
+      els.sendButton.textContent = translateUiText('Checking…');
       els.connectStatus.textContent = t('connect.status.checking', { title: gatewayTitleText(summary), url: summary.normalizedUrl });
       setStatus('warn', 'Checking Hermes', `${gatewayTitleText(summary)}: ${summary.normalizedUrl}`, { translateDetail: false });
     } else if (state.state === 'unreachable') {
@@ -6785,11 +6945,13 @@ function dismissConnectDialog() {
 function bindConnectDialog() {
   if (!els.connectPanel) return;
   els.connectPanelCloseButton?.addEventListener('click', dismissConnectDialog);
-  els.sendButton?.addEventListener('click', (event) => {
-    if (isConnected() || isRemoteWsMode()) return;
-    event.preventDefault();
-    openConnectDialog();
-  }, { capture: true });
+  for (const button of [els.sendButton, els.inlineSendButton]) {
+    button?.addEventListener('click', (event) => {
+      if (isConnected() || isRemoteWsMode()) return;
+      event.preventDefault();
+      openConnectDialog();
+    }, { capture: true });
+  }
   // A click on the dimmed backdrop, outside the card, closes it too.
   els.connectPanel.addEventListener('click', (event) => {
     if (event.target === els.connectPanel) dismissConnectDialog();
@@ -6827,6 +6989,12 @@ function bindConnectDialog() {
     needed = nowNeeded;
     if (onboardingFlow?.isOpen) onboardingFlow.render();
   }).observe(els.connectPanel, { attributes: true, attributeFilter: ['hidden', 'disabled'], subtree: true, childList: true, characterData: true });
+}
+
+function addShortcutHint(button, keys) {
+  if (!button) return;
+  const base = (button.getAttribute('aria-label') || button.title || '').trim();
+  if (base) button.title = `${base} (${keys})`;
 }
 
 function setComposerButtonState(button, state = {}) {
@@ -6909,9 +7077,12 @@ function updateComposerBusyState() {
   setComposerButtonState(els.stopButton, state.controls.stop);
   setComposerButtonState(els.queueButton, state.controls.queue);
   setComposerButtonState(els.steerButton, state.controls.steer);
+  addShortcutHint(els.inlineSendButton, 'Enter');
+  addShortcutHint(els.stopButton, 'Esc');
   if (startupBlocking) {
     [els.inlineSendButton, els.stopButton, els.queueButton, els.steerButton, els.voiceButton].filter(Boolean).forEach((button) => { button.disabled = true; });
   }
+  if (!startupBlocking && !isConnected() && els.inlineSendButton) els.inlineSendButton.disabled = false;
   els.composerDropZone?.classList.toggle('busy-draft', state.busyDraft);
   els.composerDropZone?.classList.toggle('can-steer', state.busyDraft && !state.controls.steer.hidden);
   if (els.sendButton) {
@@ -9668,8 +9839,8 @@ async function fallbackDeletedCustomThemeSelections(id, { allCustom = false } = 
     if (!panelFallback && !webFallback) return freshSettings;
     return {
       ...freshSettings,
-      ...(panelFallback ? { appearanceTheme: 'nous' } : {}),
-      ...(webFallback ? { webAppearanceTheme: 'nous' } : {}),
+      ...(panelFallback ? { appearanceTheme: 'calm' } : {}),
+      ...(webFallback ? { webAppearanceTheme: 'calm' } : {}),
     };
   });
 }
@@ -9689,7 +9860,7 @@ async function handleCustomThemeDelete(id) {
     const result = await deleteCustomTheme(browserApi.storage.local, id);
     if (!result.ok) throw new Error(result.error?.message || 'Could not delete custom theme');
     customThemeStoreState = { ok: true, status: result.store.themes.length ? 'ready' : 'empty', themes: result.store.themes };
-    if (settings.appearanceTheme === id) settings = { ...settings, ...savedSettings, appearanceTheme: 'nous' };
+    if (settings.appearanceTheme === id) settings = { ...settings, ...savedSettings, appearanceTheme: 'calm' };
     customThemeImportStatus = customThemeText('custom_theme.deleted', 'Theme deleted.');
     renderAppearanceControls();
   } catch (error) {
@@ -9766,8 +9937,8 @@ async function handleCustomThemeStoreChange() {
   const hydrated = await readBrowserSettingsFromStorage();
   const freshAppearanceTheme = hydrated?.appearanceTheme ?? previousTheme;
   const nextTheme = normalizedPanelThemeId(freshAppearanceTheme);
-  if (String(previousTheme || '').startsWith('custom:') && nextTheme === 'nous' && previousTheme !== 'nous') {
-    appearanceSaveStatus = customThemeText('custom_theme.active_unavailable', 'Active theme is unavailable. Using Nous.');
+  if (String(previousTheme || '').startsWith('custom:') && nextTheme === 'calm' && previousTheme !== 'calm') {
+    appearanceSaveStatus = customThemeText('custom_theme.active_unavailable', 'Active theme is unavailable. Using Calm.');
   }
   settings = { ...settings, appearanceTheme: nextTheme };
   renderAppearanceControls();
@@ -9782,7 +9953,7 @@ function resolvedColorMode(value = settings.colorMode) {
 function panelAppearancePreferences() {
   return {
     textZoomPercent: normalizeTextZoomPercent(settings.textZoomPercent),
-    fontProfile: settings.fontProfile || 'signature',
+    fontProfile: settings.fontProfile || 'system-sans',
     customFontFamily: sanitizeLocalFontFamily(settings.customFontFamily),
   };
 }
@@ -9949,7 +10120,7 @@ async function setAppearanceOption(key, value, { persist = true } = {}) {
   if (key === 'colorMode') settings = { ...settings, colorMode: normalizeColorMode(value) };
   if (key === 'appearanceTheme') settings = { ...settings, appearanceTheme: normalizedPanelThemeId(value) };
   if (key === 'textZoomPercent') settings = { ...settings, textZoomPercent: normalizeTextZoomPercent(value) };
-  if (key === 'fontProfile') settings = { ...settings, fontProfile: String(value || 'signature') };
+  if (key === 'fontProfile') settings = { ...settings, fontProfile: String(value || 'system-sans') };
   if (key === 'customFontFamily') settings = { ...settings, customFontFamily: sanitizeLocalFontFamily(value) };
 
   if (settings.fontProfile === 'custom-local' && !sanitizeLocalFontFamily(settings.customFontFamily)) {
@@ -10321,7 +10492,7 @@ async function attachFolder(fileList) {
     .slice(0, 300)
     .map((file) => `${file.webkitRelativePath || file.name} (${formatBytes(file.size)})`)
     .join('\n');
-  const omitted = files.length > 300 ? `\n... ${files.length - 300} more files omitted` : '';
+  const omitted = files.length > 300 ? `\n… ${files.length - 300} more files omitted` : '';
   addAttachment({
     id: attachmentId('folder', folderName),
     kind: 'folder',
@@ -10909,6 +11080,47 @@ function setModelSelectionTarget(target = 'chat') {
   });
 }
 
+const RECENT_MODEL_PICKS_KEY = 'hermesRecentModelPicks';
+const RECENT_MODEL_PICKS_MAX = 3;
+const RECENT_MODELS_MIN_CATALOG = 5;
+
+function readRecentModelPicks() {
+  try {
+    const parsed = JSON.parse(globalThis.localStorage?.getItem(RECENT_MODEL_PICKS_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'string' && id) : [];
+  } catch {
+    return [];
+  }
+}
+
+function noteRecentModelPick(modelId) {
+  if (!modelId) return;
+  try {
+    const next = [modelId, ...readRecentModelPicks().filter((id) => id !== modelId)].slice(0, RECENT_MODEL_PICKS_MAX + 1);
+    globalThis.localStorage?.setItem(RECENT_MODEL_PICKS_KEY, JSON.stringify(next));
+  } catch {
+    // Recents are a convenience; a blocked store only loses them.
+  }
+}
+
+function modelRowCheckIcon() {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'model-option-check');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('width', '14');
+  svg.setAttribute('height', '14');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', 'M20 6 9 17l-5-5');
+  svg.appendChild(path);
+  return svg;
+}
+
 function renderModelMenu(query = els.modelSearchInput?.value || '') {
   const roomPick = modelSelectionTarget === 'room-member' ? roomModelPickTarget : null;
   const menuModelId = modelSelectionTarget === 'assist'
@@ -10970,43 +11182,65 @@ function renderModelMenu(query = els.modelSearchInput?.value || '') {
     return;
   }
 
+  const appendModelRow = (model, { metaProvider = false } = {}) => {
+    const runtimeStatus = modelRuntimeStatus(model);
+    const requestable = isModelRuntimeSelectable(model);
+    const isCurrent = model.id === menuModelId;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `model-option ${isCurrent ? 'selected' : ''} ${requestable ? '' : 'observed'}`.trim();
+    button.dataset.modelId = model.id;
+    button.title = runtimeStatus.detail;
+    if (isCurrent) button.setAttribute('aria-current', 'true');
+    if (model.source === 'external') {
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+    }
+
+    const name = document.createElement('span');
+    name.className = 'model-option-name';
+    name.textContent = modelDisplayName(model);
+
+    const meta = document.createElement('span');
+    meta.className = 'model-option-meta';
+    meta.textContent = metaProvider
+      ? modelProviderLabel(model)
+      : (!requestable ? 'observed' : formatTokens(model.contextTokens || 256_000).replace(' tokens', ''));
+
+    button.append(name, meta);
+    if (isCurrent) button.append(modelRowCheckIcon());
+    button.addEventListener('click', async () => {
+      if (modelSelectionTarget === 'assist') await applyAssistSelectedModel(model);
+      else if (modelSelectionTarget === 'room-member') await setRoomMemberModel(model);
+      else {
+        noteRecentModelPick(model.id);
+        requestSelectedModelWithContextConfirm(model);
+      }
+    });
+    els.modelMenuList.appendChild(button);
+  };
+
+  const recentCandidates = !needle && modelSelectionTarget === 'chat' && availableModels.length >= RECENT_MODELS_MIN_CATALOG
+    ? [menuModelId, ...readRecentModelPicks()]
+      .filter((id, position, all) => id && all.indexOf(id) === position)
+      .map((id) => availableModels.find((model) => model.id === id))
+      .filter((model) => model && model.source !== 'external')
+      .slice(0, RECENT_MODEL_PICKS_MAX)
+    : [];
+  if (recentCandidates.length > 1) {
+    const recentTitle = document.createElement('div');
+    recentTitle.className = 'model-group-title model-recent-title';
+    recentTitle.textContent = translateUiText('Recent');
+    els.modelMenuList.appendChild(recentTitle);
+    for (const model of recentCandidates) appendModelRow(model, { metaProvider: true });
+  }
+
   for (const group of groupsToRender) {
     const title = document.createElement('div');
     title.className = 'model-group-title';
-    title.textContent = needle ? `${group.label} ${group.models.length}` : `${group.label} ${group.models.length}/${group.models.length}`;
+    title.textContent = `${group.label} · ${group.models.length}`;
     els.modelMenuList.appendChild(title);
-
-    for (const model of group.models) {
-      const runtimeStatus = modelRuntimeStatus(model);
-      const requestable = isModelRuntimeSelectable(model);
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = `model-option ${model.id === menuModelId ? 'selected' : ''} ${requestable ? '' : 'observed'}`.trim();
-      button.dataset.modelId = model.id;
-      button.title = runtimeStatus.detail;
-      if (model.source === 'external') {
-        button.disabled = true;
-        button.setAttribute('aria-disabled', 'true');
-      }
-
-      const name = document.createElement('span');
-      name.className = 'model-option-name';
-      name.textContent = modelDisplayName(model);
-
-      const meta = document.createElement('span');
-      meta.className = 'model-option-meta';
-      meta.textContent = model.id === menuModelId
-        ? '✓'
-        : (!requestable ? 'observed' : formatTokens(model.contextTokens || 256_000).replace(' tokens', ''));
-
-      button.append(name, meta);
-      button.addEventListener('click', async () => {
-              if (modelSelectionTarget === 'assist') await applyAssistSelectedModel(model);
-              else if (modelSelectionTarget === 'room-member') await setRoomMemberModel(model);
-              else requestSelectedModelWithContextConfirm(model);
-            });
-      els.modelMenuList.appendChild(button);
-    }
+    for (const model of group.models) appendModelRow(model);
   }
 }
 
@@ -11420,27 +11654,33 @@ function renderContextWindow(userText = els.input?.value || '') {
     // The composer's scope button already reads "Chat only"; the chip row
     // would only repeat it and eat vertical space.
     if (els.contextChip) els.contextChip.hidden = true;
-    els.contextChipLabel.textContent = translateUiText('💬 Chat only');
+    els.contextChipLabel.textContent = translateUiText('Chat only');
     els.contextChip.title = translateUiText('No browser tab, selected text, open tabs, metadata, transcript, or page text will be attached.');
     els.contextPreview.textContent = translateUiText('Chat only mode is active. Hermes will not read or attach browser context for this turn.');
   } else {
     if (els.contextChip) els.contextChip.hidden = false;
     const chip = contextChipSummary({ pageContext: pc, activeTab: currentContext.activeTab, parts: stats.parts });
     if (pc?.meta?.siteAdapter?.id === 'gmail' && pc.meta.siteAdapter.suppressed) {
-      chip.label = translateUiText('Thread context off');
+      chip.kind = translateUiText('Off');
+      chip.state = 'restricted';
       chip.title = translateUiText('Page text is not shared. Enable Gmail thread context once in Settings.');
     }
     els.contextChipLabel.textContent = translateUiText(chip.label);
-    // DOM means the page's structure and text; explain it rather than echo the URL the user is already on.
-    els.contextChip.title = (pc && !pc.restricted && pc.ok !== false && !pc.meta?.siteAdapter?.suppressed)
-      ? translateUiText('DOM is the page content Hermes reads: the text and structure of the tab you are on. Click to preview exactly what gets sent with your message.')
-      : translateUiText(chip.title);
+    if (els.contextChipKind) {
+      els.contextChipKind.textContent = translateUiText(chip.kind || '');
+      els.contextChipKind.hidden = !chip.kind;
+    }
+    els.contextChip.dataset.state = chip.state;
+    renderContextChipFavicon(chip.state === 'ok' || chip.state === 'loading' ? currentContext.activeTab?.favIconUrl : '');
+    els.contextChip.title = translateUiText(chip.title);
     els.contextPreview.textContent = [
+      translateUiText('What Hermes will see with your next message'),
+      '',
       currentContext.activeTab?.title || '(unknown tab)',
       currentContext.activeTab?.url || '',
       '',
       clampText(pc?.selectedText || pc?.text || pc?.reason || pc?.error || 'No readable page text captured yet.', 900),
-    ].filter(Boolean).join('\n');
+    ].filter((line, index) => line || index === 1 || index > 3).join('\n');
   }
 
   if (els.explicitSiteCaptureButton && els.explicitSiteCaptureWrap) {
@@ -12432,6 +12672,7 @@ function renderSkillSuggestions() {
     const detail = document.createElement('span');
     detail.className = 'skill-option-command';
     detail.textContent = mention.detail;
+    button.title = `${mention.token} ${mention.detail}`.trim();
     button.append(name, detail);
     button.addEventListener('click', () => {
       replaceGroupMentionToken(mention.token);
@@ -12448,10 +12689,11 @@ function renderSkillSuggestions() {
     button.dataset.command = `/${cmd.name}`;
     const name = document.createElement('span');
     name.className = 'skill-option-name';
-    name.textContent = `${cmd.icon} ${cmd.name}`;
+    name.textContent = `/${cmd.name}`;
     const command = document.createElement('span');
     command.className = 'skill-option-command';
-    command.textContent = `/${cmd.name}`;
+    command.textContent = translateUiText(cmd.description || '');
+    button.title = command.textContent;
     button.append(name, command);
     button.addEventListener('click', () => {
       els.input.value = `/${cmd.name} `;
@@ -12470,10 +12712,11 @@ function renderSkillSuggestions() {
     button.dataset.command = skill.command;
     const name = document.createElement('span');
     name.className = 'skill-option-name';
-    name.textContent = skill.name;
+    name.textContent = skill.command;
     const command = document.createElement('span');
     command.className = 'skill-option-command';
-    command.textContent = skill.command;
+    command.textContent = skill.description || skill.name;
+    button.title = command.textContent;
     button.append(name, command);
     button.addEventListener('click', () => replaceActiveSkillToken(skill.command));
     els.skillMenu.appendChild(button);
@@ -12512,42 +12755,98 @@ function replaceGroupMentionToken(token) {
   renderContextWindow(replaced);
 }
 
+/* ── Menu keyboard navigation ── */
+function menuNavItems(menu, selector) {
+  return [...menu.querySelectorAll(selector)].filter((el) => !el.disabled && !el.closest('[hidden]'));
+}
+
+// Arrow/Home/End move focus through a menu's items, Escape hands focus back to the trigger, and a
+// printable key typed on an item moves to the menu's search box so the list filters as you type.
+function wireMenuKeyboard(menu, { items, search = '', trigger = null, enterPicksFirst = false } = {}) {
+  if (!menu) return;
+  menu.addEventListener('keydown', (event) => {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.isComposing) return;
+    const list = menuNavItems(menu, items);
+    const active = document.activeElement;
+    const index = list.indexOf(active);
+    const searchEl = search ? menu.querySelector(search) : null;
+    const focusAt = (position) => {
+      const target = list[Math.max(0, Math.min(list.length - 1, position))];
+      target?.focus({ preventScroll: true });
+      target?.scrollIntoView?.({ block: 'nearest' });
+    };
+    if (event.key === 'Escape') {
+      const returnTo = typeof trigger === 'function' ? trigger() : trigger;
+      if (returnTo) globalThis.setTimeout(() => returnTo.focus?.({ preventScroll: true }), 0);
+      return;
+    }
+    if (event.key === 'ArrowDown' && list.length) {
+      event.preventDefault();
+      focusAt(index < 0 ? 0 : index + 1 >= list.length ? 0 : index + 1);
+    } else if (event.key === 'ArrowUp' && list.length) {
+      event.preventDefault();
+      if (index === 0 && searchEl) searchEl.focus();
+      else focusAt(index <= 0 ? list.length - 1 : index - 1);
+    } else if (event.key === 'Home' && index >= 0) {
+      event.preventDefault();
+      focusAt(0);
+    } else if (event.key === 'End' && index >= 0) {
+      event.preventDefault();
+      focusAt(list.length - 1);
+    } else if (event.key === 'Enter' && enterPicksFirst && active === searchEl && list.length) {
+      event.preventDefault();
+      list[0].click();
+    } else if (searchEl && active !== searchEl && active?.matches?.(items) && event.key.length === 1 && event.key !== ' ') {
+      searchEl.focus();
+    }
+  });
+}
+
+function wireMenuKeyboards() {
+  wireMenuKeyboard(els.attachMenu, { items: 'button:not([hidden])', trigger: () => els.input });
+  wireMenuKeyboard(els.quickMoreMenu, { items: '.quick-more-item', trigger: () => els.input });
+  wireMenuKeyboard(document.getElementById('profileSwitchMenu'), { items: 'button', trigger: () => document.getElementById('activeProfileIndicator') });
+  wireMenuKeyboard(els.modelMenu, { items: '.model-option', search: '#modelSearchInput', trigger: () => els.input, enterPicksFirst: true });
+  wireMenuKeyboard(els.sessionMenu, { items: '.session-option', search: '#sessionSearchInput', trigger: () => els.sessionMenuButton, enterPicksFirst: true });
+  els.sessionMenu?.addEventListener('keydown', (event) => {
+    const row = document.activeElement?.closest?.('.session-option-row');
+    if (!row || event.defaultPrevented) return;
+    const trigger = row.querySelector('.session-actions-trigger');
+    if (event.key === 'ArrowRight' && document.activeElement.classList.contains('session-option') && trigger) {
+      event.preventDefault();
+      trigger.focus();
+    } else if (event.key === 'ArrowLeft' && document.activeElement === trigger) {
+      event.preventDefault();
+      row.querySelector('.session-option')?.focus();
+    }
+  });
+}
+
+// Typing "/" keeps focus in the composer, so ↑/↓ move a highlight through the suggestions and
+// Enter or Tab accept it; Escape dismisses without touching the draft.
+function moveSkillMenuHighlight(step) {
+  const options = menuNavItems(els.skillMenu, '[data-command]');
+  if (!options.length) return false;
+  const current = options.findIndex((option) => option.classList.contains('active'));
+  const next = current < 0 ? (step > 0 ? 0 : options.length - 1) : (current + step + options.length) % options.length;
+  options.forEach((option, position) => {
+    option.classList.toggle('active', position === next);
+    option.setAttribute('aria-selected', String(position === next));
+  });
+  options[next].scrollIntoView?.({ block: 'nearest' });
+  return true;
+}
+
 /* ── Composer quick-command menu ── */
 function setQuickCommandMenuOpen(open) {
   if (!els.quickMoreMenu) return;
   els.quickMoreMenu.hidden = !open;
   els.commandMenuButton?.setAttribute('aria-expanded', String(Boolean(open)));
-  if (!open) {
-    clearQuickCommandDetail();
-  } else {
-    scrollInputToCaret();
-  }
+  if (open) scrollInputToCaret();
 }
 
 function scrollInputToCaret() {
   requestAnimationFrame(() => syncComposerFrame({ followCaret: true }));
-}
-
-function clearQuickCommandDetail() {
-  const detail = els.quickMoreMenu?.querySelector('[data-command-detail]');
-  if (detail) detail.hidden = true;
-  els.quickMoreMenu?.classList.remove('has-command-detail');
-}
-
-function showQuickCommandDetail(cmd) {
-  const detail = els.quickMoreMenu?.querySelector('[data-command-detail]');
-  if (!detail || !cmd) return;
-  detail.querySelector('[data-command-detail-token]').textContent = `/${cmd.name}`;
-  detail.querySelector('[data-command-detail-category]').textContent = translateUiText(cmd.category || 'Command');
-  detail.querySelector('[data-command-detail-description]').textContent = translateUiText(cmd.description);
-  detail.querySelector('[data-command-detail-hint]').textContent = translateUiText(cmd.promptHint || (cmd.requiresInput
-    ? 'Add instructions after the slash command before sending.'
-    : 'Runs immediately against the current browser context.'));
-  detail.querySelector('[data-command-detail-footnote]').textContent = translateUiText(cmd.requiresInput
-    ? 'Click to insert, then add details.'
-    : 'Click or press Enter to run.');
-  detail.hidden = false;
-  els.quickMoreMenu?.classList.add('has-command-detail');
 }
 
 function applyQuickCommand(cmd) {
@@ -12569,45 +12868,8 @@ function renderQuickMoreMenu(category = 'all') {
 
   const header = document.createElement('div');
   header.className = 'quick-more-heading';
-  const headerLabel = document.createElement('span');
-  headerLabel.textContent = translateUiText('Commands');
-  const headerHint = document.createElement('small');
-  headerHint.textContent = translateUiText('Slash helpers');
-  header.append(headerLabel, headerHint);
+  header.textContent = translateUiText('Commands');
   els.quickMoreMenu.appendChild(header);
-
-  const detail = document.createElement('aside');
-  detail.id = 'quickCommandDetail';
-  detail.className = 'quick-command-detail';
-  detail.dataset.commandDetail = 'true';
-  detail.hidden = true;
-  detail.setAttribute('aria-live', 'polite');
-  detail.setAttribute('aria-label', translateUiText('Command details'));
-
-  const detailTop = document.createElement('div');
-  detailTop.className = 'qmd-top';
-  const detailToken = document.createElement('span');
-  detailToken.className = 'qmd-token';
-  detailToken.dataset.commandDetailToken = 'true';
-  const detailCategory = document.createElement('span');
-  detailCategory.className = 'qmd-category';
-  detailCategory.dataset.commandDetailCategory = 'true';
-  detailTop.append(detailToken, detailCategory);
-
-  const detailDescription = document.createElement('strong');
-  detailDescription.className = 'qmd-description';
-  detailDescription.dataset.commandDetailDescription = 'true';
-
-  const detailHint = document.createElement('p');
-  detailHint.className = 'qmd-hint';
-  detailHint.dataset.commandDetailHint = 'true';
-
-  const detailFootnote = document.createElement('span');
-  detailFootnote.className = 'qmd-footnote';
-  detailFootnote.dataset.commandDetailFootnote = 'true';
-
-  detail.append(detailTop, detailDescription, detailHint, detailFootnote);
-  els.quickMoreMenu.appendChild(detail);
 
   const list = document.createElement('div');
   list.className = 'quick-command-list';
@@ -12619,31 +12881,26 @@ function renderQuickMoreMenu(category = 'all') {
     item.className = 'quick-more-item';
     item.dataset.command = cmd.name;
     item.setAttribute('role', 'menuitem');
-    item.setAttribute('aria-describedby', 'quickCommandDetail');
+    const description = translateUiText(cmd.description);
+    item.title = [description, translateUiText(cmd.promptHint || (cmd.requiresInput
+      ? 'Add instructions after the slash command before sending.'
+      : 'Runs immediately against the current browser context.'))].filter(Boolean).join('\n');
 
     const token = document.createElement('span');
     token.className = 'qmi-token';
     token.textContent = `/${cmd.name}`;
 
     const copy = document.createElement('span');
-    copy.className = 'qmi-copy';
-    const description = document.createElement('span');
-    description.className = 'qmi-description';
-    description.textContent = translateUiText(cmd.description);
-    const categoryTag = document.createElement('span');
-    categoryTag.className = 'qmi-category';
-    categoryTag.textContent = translateUiText(cmd.category || '');
-    copy.append(description, categoryTag);
+    copy.className = 'qmi-description';
+    copy.textContent = description;
 
     item.append(token, copy);
-    item.addEventListener('mouseenter', () => showQuickCommandDetail(cmd));
-    item.addEventListener('focus', () => showQuickCommandDetail(cmd));
     item.addEventListener('click', () => applyQuickCommand(cmd));
     list.appendChild(item);
   }
   els.quickMoreMenu.appendChild(list);
-  showQuickCommandDetail(commands[0]);
   setQuickCommandMenuOpen(true);
+  list.querySelector('.quick-more-item')?.focus({ preventScroll: true });
 }
 
 // Settings → Active profile: compact verified-agent preview (avatar + name + model).
@@ -13763,7 +14020,7 @@ function renderBotModeGroupChats(query = '') {
     settingsBtn.className = 'group-settings-btn';
     settingsBtn.title = `Group settings for ${row.displayName}`;
     settingsBtn.setAttribute('aria-label', `Group settings for ${row.displayName}`);
-    settingsBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" data-icon="settings-cog"><path d="M4 20h3v-2h4v4h2v-4h4v2h-2v4H9v-4H7v2H2v-5h2v3Zm18 2h-5v-2h3v-3h2v5ZM6 11H2v2h4v4H4v-2H0V9h4V7h2v4Zm14-2h4v6h-4v2h-2v-4h4v-2h-4V7h2v2Zm-6 7h-4v-2h4v2Zm-4-2H8v-4h2v4Zm6 0h-2v-4h2v4Zm-2-4h-4V8h4v2ZM7 4H4v3H2V2h5v2Zm8 0h2V2h5v5h-2V4h-3v2h-4V2h-2v4H7V4h2V0h6v4Z"/></svg>';
+    settingsBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="settings-cog"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
     settingsBtn.addEventListener('click', (ev) => {
       ev.stopPropagation();
       openGroupSettingsModal(row);
@@ -14395,7 +14652,7 @@ function renderGroupFailureNotices() {
     const icon = document.createElement('span');
     icon.className = 'presence-notice-icon';
     icon.setAttribute('aria-hidden', 'true');
-    icon.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" data-icon="warning-diamond"><path d="M2 10h2v2H2zm0 4h2v-2H2zm20-4h-2v2h2zm0 4h-2v-2h2zM4 8h2v2H4zm0 8h2v-2H4zm16-8h-2v2h2zm0 8h-2v-2h2zM6 6h2v2H6zm0 12h2v-2H6zM18 6h-2v2h2zm0 12h-2v-2h2zM8 4h2v2H8zm0 16h2v-2H8zm8-16h-2v2h2zm0 16h-2v-2h2zM10 2h2v2h-2zm0 20h2v-2h-2zm4-20h-2v2h2zm0 20h-2v-2h2zm-3-5h2v-2h-2zm0-4h2V7h-2z"/></svg>';
+    icon.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="warning-diamond"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>';
     const avatar = document.createElement('span');
     avatar.className = 'presence-avatar';
     avatar.setAttribute('aria-hidden', 'true');
@@ -16537,7 +16794,7 @@ async function openBotProfile(row) {
     renderBotChatIntro(row);
     void refreshBotChatEarlier(row);
     if (els.composerInput) {
-      els.composerInput.placeholder = `Ask ${botProfileDisplayName(row)} anything...`;
+      els.composerInput.placeholder = `Ask ${botProfileDisplayName(row)} anything…`;
     }
   }
 }
@@ -16865,7 +17122,7 @@ function renderActiveProfileIndicator() {
   els.botChatIntro.hidden = hasMessages;
 }
 
-// Footer "Open Bot Mode" opens the selected (or first verified) agent's canonical chat.
+// Footer "Open bot mode" opens the selected (or first verified) agent's canonical chat.
 async function openBotModeSelection() {
   if (!els.botModeOpenButton || els.botModeOpenButton.disabled) return false;
   const selectedProfile = settings.botModeSelectedProfile || settings.activeProfile || '';
@@ -16886,7 +17143,7 @@ function syncBotModeFooterState() {
   const hasVerified = botModeRoster.some((entry) => entry.canonical.status === 'ready');
   const hasSelection = botModeRoster.some((entry) => entry.profileName === selectedProfile);
   // In the Group Chats view, agent actions do not apply: rooms own their own
-  // bounded runtime and composer. "Open Bot Chat" is meaningless there — hide
+  // bounded runtime and composer. "Open bot chat" is meaningless there — hide
   // it and let "+ Start A New Group Chat" be the footer's primary action.
   els.botModeOpenButton.disabled = groupsActive || !(hasVerified || hasSelection);
   els.botModeOpenButton.hidden = groupsActive;
@@ -17529,7 +17786,7 @@ function openBotProfileSheet({ mode = 'edit', profileName = '' } = {}) {
   petSelection = null;
   botSheetSaving = false;
   if (els.botModeSheetTitle) {
-    els.botModeSheetTitle.textContent = mode === 'create' ? translateUiText('New Bot') : translateUiText('Edit profile');
+    els.botModeSheetTitle.textContent = mode === 'create' ? translateUiText('New bot') : translateUiText('Edit profile');
   }
   if (els.botModeSheetMeta) {
     if (mode === 'create') {
@@ -18410,7 +18667,7 @@ async function switchAgentGateway(agent) {
   }
   settings = { ...settings, gatewayMode: 'local-api', gatewayUrl: nextUrl };
   await setPackedBrowserSettings(settings);
-  setStatus('ok', 'Switched gateway', `Reconnecting to ${agent.name} (${nextUrl})...`);
+  setStatus('ok', 'Switched gateway', `Reconnecting to ${agent.name} (${nextUrl})…`);
   // Re-run the full connect flow against the new gateway.
   try {
     await testConnection();
@@ -18433,76 +18690,14 @@ function renderEmptyState() {
   maybeOpenOnboarding();
 }
 
-// The language step's view of the world: the card in force (the browser's
-// suggestion until something is picked or kept), and the step's heading and
-// body drawn in that language with the heading repeated in English.
-function onboardingLanguageState() {
-  const current = getLocale();
-  const selected = onboardingLanguage.picked || onboardingLanguage.suggested || current;
-  const messages = localeMetadata(selected).messages;
-  const english = localeMetadata('en').messages;
-  const suggestion = onboardingLanguage.suggestionActive && !onboardingLanguage.picked;
-  const nativeName = SUPPORTED_LOCALES.find((entry) => entry.id === selected)?.nativeName || selected;
-  return {
-    current,
-    selected,
-    suggested: onboardingLanguage.suggested,
-    copy: {
-      locale: selected,
-      title: formatMessage(messages['onboarding.language.title'] ?? english['onboarding.language.title'], {}, selected),
-      body: suggestion
-        ? formatMessage(messages['onboarding.language.body_suggested'] ?? english['onboarding.language.body_suggested'], { language: nativeName }, selected)
-        : formatMessage(messages['onboarding.language.body'] ?? english['onboarding.language.body'], {}, selected),
-    },
-    english: { title: english['onboarding.language.title'] },
-  };
-}
-
-// The welcome screen before the first step: drawn in the language the browser
-// suggests (no language is chosen yet), the English words beneath it, and
-// "Welcome" in a few scripts as decoration.
-function onboardingWelcomeState() {
-  const greetingLocales = ['en', 'ar', 'zh-CN', 'es', 'hi', 'ja'];
-  const locale = onboardingLanguage.picked || onboardingLanguage.suggested || getLocale();
-  const messages = localeMetadata(locale).messages;
-  const english = localeMetadata('en').messages;
-  const say = (catalog, key) => formatMessage(catalog[key] ?? english[key], {}, locale);
-  return {
-    copy: {
-      locale,
-      title: say(messages, 'onboarding.welcome.title'),
-      body: say(messages, 'onboarding.welcome.body'),
-      start: say(messages, 'onboarding.welcome.start'),
-      skip: say(messages, 'onboarding.welcome.skip'),
-    },
-    english: {
-      title: english['onboarding.welcome.title'],
-      body: english['onboarding.welcome.body'],
-      start: english['onboarding.welcome.start'],
-      skip: english['onboarding.welcome.skip'],
-    },
-    greetings: greetingLocales.map((id) => ({
-      lang: id,
-      dir: SUPPORTED_LOCALES.find((entry) => entry.id === id)?.direction === 'rtl' ? 'rtl' : 'ltr',
-      text: localeMetadata(id).messages['onboarding.welcome.greeting'] || english['onboarding.welcome.greeting'],
-    })),
-  };
-}
-
 function onboardingState() {
   const failed = Boolean(onboardingConnectFailure) && !isConnected();
   return {
-    language: onboardingLanguageState(),
-    welcome: onboardingWelcomeState(),
-    theme: normalizedPanelThemeId(settings.appearanceTheme),
-    colorMode: normalizeColorMode(settings.colorMode),
-    resolvedMode: resolvedColorMode(),
-    fontProfile: settings.fontProfile || 'signature',
-    ...responsePresentationFromSettings(settings),
     connection: {
       connected: isConnected(),
       busy: Boolean(els.connectButton?.disabled),
       busyLabel: els.connectButton?.textContent?.trim() || '',
+      gatewayUrl: settings.gatewayUrl || '',
       status: failed ? onboardingConnectFailure : (els.connectStatus?.textContent?.trim() || ''),
       failed,
     },
@@ -18513,32 +18708,10 @@ function ensureOnboardingFlow() {
   if (onboardingFlow || !els.onboardingFlow) return onboardingFlow;
   onboardingFlow = createOnboardingFlow({
     host: els.onboardingFlow,
-    themes: APPEARANCE_THEMES,
-    languages: SUPPORTED_LOCALES,
     translate: (key, values) => t(key, values),
     getState: onboardingState,
-    renderReply: (style, text) => renderResponseSafe(text, { style, labels: adaptiveUiLabels(), streaming: false }),
-    roleLabels: { user: 'user', assistant: assistantMessageRoleLabel() },
-    onSelectLanguage: (locale) => chooseOnboardingLanguage(locale),
-    onLeaveStep: (step) => { if (step === 'language') keepSuggestedOnboardingLanguage(); },
-    onSelectTheme: (theme) => {
-      customThemeDeleteArmedId = '';
-      themeFontPinned = false;
-      themeFontPinnedFor = '';
-      void setAppearanceOption('appearanceTheme', theme).then(() => persistSetupFullTabTheme(theme));
-    },
-    onSelectMode: (mode) => { void setAppearanceOption('colorMode', mode); },
-    onSelectFont: (fontProfile) => {
-      const theme = normalizedPanelThemeId(settings.appearanceTheme);
-      if (themeOwnsFont(theme)) {
-        themeFontPinned = true;
-        themeFontPinnedFor = theme;
-      }
-      void setAppearanceOption('fontProfile', fontProfile);
-    },
-    onSelectStyle: (responseStyle) => { void setResponsePresentation({ responseStyle }); },
-    onSelectLayout: (messageLayout) => { void setResponsePresentation({ messageLayout }); },
-    onConnect: () => {
+    onConnect: ({ gatewayUrl = '' } = {}) => {
+      if (gatewayUrl && els.gatewayUrlInput) els.gatewayUrlInput.value = gatewayUrl;
       connectToHermes().catch((error) => {
         setStatus('warn', 'Connect failed', error?.message || String(error), { translateDetail: false });
       });
@@ -18551,47 +18724,12 @@ function ensureOnboardingFlow() {
   return onboardingFlow;
 }
 
-// A card in the language step: applied at once and live, through the same call
-// Settings > Language makes, so the whole panel (setup included) redraws in it,
-// the document direction follows, and the choice is saved.
-function chooseOnboardingLanguage(locale) {
-  onboardingLanguage = { ...onboardingLanguage, picked: locale, suggestionActive: false };
-  trackInstantSave('appearance', setLocale(locale)).catch((error) => {
-    console.warn('[Hermes Browser] Language change failed:', error);
-  });
-}
-
-// Leaving the language step (Next, or Skip on it) keeps the suggestion nobody
-// picked: it becomes the language, saved like a pick.
-function keepSuggestedOnboardingLanguage() {
-  if (!onboardingLanguage.suggestionActive) return;
-  const suggested = onboardingLanguage.suggested;
-  onboardingLanguage = { ...onboardingLanguage, picked: suggested, suggestionActive: false };
-  if (suggested && suggested !== getLocale()) {
-    trackInstantSave('appearance', setLocale(suggested)).catch((error) => {
-      console.warn('[Hermes Browser] Language change failed:', error);
-    });
-  }
-}
-
 // What the browser says its people read: its UI language, then the ordered
 // language list, falling back to English.
 function browserLanguageSuggestion() {
   let ui = '';
   try { ui = browserApi.i18n?.getUILanguage?.() || ''; } catch { ui = ''; }
   return suggestLocale([ui, ...(globalThis.navigator?.languages || [])]);
-}
-
-// Setup picks one theme for both surfaces; afterwards each keeps its own
-// Settings choice.
-function persistSetupFullTabTheme(theme) {
-  const write = async () => mergePackedBrowserSettingsFromStorage((current) => ({
-    ...current,
-    webAppearanceTheme: normalizedPanelThemeId(theme),
-  }));
-  const pendingWrite = appearanceWriteQueue.then(write, write);
-  appearanceWriteQueue = pendingWrite.catch(() => undefined);
-  return pendingWrite;
 }
 
 function setOnboardingOpen(open) {
@@ -18607,38 +18745,32 @@ function startupReadinessSettled() {
 }
 
 // New users get the setup once, before their first message, as soon as the
-// startup screen settles. Setup preselects Vivid UI when no style was ever
-// chosen, and saves it at once: an appearance pick saved before it would
-// otherwise reload the settings without it.
+// startup screen settles: a welcome, then Connect.
 function maybeOpenOnboarding() {
   if (!onboardingStateLoaded || onboardingFlow?.isOpen || onboardingFlow?.isExiting) return;
   if (!startupReadinessSettled()) return;
   if (!shouldShowOnboarding({ completed: onboardingCompleted, legacyIntroSeen: browserIntroSeen, messageCount: messages.length })) return;
-  if (!settings.responseStyle) void setResponsePresentation({ responseStyle: RESPONSE_STYLE_SETUP_DEFAULT });
-  // A first run opens on the welcome; a rerun from Settings goes straight to the language step.
-  openOnboarding({ welcome: true });
+  openOnboarding();
 }
 
-// A paired panel skips the Connect step. The logo flies up from the startup
-// screen when setup takes over from it.
-function openOnboarding({ step = 'language', includeConnect = !isConnected(), rerun = false, welcome = false } = {}) {
+// The panel follows the browser's language until the user picks one in
+// Settings. A paired panel skips the Connect step.
+function openOnboarding({ includeConnect = !isConnected() } = {}) {
   const flow = ensureOnboardingFlow();
   if (!flow) return;
   // The reason an earlier Connect failed must not show on a run that has not tried anything.
   onboardingConnectFailure = '';
-  // Setup only ever shows its seven backgrounds, a rerun from Settings included;
-  // the picture on screen is kept when it is one of them and when setup ends.
-  void backgroundArtRotation.ensureOnboardingArt();
-  // A first run with no saved language preselects the browser's suggestion; a
-  // rerun, or a run after the language was already chosen, preselects theirs.
-  onboardingLanguage = (rerun || explicitLocaleStored)
-    ? { suggested: getLocale(), picked: '', suggestionActive: false }
-    : { suggested: browserLanguageSuggestion(), picked: '', suggestionActive: true };
-  const startupLogo = els.startupScreen && !els.startupScreen.hidden ? els.startupScreen.querySelector('.startup-brand-icon') : null;
-  const origin = startupLogo?.getBoundingClientRect?.() || null;
+  if (!explicitLocaleStored) {
+    const suggested = browserLanguageSuggestion();
+    if (suggested && suggested !== getLocale()) {
+      trackInstantSave('appearance', setLocale(suggested)).catch((error) => {
+        console.warn('[Hermes Browser] Language change failed:', error);
+      });
+    }
+  }
   hideFirstPrompt();
   setOnboardingOpen(true);
-  flow.open({ step, includeConnect, origin, welcome });
+  flow.open({ includeConnect, welcome: true });
 }
 
 // Finishing without a connection ("Connect later", or Skip) lets the panel
@@ -18793,7 +18925,12 @@ async function persistBrowserIntroSeen() {
 }
 
 function sessionDisplayName(session = {}) {
-  return String(session.title || session.id || settings.sessionTitle || 'Hermes Browser Extension');
+  return friendlySessionTitle(session.title || session.id || settings.sessionTitle || 'Hermes Browser Extension');
+}
+
+// The stored default title carries a timestamp; show "New chat" until auto-naming replaces it.
+function friendlySessionTitle(title) {
+  return isDefaultBrowserSessionTitle(title) ? translateUiText('New chat') : String(title || '');
 }
 
 function updateSessionLabel() {
@@ -18819,7 +18956,7 @@ function updateSessionLabel() {
     return;
   }
   const current = availableSessions.find((session) => session.id === settings.sessionId);
-  const label = current ? sessionDisplayName(current) : (settings.sessionTitle || settings.sessionId || 'Hermes Browser Extension');
+  const label = current ? sessionDisplayName(current) : friendlySessionTitle(settings.sessionTitle || settings.sessionId || 'Hermes Browser Extension');
   els.currentSessionName.textContent = label;
   els.currentSessionName.title = `${label} · ${settings.sessionId}`;
   if (els.input) {
@@ -18829,7 +18966,7 @@ function updateSessionLabel() {
     const botName = activeRow ? botProfileDisplayName(activeRow) : '';
     els.input.placeholder = botName
       ? `Ask ${botName}...`
-      : translateUiText('Ask Hermes about this page...');
+      : translateUiText('Ask Hermes about this page…');
   }
   updateComposerActionLabels();
   renderTaskStack();
@@ -19365,6 +19502,120 @@ function openMoveToProjectFromRecents(session) {
   void controller.startMove(session, { returnTo: 'recents' });
 }
 
+function sessionActivityMs(lastActive) {
+  const value = Number(lastActive) || 0;
+  if (!value) return 0;
+  const epochMsThreshold = 1e12;
+  return value < epochMsThreshold ? value * 1000 : value;
+}
+
+function formatSessionAge(lastActive) {
+  const ms = sessionActivityMs(lastActive);
+  if (!ms) return '';
+  const seconds = Math.max(0, Math.round((Date.now() - ms) / 1000));
+  const justNowSeconds = 45;
+  if (seconds < justNowSeconds) return translateUiText('now');
+  const units = [
+    { limit: 3600, divisor: 60, suffix: 'm' },
+    { limit: 86400, divisor: 3600, suffix: 'h' },
+    { limit: 604800, divisor: 86400, suffix: 'd' },
+  ];
+  for (const unit of units) {
+    if (seconds < unit.limit) return `${Math.max(1, Math.round(seconds / unit.divisor))}${unit.suffix}`;
+  }
+  return new Date(ms).toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' });
+}
+
+function sessionDateBucket(lastActive) {
+  const ms = sessionActivityMs(lastActive);
+  if (!ms) return '';
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const dayMs = 86_400_000;
+  if (ms >= startOfToday.getTime()) return 'Today';
+  if (ms >= startOfToday.getTime() - dayMs) return 'Yesterday';
+  return 'Earlier';
+}
+
+let sessionRowMenuState = null;
+
+function closeSessionRowMenu({ restoreFocus = false } = {}) {
+  const state = sessionRowMenuState;
+  sessionRowMenuState = null;
+  state?.menu.remove();
+  if (!state) return;
+  const trigger = [...(els.sessionMenuList?.querySelectorAll('.session-option-row') || [])]
+    .find((row) => row.dataset.sessionId === state.sessionId)?.querySelector('.session-actions-trigger');
+  trigger?.setAttribute('aria-expanded', 'false');
+  if (restoreFocus) trigger?.focus({ preventScroll: true });
+}
+
+function openSessionRowMenu(trigger, session, items) {
+  const sameRow = sessionRowMenuState?.sessionId === session.id;
+  closeSessionRowMenu();
+  if (sameRow || !items.length) return;
+  const menu = document.createElement('div');
+  menu.className = 'session-row-menu';
+  menu.setAttribute('role', 'menu');
+  for (const item of items) {
+    const entry = document.createElement('button');
+    entry.type = 'button';
+    entry.className = 'session-row-menu-item';
+    entry.setAttribute('role', 'menuitem');
+    entry.textContent = item.label;
+    if (item.title) entry.title = item.title;
+    entry.addEventListener('click', (event) => {
+      event.stopPropagation();
+      closeSessionRowMenu();
+      item.run();
+    });
+    menu.append(entry);
+  }
+  menu.addEventListener('keydown', (event) => {
+    const entries = [...menu.querySelectorAll('button')];
+    const index = entries.indexOf(document.activeElement);
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const step = event.key === 'ArrowDown' ? 1 : -1;
+      entries[(index + step + entries.length) % entries.length]?.focus();
+    } else if (event.key === 'Escape' || event.key === 'ArrowLeft') {
+      event.preventDefault();
+      event.stopPropagation();
+      closeSessionRowMenu({ restoreFocus: true });
+    } else if (event.key === 'Tab') {
+      closeSessionRowMenu();
+    }
+  });
+  menu.addEventListener('click', (event) => event.stopPropagation());
+  els.sessionMenu.append(menu);
+  const host = els.sessionMenu.getBoundingClientRect();
+  const anchor = trigger.getBoundingClientRect();
+  const menuRect = menu.getBoundingClientRect();
+  const below = anchor.bottom + 4 + menuRect.height <= host.bottom - 8;
+  menu.style.top = `${Math.round((below ? anchor.bottom + 4 : anchor.top - 4 - menuRect.height) - host.top)}px`;
+  menu.style.left = `${Math.round(Math.max(8, Math.min(host.width - menuRect.width - 8, anchor.right - menuRect.width - host.left)))}px`;
+  trigger.setAttribute('aria-expanded', 'true');
+  sessionRowMenuState = { sessionId: session.id, menu };
+  menu.querySelector('button')?.focus({ preventScroll: true });
+}
+
+function sessionRowMenuTrigger(session, buildItems) {
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'session-actions-trigger';
+  const label = translateUiText('Session actions');
+  trigger.title = label;
+  trigger.setAttribute('aria-label', `${label}: ${session.title || session.id}`);
+  trigger.setAttribute('aria-haspopup', 'menu');
+  trigger.setAttribute('aria-expanded', String(sessionRowMenuState?.sessionId === session.id));
+  trigger.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon="ellipsis"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>';
+  trigger.addEventListener('click', (event) => {
+    event.stopPropagation();
+    openSessionRowMenu(trigger, session, buildItems());
+  });
+  return trigger;
+}
+
 function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
   scheduleLiveSessionPoll();
   syncSessionMenuChrome();
@@ -19386,8 +19637,10 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
 
   for (const group of groups) {
     if (shouldAutoOpenSessionGroup(group, groups, closedSessionGroups)) openSessionGroups.add(group.label);
-    const isOpen = searching || openSessionGroups.has(group.label);
+    const showGroupHeader = groups.length > 1 || group.source === 'hermes_bot_group_threads';
+    const isOpen = !showGroupHeader || searching || openSessionGroups.has(group.label);
 
+    if (showGroupHeader) {
     const title = document.createElement('button');
     title.type = 'button';
     title.className = `session-group-title session-group-toggle ${isOpen ? 'open' : ''}`.trim();
@@ -19411,8 +19664,10 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
       renderSessionMenu(els.sessionSearchInput.value);
     });
     els.sessionMenuList.appendChild(title);
+    }
 
     if (!isOpen) continue;
+    let lastBucket = '';
 
     if (group.source === 'hermes_bot_group_threads') {
       const newThreadRow = document.createElement('div');
@@ -19430,6 +19685,17 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
     }
 
     for (const session of group.sessions) {
+      if (group.source !== 'hermes_bot_group_threads') {
+        const bucket = sessionDateBucket(session.lastActive);
+        if (bucket && bucket !== lastBucket) {
+          lastBucket = bucket;
+          const bucketLabel = document.createElement('div');
+          bucketLabel.className = 'session-date-label';
+          bucketLabel.setAttribute('role', 'presentation');
+          bucketLabel.textContent = translateUiText(bucket);
+          els.sessionMenuList.appendChild(bucketLabel);
+        }
+      }
       const row = document.createElement('div');
       row.className = `session-option-row ${session.selected ? 'selected' : ''}`.trim();
       row.dataset.sessionId = session.id;
@@ -19466,31 +19732,18 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
         const actions = document.createElement('span');
         actions.className = 'session-actions';
         if (session.threadId === 'main') {
-          const settingsButton = document.createElement('button');
-          settingsButton.type = 'button';
-          settingsButton.className = 'session-action-button';
-          settingsButton.textContent = t('ui.settings');
-          settingsButton.title = t('ui.group.settings');
-          settingsButton.setAttribute('aria-label', t('ui.group.settings'));
-          settingsButton.setAttribute('data-i18n', 'ui.settings');
-          settingsButton.setAttribute('data-i18n-title', 'ui.group.settings');
-          settingsButton.setAttribute('data-i18n-aria-label', 'ui.group.settings');
-          settingsButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-            closeFloatingPanels();
-            openGroupSettingsModal(activeGroupProjection);
-          });
-          const renameButton = document.createElement('button');
-          renameButton.type = 'button';
-          renameButton.className = 'session-action-button';
-          renameButton.textContent = translateUiText('Rename');
-          renameButton.title = translateUiText('Rename group room');
-          renameButton.setAttribute('aria-label', translateUiText('Rename group room'));
-          renameButton.addEventListener('click', (event) => {
-            event.stopPropagation();
-            openSessionRenameEditor({ id: activeGroupProjection.id, title: activeGroupProjection.displayName });
-          });
-          actions.append(settingsButton, renameButton);
+          actions.append(sessionRowMenuTrigger(session, () => [
+            {
+              label: t('ui.settings'),
+              title: t('ui.group.settings'),
+              run: () => { closeFloatingPanels(); openGroupSettingsModal(activeGroupProjection); },
+            },
+            {
+              label: translateUiText('Rename'),
+              title: translateUiText('Rename group room'),
+              run: () => openSessionRenameEditor({ id: activeGroupProjection.id, title: activeGroupProjection.displayName }),
+            },
+          ]));
         }
         row.append(button, actions);
         els.sessionMenuList.appendChild(row);
@@ -19518,7 +19771,7 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
       if (modelLabel) tooltipLines.push(t('session.row_model', { model: modelLabel }));
       if (session.messageCount) tooltipLines.push(`${t('ui.messages')}: ${session.messageCount}`);
       button.title = tooltipLines.join('\n');
-      meta.textContent = session.selected ? '✓' : '';
+      meta.textContent = session.selected ? '' : formatSessionAge(session.lastActive);
 
       const isAttachedSession = String(session.id || '') === String(settings.sessionId || '');
       const ownsLocalRun = localSessionStream?.sessionId === String(session.id || '');
@@ -19541,51 +19794,35 @@ function renderSessionMenu(query = els.sessionSearchInput?.value || '') {
       } else if (liveAttach?.sessionId === session.id) {
         meta.textContent = translateUiText('Running');
       }
+      if (meta.dataset.liveState === 'running' || row.dataset.liveState === 'running') {
+        meta.dataset.liveState = 'running';
+        meta.classList.add('session-live-dot');
+      }
 
       button.setAttribute('aria-label', `${sessionDisplayName(session)}${row.dataset.liveState === 'running' ? ' · ' + translateUiText('Running') : ''}`);
       // An empty meta cell would still cost its grid gap, so it is added only when it has something to say.
       button.append(...(meta.textContent ? [name, meta] : [name]));
+      if (!meta.textContent) button.classList.add('no-meta');
       button.addEventListener('click', () => openHermesSession(session));
 
       const actions = document.createElement('span');
       actions.className = 'session-actions';
-
-      const copyButton = document.createElement('button');
-      copyButton.type = 'button';
-      copyButton.className = 'session-action-button';
-      copyButton.textContent = 'ID';
-      copyButton.title = translateUiText('Copy session ID');
-      copyButton.setAttribute('aria-label', t('session.copy_id_for', { title: sessionDisplayName(session) }));
-      copyButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        copyTextToClipboard(session.id, { label: translateUiText('Copy session ID') });
-      });
-
-      const renameButton = document.createElement('button');
-      renameButton.type = 'button';
-      renameButton.className = 'session-action-button';
-      renameButton.textContent = translateUiText('Rename');
-      renameButton.title = translateUiText('Rename session');
-      renameButton.setAttribute('aria-label', t('session.rename_named', { title: sessionDisplayName(session) }));
-      renameButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        openSessionRenameEditor(session);
-      });
-
-      actions.append(copyButton, renameButton);
-      if (canMoveToProject) {
-        const moveButton = document.createElement('button');
-        moveButton.type = 'button';
-        moveButton.className = 'session-action-button';
-        moveButton.textContent = t('projects.move.action');
-        moveButton.title = t('projects.move.action_title');
-        moveButton.setAttribute('aria-label', t('projects.move.action_for', { title: sessionDisplayName(session) }));
-        moveButton.addEventListener('click', (event) => {
-          event.stopPropagation();
-          openMoveToProjectFromRecents(session);
-        });
-        actions.append(moveButton);
-      }
+      actions.append(sessionRowMenuTrigger(session, () => [
+        {
+          label: translateUiText('Copy session ID'),
+          run: () => copyTextToClipboard(session.id, { label: translateUiText('Copy session ID') }),
+        },
+        {
+          label: translateUiText('Rename'),
+          title: translateUiText('Rename session'),
+          run: () => openSessionRenameEditor(session),
+        },
+        ...(canMoveToProject ? [{
+          label: t('projects.move.action'),
+          title: t('projects.move.action_title'),
+          run: () => openMoveToProjectFromRecents(session),
+        }] : []),
+      ]));
       row.append(button, actions);
       els.sessionMenuList.appendChild(row);
     }
@@ -19978,7 +20215,7 @@ async function refreshSessionsFromMenu() {
     els.refreshSessionsButton.disabled = false;
     els.refreshSessionsButton.classList.remove('is-refreshing');
     els.refreshSessionsButton.removeAttribute('aria-busy');
-    if (els.refreshSessionsLabel) els.refreshSessionsLabel.textContent = translateUiText('Refresh Sessions');
+    if (els.refreshSessionsLabel) els.refreshSessionsLabel.textContent = translateUiText('Refresh');
   }
   showOperationToast(outcome?.ok
     ? { title: 'Sessions refreshed', detail: `${outcome.count} canonical session${outcome.count === 1 ? '' : 's'} ready.` }
@@ -20501,7 +20738,7 @@ function renderSessionHistoryLoading(session = {}) {
   avatar.append(icon);
 
   const title = document.createElement('strong');
-  title.textContent = translateUiText('OPENING SESSION');
+  title.textContent = translateUiText('Opening session');
 
   const detail = document.createElement('span');
   detail.className = 'hint';
@@ -21656,7 +21893,7 @@ async function ensureDefaultBrowserSession({ focus = false, scopeRevisionId = sc
   return scopeRevision.isCurrent(scopeRevisionId);
 }
 
-const THINKING_PLACEHOLDER = 'Hermes is thinking...';
+const THINKING_PLACEHOLDER = 'Hermes is thinking…';
 const SLOW_REPLY_NOTICE_MS = 30_000;
 const SLOW_REPLY_DETAIL = 'No reply yet. The model may be rate-limited or at capacity (free models often are), and Hermes keeps retrying. You can stop this run and switch models, or wait.';
 const THINKING_STATUSES = ['thinking', 'brainstorming', 'contemplating', 'reasoning', 'processing', 'analyzing', 'reflecting', 'pondering', 'deliberating', 'formulating'];
@@ -21679,10 +21916,17 @@ function scheduleClassicThinkingFaces() {
 }
 
 function renderThinkingIndicator(element) {
-  scheduleClassicThinkingFaces();
+  const classic = settings.classicThinkingFaces === true;
+  if (classic) scheduleClassicThinkingFaces();
   // Streaming calls this every frame while the model warms up. Rebuilding the
   // indicator would restart its CSS animations — only build it once.
-  if (element.firstElementChild?.classList.contains('thinking-indicator')) return;
+  const built = element.firstElementChild;
+  if (built?.classList.contains('thinking-indicator') && built.classList.contains('thinking-quiet') === !classic) return;
+  if (!classic) {
+    const label = translateUiText('Thinking');
+    element.innerHTML = `<span class="thinking-indicator thinking-quiet" role="status" aria-live="polite" aria-label="${escapeHtml(label)}"><span class="thinking-quiet-label">${escapeHtml(label)}…</span></span>`;
+    return;
+  }
   const phrases = THINKING_STATUSES
     .map((word) => `
         <span class="thinking-line">
@@ -22246,7 +22490,7 @@ function renderImageGenPlaceholder(activity = {}) {
   status.className = 'image-gen-status';
   const phaseTrack = document.createElement('div');
   phaseTrack.className = 'image-gen-phase-track';
-  for (const phase of ['LATENT FIELD', 'DENOISING', 'RESOLVING', 'FINALIZING']) {
+  for (const phase of ['Latent field', 'DENOISING', 'RESOLVING', 'FINALIZING']) {
     const phaseLabel = document.createElement('span');
     phaseLabel.textContent = translateUiText(phase);
     phaseTrack.appendChild(phaseLabel);
@@ -23552,6 +23796,9 @@ async function loadSettings({ restoreMessages = false } = {}) {
   explicitLocaleStored = typeof stored[LOCALE_STORAGE_KEY] === 'string' && stored[LOCALE_STORAGE_KEY] !== '';
   onboardingStateLoaded = true;
   renderBrowserIntroVisibility();
+  const calmMigration = migrateToCalmAppearance(stored.hermesBrowserSettings);
+  const migrateCalmAppearance = Boolean(stored.hermesBrowserSettings) && calmMigration.changed;
+  if (migrateCalmAppearance) stored.hermesBrowserSettings = calmMigration.settings;
   const migrateConnectionSchema = stored.hermesBrowserSettings?.connectionSchemaVersion !== DEFAULT_SETTINGS.connectionSchemaVersion;
   const storedSettings = await hydrateSavedConnectionSecrets(
     migrateConnectionSettings(stored.hermesBrowserSettings || {}),
@@ -23591,6 +23838,7 @@ async function loadSettings({ restoreMessages = false } = {}) {
     agentDiscoveryScheme: normalizeAgentDiscoveryScheme(settings.agentDiscoveryScheme || DEFAULT_SETTINGS.agentDiscoveryScheme),
     autoNameSessions: settings.autoNameSessions !== false,
     showMessageTimes: settings.showMessageTimes !== false,
+    classicThinkingFaces: settings.classicThinkingFaces === true,
     sessionStartupMode: normalizeSessionStartupMode(settings.sessionStartupMode),
     inlineAssistEnabled: settings.inlineAssistEnabled !== false,
     inlineAssistDefaultRoute: normalizeInlineDraftRoutePreference(settings.inlineAssistDefaultRoute),
@@ -23616,7 +23864,7 @@ async function loadSettings({ restoreMessages = false } = {}) {
     appearanceTheme: normalizedPanelThemeId(settings.appearanceTheme),
     appearanceSchemaVersion: 2,
     textZoomPercent: normalizeTextZoomPercent(settings.textZoomPercent),
-    fontProfile: settings.fontProfile || 'signature',
+    fontProfile: settings.fontProfile || 'system-sans',
     customFontFamily: sanitizeLocalFontFamily(settings.customFontFamily),
     browserContextConsentLedger: normalizeContextConsentLedger(stored[CONTEXT_CONSENT_STORAGE_KEY] || settings.browserContextConsentLedger),
     panelResidencyMode: normalizePanelResidencyMode(settings.panelResidencyMode),
@@ -23670,7 +23918,7 @@ async function loadSettings({ restoreMessages = false } = {}) {
     settings.fastMode = effectiveOptions.fastMode;
   }
   applyAppearanceSettings();
-  if (migrateConnectionSchema || migrateDesktopOptionDefaults || migrateModelOptionScope || hasUnboundProfileContextHandoff) {
+  if (migrateConnectionSchema || migrateCalmAppearance || migrateDesktopOptionDefaults || migrateModelOptionScope || hasUnboundProfileContextHandoff) {
     await setPackedBrowserSettings(settings);
   }
   messages = restoreMessages && Array.isArray(stored[messageKey]) ? stored[messageKey] : [];
@@ -24467,6 +24715,7 @@ function syncSettingsForm() {
   renderPanelResidencyHost();
   if (els.autoNameSessionsInput) els.autoNameSessionsInput.checked = settings.autoNameSessions !== false;
   if (els.showMessageTimesInput) els.showMessageTimesInput.checked = settings.showMessageTimes !== false;
+  if (els.classicThinkingFacesInput) els.classicThinkingFacesInput.checked = settings.classicThinkingFaces === true;
   if (els.agentHostInput) els.agentHostInput.value = settings.agentDiscoveryHost || DEFAULT_SETTINGS.agentDiscoveryHost;
   if (els.agentSchemeInput) els.agentSchemeInput.value = normalizeAgentDiscoveryScheme(settings.agentDiscoveryScheme || DEFAULT_SETTINGS.agentDiscoveryScheme);
   if (els.agentPortsInput) els.agentPortsInput.value = getAgentPorts().join(',');
@@ -24587,6 +24836,7 @@ async function saveSettingsFromForm({ lockHeld = false } = {}) {
     panelResidencyMode: normalizePanelResidencyMode(els.panelResidencyInputs?.find((input) => input.checked)?.value || settings.panelResidencyMode),
     autoNameSessions: els.autoNameSessionsInput ? els.autoNameSessionsInput.checked : settings.autoNameSessions !== false,
     showMessageTimes: els.showMessageTimesInput ? els.showMessageTimesInput.checked : settings.showMessageTimes !== false,
+    classicThinkingFaces: els.classicThinkingFacesInput ? els.classicThinkingFacesInput.checked : settings.classicThinkingFaces === true,
     agentDiscoveryHost: normalizeAgentDiscoveryHost(els.agentHostInput?.value || settings.agentDiscoveryHost || DEFAULT_SETTINGS.agentDiscoveryHost),
     agentDiscoveryScheme: normalizeAgentDiscoveryScheme(els.agentSchemeInput?.value || settings.agentDiscoveryScheme || DEFAULT_SETTINGS.agentDiscoveryScheme),
     agentPorts: parseAgentPortsInput(els.agentPortsInput?.value || '').length ? parseAgentPortsInput(els.agentPortsInput?.value || '') : getAgentPorts(),
@@ -25118,11 +25368,13 @@ function setPickButtonState() {
   const pickingActive = elementPickActiveForTab();
   const attachPick = document.querySelector('[data-attach="pick-element"]');
   if (attachPick) {
-    attachPick.textContent = pickingActive
-      ? translateUiText('◈ Picking element...')
+    const pickLabel = pickingActive
+      ? translateUiText('◈ Picking element…')
       : hasPick
         ? translateUiText('◈ Pick a different element')
         : translateUiText('◈ Pick page element');
+    const pickText = attachPick.querySelector('span');
+    if (pickText) { pickText.removeAttribute('data-i18n'); pickText.textContent = pickLabel.replace(/^◈\s*/, ''); }
     attachPick.setAttribute('aria-pressed', String(pickingActive || Boolean(hasPick)));
   }
   const attachClear = document.getElementById('clearPickAttachButton');
@@ -27666,7 +27918,7 @@ async function pollPairing(pairingId, { attempts = 90, delay = 1500 } = {}) {
     if (payload?.error?.code === 'pairing_denied') throw new Error(t('pairing.denied'));
     if (payload.status === 'expired' || response.status === 410) throw new Error('Pairing expired. Click Connect again.');
     if (response.status === 404) throw new Error('Pairing request was not found. Click Connect again.');
-    if (!pairingApproval?.showing) els.connectStatus.textContent = translateUiText('Waiting for Hermes Desktop approval...');
+    if (!pairingApproval?.showing) els.connectStatus.textContent = translateUiText('Waiting for Hermes Desktop approval…');
     await sleep(delay);
   }
   throw new Error('Timed out waiting for Hermes Desktop approval.');
@@ -27839,7 +28091,7 @@ async function connectApiWithPairing() {
   const summary = currentGatewaySummary();
   markConnectionProbe('connecting', summary.normalizedUrl);
   els.connectButton.disabled = true;
-  els.connectButton.textContent = translateUiText('Connecting...');
+  els.connectButton.textContent = translateUiText('Connecting…');
   els.connectStatus.textContent = t('connect.status.looking', { title: gatewayTitleText(summary), url: summary.normalizedUrl });
   // A failing request can only be blamed on the origin/CORS layer when the
   // health probe already answered from this extension origin.
@@ -28508,7 +28760,7 @@ ${streamError.message}`);
             },
           });
         } else {
-          streamView.update('Hermes accepted this turn; recovering the response without retrying it...');
+          streamView.update('Hermes accepted this turn; recovering the response without retrying it…');
           const recovered = await recoverAcceptedTurn(prompt, preparedAttachments, { signal: activeAbortController.signal });
           answer = recovered?.answer || '';
           recoveredImageSources = Array.isArray(recovered?.imageSources) ? recovered.imageSources : [];
@@ -29402,12 +29654,14 @@ function connectionTestButtons() {
   return [els.testConnectionButton, els.startupTestConnectionButton].filter(Boolean);
 }
 
+const SETTINGS_TEST_LABELS = { TEST: 'Test connection', TESTING: 'Testing…', ONLINE: 'Online', FAILED: 'Failed' };
+
 function setTestConnectionButtonLabel(label) {
   for (const button of connectionTestButtons()) {
     const target = button.querySelector('.settings-connection-test-label');
-    const nextLabel = button === els.startupTestConnectionButton && label === 'TEST'
-      ? 'TEST CONNECTION'
-      : label;
+    const nextLabel = button === els.startupTestConnectionButton
+      ? ({ TEST: t('ui.retry'), TESTING: `${t('ui.retry')}...`, ONLINE: 'Online', FAILED: 'Failed' }[label] || label)
+      : button === els.testConnectionButton ? (SETTINGS_TEST_LABELS[label] || label) : label;
     if (target) target.textContent = nextLabel;
     else button.textContent = nextLabel;
     if (button.dataset.tip) button.dataset.tip = nextLabel;
@@ -29642,7 +29896,20 @@ async function testConnection() {
   }
 }
 
+function anyComposerPanelOpen() {
+  return [els.modelMenu, els.sessionMenu, els.attachMenu, els.skillMenu, els.quickMoreMenu, els.contextPopover, els.contextScopeMenu, els.contextPreview]
+    .some((panel) => panel && !panel.hidden);
+}
+
+// Menus hand focus back to the composer, so typing carries on where it stopped.
+function focusComposerSoon() {
+  globalThis.setTimeout(() => {
+    if (els.input && !els.input.disabled && els.settingsDialog?.hidden !== false) els.input.focus({ preventScroll: true });
+  }, 0);
+}
+
 function closeFloatingPanels() {
+  closeSessionRowMenu();
   els.modelMenu.hidden = true;
   els.modelMenuButton.setAttribute('aria-expanded', 'false');
   els.inlineAssistModelButton?.setAttribute('aria-expanded', 'false');
@@ -29661,6 +29928,7 @@ function closeFloatingPanels() {
   els.attachMenu.hidden = true;
   els.attachMenuButton.setAttribute('aria-expanded', 'false');
   if (els.skillMenu) els.skillMenu.hidden = true;
+  if (els.quickMoreMenu && !els.quickMoreMenu.hidden) setQuickCommandMenuOpen(false);
   els.contextPopover.hidden = true;
   els.contextBarButton.setAttribute('aria-expanded', 'false');
   els.botModeThreadsButton?.setAttribute('aria-expanded', 'false');
@@ -30083,6 +30351,7 @@ function bindEvents() {
     panel.addEventListener('pointerdown', (event) => event.stopPropagation());
   });
   // Escape inside a project, the create form or the move picker steps back to the project list first.
+  els.sessionMenu.addEventListener('click', () => closeSessionRowMenu());
   els.sessionMenu.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !projectsTabActive()) return;
     const controller = getProjectsController();
@@ -30198,8 +30467,18 @@ function bindEvents() {
         showSettingsPane('');
         return;
       }
-      if (!els.settingsDialog.hidden) closeSettingsDialog();
+      if (!els.settingsDialog.hidden) {
+        closeSettingsDialog();
+        return;
+      }
+      const hadOpenPanel = anyComposerPanelOpen();
       closeFloatingPanels();
+      if (els.contextScopeMenu) els.contextScopeMenu.hidden = true;
+      if (els.contextPreview && !els.contextPreview.hidden) {
+        els.contextPreview.hidden = true;
+        els.contextChip?.setAttribute('aria-expanded', 'false');
+      }
+      if (hadOpenPanel) focusComposerSoon();
     }
   });
   document.addEventListener('click', (event) => {
@@ -30725,6 +31004,8 @@ function bindEvents() {
     compactCurrentSessionContext().catch((error) => setStatus('warn', 'Context compaction failed', error?.message || String(error), { translateDetail: false }));
   });
   els.testConnectionButton.addEventListener('click', testConnection);
+  bindSettingsSearch();
+  els.settingsForm.addEventListener('toggle', () => requestAnimationFrame(markSettingsProse), true);
   // Read the connection afresh whenever Settings opens, so the bars are live
   // without the button needing a click first.
   new MutationObserver(() => {
@@ -30844,11 +31125,26 @@ function bindEvents() {
   els.responseStyleChoices?.addEventListener('keydown', (event) => handleRadioCardKeydown(event, els.responseStyleChoices));
   els.messageLayoutChoices?.addEventListener('keydown', (event) => handleRadioCardKeydown(event, els.messageLayoutChoices));
   els.messages?.addEventListener('click', handleAdaptiveUiClick);
-  els.rerunOnboardingButton?.addEventListener('click', () => {
-    closeSettingsDialog();
-    openOnboarding({ rerun: true });
-  });
   els.firstPromptChip?.addEventListener('click', useFirstPrompt);
+  els.firstPromptChips?.addEventListener('click', (event) => {
+    const prompt = event.target.closest?.('[data-prompt]')?.dataset.prompt;
+    if (!prompt || !els.input) return;
+    els.input.value = prompt;
+    els.input.dispatchEvent(new Event('input', { bubbles: true }));
+    hideFirstPrompt();
+    els.input.focus();
+  });
+  if (els.messages && els.firstPromptChips && typeof MutationObserver === 'function') {
+    const syncEmptyChips = () => {
+      const empty = !els.messages.querySelector('.message-row') && !messages.length;
+      const blocked = document.body.classList.contains('startup-active') || document.body.classList.contains('onboarding-active');
+      els.firstPromptChips.hidden = !empty || blocked || Boolean(els.input?.value);
+    };
+    new MutationObserver(syncEmptyChips).observe(els.messages, { childList: true });
+    new MutationObserver(syncEmptyChips).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    els.input?.addEventListener('input', syncEmptyChips);
+    syncEmptyChips();
+  }
   els.composer?.addEventListener('submit', hideFirstPrompt, { capture: true });
   bindConnectDialog();
   els.browserControlScopeInput?.addEventListener('change', () => {
@@ -31109,11 +31405,46 @@ function bindEvents() {
     await askHermes(userText, [...attachments]);
   });
   els.input.addEventListener('keydown', (event) => {
+    if (!els.skillMenu.hidden && !event.isComposing) {
+      const highlighted = els.skillMenu.querySelector('[data-command].active');
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        if (moveSkillMenuHighlight(event.key === 'ArrowDown' ? 1 : -1)) { event.preventDefault(); return; }
+      } else if (event.key === 'Escape') {
+        els.skillMenu.hidden = true;
+        event.preventDefault();
+        return;
+      } else if (event.key === 'Enter' && highlighted && !event.shiftKey) {
+        event.preventDefault();
+        highlighted.click();
+        return;
+      }
+    }
     if (!els.skillMenu.hidden && (event.key === 'Tab' || event.key === 'ArrowRight')) {
-      const first = els.skillMenu.querySelector('[data-command]');
+      const first = els.skillMenu.querySelector('[data-command].active') || els.skillMenu.querySelector('[data-command]');
       if (first?.dataset.command) {
         event.preventDefault();
         replaceActiveSkillToken(first.dataset.command);
+        return;
+      }
+    }
+    if (event.key === 'Escape' && !event.isComposing) {
+      if (els.quickMoreMenu && !els.quickMoreMenu.hidden) {
+        event.preventDefault();
+        setQuickCommandMenuOpen(false);
+        return;
+      }
+      if (els.skillMenu.hidden && els.stopButton && !els.stopButton.hidden && !els.stopButton.disabled) {
+        event.preventDefault();
+        els.stopButton.click();
+        return;
+      }
+    }
+    if (event.key === 'ArrowUp' && !event.isComposing && !event.shiftKey && !event.altKey && !event.metaKey && !event.ctrlKey
+      && !els.input.value && !viewedSessionIsRunning() && els.skillMenu.hidden) {
+      const edit = [...els.messages.querySelectorAll('.message-row[data-role="user"] .message-action-edit')].pop();
+      if (edit) {
+        event.preventDefault();
+        edit.click();
         return;
       }
     }
@@ -31701,3 +32032,4 @@ function renderContextUsageCard(root, view) {
 }
 
 observeComposerPopovers();
+wireMenuKeyboards();

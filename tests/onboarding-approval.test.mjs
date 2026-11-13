@@ -78,12 +78,10 @@ test('taking the page away restores the plain Connect step', () => {
   assert.ok(host.querySelector('[data-onboarding-connect]'), 'the Connect button is back');
 });
 
-test('the page waits in the wings when setup is on another step, and comes back with the Connect step', () => {
+test('the approval page shows in the Connect step and marks setup as approving', () => {
   const { host, flow, node } = mount();
-  flow.open({ step: 'layout' });
-  assert.equal(flow.setApproval(node), false, 'nothing to hold it on this step');
-  assert.equal(host.classList.contains('is-approving'), false, 'setup keeps its preview and layout elsewhere');
   flow.open({ step: 'connect' });
+  assert.equal(flow.setApproval(node), true);
   assert.ok(host.querySelector('.onboarding-approval-slot').contains(node));
   assert.ok(host.classList.contains('is-approving'));
 });

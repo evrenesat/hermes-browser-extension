@@ -240,7 +240,7 @@
     "description": "Runtime interface message addconn.key_hint"
   },
   "runtime_addconn_kicker": {
-    "message": "NEW CONNECTION",
+    "message": "New connection",
     "description": "Runtime interface message addconn.kicker"
   },
   "runtime_addconn_method_browser": {
@@ -628,7 +628,7 @@
     "description": "Runtime interface message bot_mode.clone_hint"
   },
   "runtime_bot_mode_close": {
-    "message": "Close Bot Mode",
+    "message": "Close bot mode",
     "description": "Runtime interface message bot_mode.close"
   },
   "runtime_bot_mode_color_picker_label": {
@@ -656,7 +656,7 @@
     "description": "Runtime interface message bot_mode.cron_refresh"
   },
   "runtime_bot_mode_cron_title": {
-    "message": "Active Cron Jobs",
+    "message": "Active cron jobs",
     "description": "Runtime interface message bot_mode.cron_title"
   },
   "runtime_bot_mode_custom_image": {
@@ -676,7 +676,7 @@
     "description": "Runtime interface message bot_mode.density_compact"
   },
   "runtime_bot_mode_dialog_label": {
-    "message": "Bot Mode",
+    "message": "Bot mode",
     "description": "Runtime interface message bot_mode.dialog_label"
   },
   "runtime_bot_mode_earlier_messages": {
@@ -696,11 +696,11 @@
     "description": "Runtime interface message bot_mode.earlier_messages_note"
   },
   "runtime_bot_mode_edit_profile": {
-    "message": "Edit Profile",
+    "message": "Edit profile",
     "description": "Runtime interface message bot_mode.edit_profile"
   },
   "runtime_bot_mode_enable_label": {
-    "message": "Enable Bot Mode",
+    "message": "Enable bot mode",
     "description": "Runtime interface message bot_mode.enable_label"
   },
   "runtime_bot_mode_face_blobatar": {
@@ -800,11 +800,11 @@
     "description": "Runtime interface message bot_mode.group_sheet_meta"
   },
   "runtime_bot_mode_group_sheet_title": {
-    "message": "New Group Chat",
+    "message": "New group chat",
     "description": "Runtime interface message bot_mode.group_sheet_title"
   },
   "runtime_bot_mode_group_threads": {
-    "message": "Group Chat Threads",
+    "message": "Group chat threads",
     "description": "Runtime interface message bot_mode.group_threads"
   },
   "runtime_bot_mode_group_title_required": {
@@ -820,7 +820,7 @@
     "description": "Runtime interface message bot_mode.installed_skills_hint"
   },
   "runtime_bot_mode_leave_confirm": {
-    "message": "Return to Regular Sessions",
+    "message": "Return to regular sessions",
     "description": "Runtime interface message bot_mode.leave_confirm"
   },
   "runtime_bot_mode_leave_detail": {
@@ -828,11 +828,11 @@
     "description": "Runtime interface message bot_mode.leave_detail"
   },
   "runtime_bot_mode_leave_kicker": {
-    "message": "REGULAR SESSIONS",
+    "message": "Regular sessions",
     "description": "Runtime interface message bot_mode.leave_kicker"
   },
   "runtime_bot_mode_leave_title": {
-    "message": "Exit Bot Mode?",
+    "message": "Exit bot mode?",
     "description": "Runtime interface message bot_mode.leave_title"
   },
   "runtime_bot_mode_main_thread": {
@@ -860,7 +860,7 @@
     "description": "Runtime interface message bot_mode.model_switch_detail"
   },
   "runtime_bot_mode_model_switch_kicker": {
-    "message": "MODEL SWITCH",
+    "message": "Model switch",
     "description": "Runtime interface message bot_mode.model_switch_kicker"
   },
   "runtime_bot_mode_model_switch_title": {
@@ -868,7 +868,7 @@
     "description": "Runtime interface message bot_mode.model_switch_title"
   },
   "runtime_bot_mode_new_agent": {
-    "message": "New Bot",
+    "message": "New bot",
     "description": "Runtime interface message bot_mode.new_agent"
   },
   "runtime_bot_mode_new_group": {
@@ -880,11 +880,11 @@
     "description": "Runtime interface message bot_mode.off_hint_sidepanel"
   },
   "runtime_bot_mode_open_chat": {
-    "message": "Open Bot Chat",
+    "message": "Open bot chat",
     "description": "Runtime interface message bot_mode.open_chat"
   },
   "runtime_bot_mode_open_title": {
-    "message": "Open Bot Mode",
+    "message": "Open bot mode",
     "description": "Runtime interface message bot_mode.open_title"
   },
   "runtime_bot_mode_pet_apply": {
@@ -944,7 +944,7 @@
     "description": "Runtime interface message bot_mode.refresh_agents"
   },
   "runtime_bot_mode_return_to_sessions": {
-    "message": "Regular Sessions",
+    "message": "Regular sessions",
     "description": "Runtime interface message bot_mode.return_to_sessions"
   },
   "runtime_bot_mode_return_to_sessions_title": {
@@ -988,7 +988,7 @@
     "description": "Runtime interface message bot_mode.settings_copy_sidepanel"
   },
   "runtime_bot_mode_settings_title": {
-    "message": "Bots & Bot Mode",
+    "message": "Bots & bot mode",
     "description": "Runtime interface message bot_mode.settings_title"
   },
   "runtime_bot_mode_share_keys": {
@@ -1008,7 +1008,7 @@
     "description": "Runtime interface message bot_mode.sheet_create_offline"
   },
   "runtime_bot_mode_sheet_create_title": {
-    "message": "New Agent",
+    "message": "New agent",
     "description": "Runtime interface message bot_mode.sheet_create_title"
   },
   "runtime_bot_mode_sheet_edit_title": {
@@ -1076,7 +1076,7 @@
     "description": "Runtime interface message bot_mode.soul_optional_hint"
   },
   "runtime_bot_mode_soul_placeholder": {
-    "message": "Enter custom SOUL prompt...",
+    "message": "Enter custom SOUL prompt…",
     "description": "Runtime interface message bot_mode.soul_placeholder"
   },
   "runtime_bot_mode_switch_profile": {
@@ -1084,7 +1084,7 @@
     "description": "Runtime interface message bot_mode.switch_profile"
   },
   "runtime_bot_mode_syncing": {
-    "message": "SYNCING BOT",
+    "message": "Syncing bot",
     "description": "Runtime interface message bot_mode.syncing"
   },
   "runtime_bot_mode_syncing_detail": {
@@ -1104,7 +1104,7 @@
     "description": "Runtime interface message bot_mode.tab_general"
   },
   "runtime_bot_mode_tab_groups": {
-    "message": "Group Chats",
+    "message": "Group chats",
     "description": "Runtime interface message bot_mode.tab_groups"
   },
   "runtime_bot_mode_tab_mcp": {
@@ -1116,7 +1116,7 @@
     "description": "Runtime interface message bot_mode.tab_skills"
   },
   "runtime_bot_mode_tab_soul": {
-    "message": "SOUL",
+    "message": "Soul",
     "description": "Runtime interface message bot_mode.tab_soul"
   },
   "runtime_bot_mode_tab_tools": {
@@ -1140,7 +1140,7 @@
     "description": "Runtime interface message bot_mode.threads_title"
   },
   "runtime_bot_mode_title": {
-    "message": "Bot Mode",
+    "message": "Bot mode",
     "description": "Runtime interface message bot_mode.title"
   },
   "runtime_bot_mode_toolsets": {
@@ -1316,7 +1316,7 @@
     "description": "Runtime interface message browser_control.help_stop"
   },
   "runtime_browser_control_kicker": {
-    "message": "HERMES CONTROL",
+    "message": "Hermes Control",
     "description": "Runtime interface message browser_control.kicker"
   },
   "runtime_browser_control_local_document_detail": {
@@ -2052,7 +2052,7 @@
     "description": "Runtime interface message clarify.expired"
   },
   "runtime_clarify_kicker": {
-    "message": "QUESTION FROM HERMES",
+    "message": "Question from Hermes",
     "description": "Runtime interface message clarify.kicker"
   },
   "runtime_clarify_multi_hint": {
@@ -2244,7 +2244,7 @@
     "description": "Runtime interface message compact.working"
   },
   "runtime_composer_chat_label": {
-    "message": "CHAT",
+    "message": "Chat",
     "description": "Runtime interface message composer.chat_label"
   },
   "runtime_composer_connect_first": {
@@ -2262,6 +2262,26 @@
   "runtime_composer_restore_held_draft": {
     "message": "Restore draft",
     "description": "Runtime interface message composer.restore_held_draft"
+  },
+  "runtime_composer_tip_attach": {
+    "message": "Attach files, images or a URL (drag and drop works too)",
+    "description": "Runtime interface message composer.tip.attach"
+  },
+  "runtime_composer_tip_commands": {
+    "message": "Quick commands (type / in the message box)",
+    "description": "Runtime interface message composer.tip.commands"
+  },
+  "runtime_composer_tip_mic": {
+    "message": "Dictate with your microphone",
+    "description": "Runtime interface message composer.tip.mic"
+  },
+  "runtime_composer_tip_model": {
+    "message": "Model and reasoning options",
+    "description": "Runtime interface message composer.tip.model"
+  },
+  "runtime_composer_tip_send": {
+    "message": "Send (Enter)",
+    "description": "Runtime interface message composer.tip.send"
   },
   "runtime_connect_approve_or_paste": {
     "message": "Approve pairing when available, or paste",
@@ -2400,7 +2420,7 @@
     "description": "Runtime interface message context.follow_active_tab"
   },
   "runtime_context_in": {
-    "message": "IN",
+    "message": "In",
     "description": "Runtime interface message context.in"
   },
   "runtime_context_include_all_tabs": {
@@ -2416,7 +2436,7 @@
     "description": "Runtime interface message context.no_page"
   },
   "runtime_context_out": {
-    "message": "OUT",
+    "message": "Out",
     "description": "Runtime interface message context.out"
   },
   "runtime_context_page_only": {
@@ -2456,7 +2476,7 @@
     "description": "Runtime interface message context.unlock_pinned_tab"
   },
   "runtime_custom_theme_active_unavailable": {
-    "message": "Active theme is unavailable. Using Nous.",
+    "message": "Active theme is unavailable. Using Calm.",
     "description": "Runtime interface message custom_theme.active_unavailable"
   },
   "runtime_custom_theme_choose_theme_file": {
@@ -2708,7 +2728,7 @@
     "description": "Runtime interface message exec_approval.info_only"
   },
   "runtime_exec_approval_kicker": {
-    "message": "COMMAND APPROVAL",
+    "message": "Command approval",
     "description": "Runtime interface message exec_approval.kicker"
   },
   "runtime_exec_approval_other_session": {
@@ -2884,19 +2904,19 @@
     "description": "Runtime interface message image.meta_active"
   },
   "runtime_image_phase_denoising": {
-    "message": "DENOISING",
+    "message": "Denoising",
     "description": "Runtime interface message image.phase_denoising"
   },
   "runtime_image_phase_finalizing": {
-    "message": "FINALIZING",
+    "message": "Finalizing",
     "description": "Runtime interface message image.phase_finalizing"
   },
   "runtime_image_phase_latent": {
-    "message": "LATENT FIELD",
+    "message": "Latent field",
     "description": "Runtime interface message image.phase_latent"
   },
   "runtime_image_phase_resolving": {
-    "message": "RESOLVING",
+    "message": "Resolving",
     "description": "Runtime interface message image.phase_resolving"
   },
   "runtime_items_count": {
@@ -3028,7 +3048,7 @@
     "description": "Runtime interface message onboarding.back"
   },
   "runtime_onboarding_connect_body": {
-    "message": "Connect this panel to your Hermes agent. Approve pairing if your Hermes offers it, or use Manual setup with its address and API key. Then Hermes can see the page you are on and answer here.",
+    "message": "Approve pairing if your Hermes offers it, or use Manual setup with its address and API key.",
     "description": "Runtime interface message onboarding.connect.body"
   },
   "runtime_onboarding_connect_connected": {
@@ -3044,12 +3064,24 @@
     "description": "Runtime interface message onboarding.connect.not_paired"
   },
   "runtime_onboarding_connect_other_hint": {
-    "message": "Hermes on another computer, a server or Hermes Cloud? Choose Manual setup to set up that connection.",
+    "message": "Hermes on another computer or a server? Choose Manual setup.",
     "description": "Runtime interface message onboarding.connect.other_hint"
   },
   "runtime_onboarding_connect_title": {
     "message": "Connect to Hermes",
     "description": "Runtime interface message onboarding.connect.title"
+  },
+  "runtime_onboarding_connect_url_invalid": {
+    "message": "Enter an address like http://127.0.0.1:8642.",
+    "description": "Runtime interface message onboarding.connect.url_invalid"
+  },
+  "runtime_onboarding_connect_url_label": {
+    "message": "Gateway address",
+    "description": "Runtime interface message onboarding.connect.url_label"
+  },
+  "runtime_onboarding_connect_url_scheme": {
+    "message": "The address must start with http:// or https://.",
+    "description": "Runtime interface message onboarding.connect.url_scheme"
   },
   "runtime_onboarding_first_prompt": {
     "message": "Try a first prompt",
@@ -3140,7 +3172,7 @@
     "description": "Runtime interface message onboarding.theme.title"
   },
   "runtime_onboarding_welcome_body": {
-    "message": "Let's set it up. It takes about a minute.",
+    "message": "Your Hermes agent, beside the page you are on.",
     "description": "Runtime interface message onboarding.welcome.body"
   },
   "runtime_onboarding_welcome_greeting": {
@@ -3148,15 +3180,15 @@
     "description": "Runtime interface message onboarding.welcome.greeting"
   },
   "runtime_onboarding_welcome_skip": {
-    "message": "Skip setup",
+    "message": "Skip for now",
     "description": "Runtime interface message onboarding.welcome.skip"
   },
   "runtime_onboarding_welcome_start": {
-    "message": "Get started",
+    "message": "Connect to Hermes",
     "description": "Runtime interface message onboarding.welcome.start"
   },
   "runtime_onboarding_welcome_title": {
-    "message": "Welcome to Hermes Browser",
+    "message": "Hermes Browser",
     "description": "Runtime interface message onboarding.welcome.title"
   },
   "runtime_pairing_approve_below": {
@@ -3188,7 +3220,7 @@
     "description": "Runtime interface message picker.pick_different"
   },
   "runtime_picker_picking_element": {
-    "message": "◈ Picking element...",
+    "message": "◈ Picking element…",
     "description": "Runtime interface message picker.picking_element"
   },
   "runtime_profile_switch_cancel": {
@@ -3208,7 +3240,7 @@
     "description": "Runtime interface message profile_switch.detail"
   },
   "runtime_profile_switch_kicker": {
-    "message": "PROFILE CHANGE",
+    "message": "Profile change",
     "description": "Runtime interface message profile_switch.kicker"
   },
   "runtime_profile_switch_title": {
@@ -3712,7 +3744,7 @@
     "description": "Runtime interface message projects.reason_code"
   },
   "runtime_projects_refresh": {
-    "message": "Refresh Projects",
+    "message": "Refresh projects",
     "description": "Runtime interface message projects.refresh"
   },
   "runtime_projects_retry": {
@@ -3980,7 +4012,7 @@
     "description": "Runtime interface message session.long_shared_notice"
   },
   "runtime_session_new_extension_session": {
-    "message": "＋ New Hermes Browser Extension Session",
+    "message": "New session",
     "description": "Runtime interface message session.new_extension_session"
   },
   "runtime_session_origin_refused": {
@@ -4003,6 +4035,10 @@
     "message": "Model: {model}",
     "description": "Runtime interface message session.row_model"
   },
+  "runtime_settings_advanced": {
+    "message": "Advanced",
+    "description": "Runtime interface message settings.advanced"
+  },
   "runtime_settings_back_to_top": {
     "message": "Back to top",
     "description": "Runtime interface message settings.back_to_top"
@@ -4012,7 +4048,7 @@
     "description": "Runtime interface message settings.categories.about.summary"
   },
   "runtime_settings_categories_about_title": {
-    "message": "About & Diagnostics",
+    "message": "About & diagnostics",
     "description": "Runtime interface message settings.categories.about.title"
   },
   "runtime_settings_categories_agents_summary": {
@@ -4020,7 +4056,7 @@
     "description": "Runtime interface message settings.categories.agents.summary"
   },
   "runtime_settings_categories_agents_title": {
-    "message": "Agents & Bot Mode",
+    "message": "Agents & bot mode",
     "description": "Runtime interface message settings.categories.agents.title"
   },
   "runtime_settings_categories_appearance_summary": {
@@ -4028,7 +4064,7 @@
     "description": "Runtime interface message settings.categories.appearance.summary"
   },
   "runtime_settings_categories_appearance_title": {
-    "message": "Appearance & Themes",
+    "message": "Appearance & themes",
     "description": "Runtime interface message settings.categories.appearance.title"
   },
   "runtime_settings_categories_assist_summary": {
@@ -4036,7 +4072,7 @@
     "description": "Runtime interface message settings.categories.assist.summary"
   },
   "runtime_settings_categories_assist_title": {
-    "message": "Assist & Actions",
+    "message": "Assist & actions",
     "description": "Runtime interface message settings.categories.assist.title"
   },
   "runtime_settings_categories_back": {
@@ -4076,7 +4112,7 @@
     "description": "Runtime interface message settings.categories.models.summary"
   },
   "runtime_settings_categories_models_title": {
-    "message": "Models & Runtime",
+    "message": "Models & runtime",
     "description": "Runtime interface message settings.categories.models.title"
   },
   "runtime_settings_categories_permissions_summary": {
@@ -4084,7 +4120,7 @@
     "description": "Runtime interface message settings.categories.permissions.summary"
   },
   "runtime_settings_categories_permissions_title": {
-    "message": "Permissions & Control",
+    "message": "Permissions & control",
     "description": "Runtime interface message settings.categories.permissions.title"
   },
   "runtime_settings_categories_sessions_summary": {
@@ -4092,7 +4128,7 @@
     "description": "Runtime interface message settings.categories.sessions.summary"
   },
   "runtime_settings_categories_sessions_title": {
-    "message": "Sessions & Context",
+    "message": "Sessions & context",
     "description": "Runtime interface message settings.categories.sessions.title"
   },
   "runtime_settings_categories_voice_summary": {
@@ -4100,7 +4136,7 @@
     "description": "Runtime interface message settings.categories.voice.summary"
   },
   "runtime_settings_categories_voice_title": {
-    "message": "Voice & Wake",
+    "message": "Voice & wake",
     "description": "Runtime interface message settings.categories.voice.title"
   },
   "runtime_settings_context_depth_full": {
@@ -4138,6 +4174,10 @@
   "runtime_settings_language_label": {
     "message": "Language",
     "description": "Runtime interface message settings.language.label"
+  },
+  "runtime_settings_learn_more": {
+    "message": "Learn more",
+    "description": "Runtime interface message settings.learn_more"
   },
   "runtime_settings_local_api_setup_hint": {
     "message": "Local API server (default http://127.0.0.1:8642). Paste its key below.",
@@ -4271,6 +4311,26 @@
     "message": "These model source addresses are not valid: {sources}",
     "description": "Runtime interface message settings.save.sources_invalid"
   },
+  "runtime_settings_search_none": {
+    "message": "No matching settings",
+    "description": "Runtime interface message settings.search_none"
+  },
+  "runtime_settings_search_placeholder": {
+    "message": "Search settings",
+    "description": "Runtime interface message settings.search_placeholder"
+  },
+  "runtime_settings_search_results": {
+    "message": "Search results",
+    "description": "Runtime interface message settings.search_results"
+  },
+  "runtime_settings_show_less": {
+    "message": "Show less",
+    "description": "Runtime interface message settings.show_less"
+  },
+  "runtime_settings_test_connection": {
+    "message": "Test connection",
+    "description": "Runtime interface message settings.test_connection"
+  },
   "runtime_settings_transcript_auto": {
     "message": "Automatic",
     "description": "Runtime interface message settings.transcript.auto"
@@ -4380,7 +4440,7 @@
     "description": "Runtime interface message ui.active.tab"
   },
   "runtime_ui_active_tab_2bc454c2": {
-    "message": "ACTIVE TAB",
+    "message": "Active tab",
     "description": "Runtime interface message ui.active.tab.2bc454c2"
   },
   "runtime_ui_active_tab_ready": {
@@ -4436,7 +4496,7 @@
     "description": "Runtime interface message ui.again"
   },
   "runtime_ui_agent": {
-    "message": "AGENT",
+    "message": "Agent",
     "description": "Runtime interface message ui.agent"
   },
   "runtime_ui_agent_5ce2e6f4": {
@@ -4464,7 +4524,7 @@
     "description": "Runtime interface message ui.agent.ports.invalid"
   },
   "runtime_ui_agent_profile": {
-    "message": "Agent Profile",
+    "message": "Agent profile",
     "description": "Runtime interface message ui.agent.profile"
   },
   "runtime_ui_agent_scheme": {
@@ -4600,7 +4660,7 @@
     "description": "Runtime interface message ui.ask.hermes"
   },
   "runtime_ui_ask_hermes_36d55d5a": {
-    "message": "ASK HERMES",
+    "message": "Ask Hermes",
     "description": "Runtime interface message ui.ask.hermes.36d55d5a"
   },
   "runtime_ui_ask_hermes_about_the_active_page_context": {
@@ -4608,7 +4668,7 @@
     "description": "Runtime interface message ui.ask.hermes.about.the.active.page.context"
   },
   "runtime_ui_ask_hermes_about_this_page": {
-    "message": "Ask Hermes about this page...",
+    "message": "Ask Hermes about this page…",
     "description": "Runtime interface message ui.ask.hermes.about.this.page"
   },
   "runtime_ui_ask_hermes_about_this_selection": {
@@ -4792,7 +4852,7 @@
     "description": "Runtime interface message ui.blocked"
   },
   "runtime_ui_blocked_fcc4cce1": {
-    "message": "BLOCKED",
+    "message": "Blocked",
     "description": "Runtime interface message ui.blocked.fcc4cce1"
   },
   "runtime_ui_body": {
@@ -4808,7 +4868,7 @@
     "description": "Runtime interface message ui.browser"
   },
   "runtime_ui_browser_behavior": {
-    "message": "Browser Behavior",
+    "message": "Browser behavior",
     "description": "Runtime interface message ui.browser.behavior"
   },
   "runtime_ui_browser_extension": {
@@ -4840,7 +4900,7 @@
     "description": "Runtime interface message ui.build"
   },
   "runtime_ui_building_redacted_diagnostics": {
-    "message": "Building redacted diagnostics...",
+    "message": "Building redacted diagnostics…",
     "description": "Runtime interface message ui.building.redacted.diagnostics"
   },
   "runtime_ui_button_icon": {
@@ -4928,7 +4988,7 @@
     "description": "Runtime interface message ui.check"
   },
   "runtime_ui_checking": {
-    "message": "Checking...",
+    "message": "Checking…",
     "description": "Runtime interface message ui.checking"
   },
   "runtime_ui_checking_browser_main": {
@@ -4948,7 +5008,7 @@
     "description": "Runtime interface message ui.choose"
   },
   "runtime_ui_choose_9fd8325f": {
-    "message": "CHOOSE",
+    "message": "Choose",
     "description": "Runtime interface message ui.choose.9fd8325f"
   },
   "runtime_ui_choose_another_tab_or_follow_the_active_tab": {
@@ -5032,7 +5092,7 @@
     "description": "Runtime interface message ui.clear.comments"
   },
   "runtime_ui_clear_picked_element": {
-    "message": "✕ Clear picked element",
+    "message": "Clear picked element",
     "description": "Runtime interface message ui.clear.picked.element"
   },
   "runtime_ui_clear_stored_token": {
@@ -5072,7 +5132,7 @@
     "description": "Runtime interface message ui.close"
   },
   "runtime_ui_close_dbc87420": {
-    "message": "CLOSE",
+    "message": "Close",
     "description": "Runtime interface message ui.close.dbc87420"
   },
   "runtime_ui_close_generated_image": {
@@ -5112,7 +5172,7 @@
     "description": "Runtime interface message ui.color"
   },
   "runtime_ui_color_mode": {
-    "message": "Color Mode",
+    "message": "Color mode",
     "description": "Runtime interface message ui.color.mode"
   },
   "runtime_ui_color_mode_588a2981": {
@@ -5192,7 +5252,7 @@
     "description": "Runtime interface message ui.complete"
   },
   "runtime_ui_complete_2c85a73c": {
-    "message": "COMPLETE",
+    "message": "Complete",
     "description": "Runtime interface message ui.complete.2c85a73c"
   },
   "runtime_ui_component": {
@@ -5216,7 +5276,7 @@
     "description": "Runtime interface message ui.composer.ask_hermes"
   },
   "runtime_ui_composer_ask_hermes_label": {
-    "message": "ASK HERMES",
+    "message": "Ask Hermes",
     "description": "Runtime interface message ui.composer.ask_hermes_label"
   },
   "runtime_ui_composer_bot_running": {
@@ -5224,7 +5284,7 @@
     "description": "Runtime interface message ui.composer.bot_running"
   },
   "runtime_ui_composer_group_chat": {
-    "message": "GROUP CHAT",
+    "message": "Group chat",
     "description": "Runtime interface message ui.composer.group_chat"
   },
   "runtime_ui_composer_hermes_running": {
@@ -5232,7 +5292,7 @@
     "description": "Runtime interface message ui.composer.hermes_running"
   },
   "runtime_ui_composer_new_thread": {
-    "message": "New Thread",
+    "message": "New thread",
     "description": "Runtime interface message ui.composer.new_thread"
   },
   "runtime_ui_composer_send": {
@@ -5284,7 +5344,7 @@
     "description": "Runtime interface message ui.connected.agent"
   },
   "runtime_ui_connected_agent_1e63a585": {
-    "message": "CONNECTED AGENT",
+    "message": "Connected agent",
     "description": "Runtime interface message ui.connected.agent.1e63a585"
   },
   "runtime_ui_connected_to_hermes_this_draft_will_create_a_new_hermes_web_ses_59e2faf2": {
@@ -5296,7 +5356,7 @@
     "description": "Runtime interface message ui.connected.to.hermes.you.can.start.chatting.with.page.context"
   },
   "runtime_ui_connecting": {
-    "message": "Connecting...",
+    "message": "Connecting…",
     "description": "Runtime interface message ui.connecting"
   },
   "runtime_ui_connecting_c1f3b71f": {
@@ -5308,7 +5368,7 @@
     "description": "Runtime interface message ui.connection"
   },
   "runtime_ui_connection_detail": {
-    "message": "CONNECTION DETAIL",
+    "message": "Connection detail",
     "description": "Runtime interface message ui.connection.detail"
   },
   "runtime_ui_connection_details": {
@@ -5328,7 +5388,7 @@
     "description": "Runtime interface message ui.connection.security"
   },
   "runtime_ui_connection_truth": {
-    "message": "CONNECTION TRUTH",
+    "message": "Connection truth",
     "description": "Runtime interface message ui.connection.truth"
   },
   "runtime_ui_content": {
@@ -5476,7 +5536,7 @@
     "description": "Runtime interface message ui.context.refresh.unavailable"
   },
   "runtime_ui_context_window": {
-    "message": "CONTEXT WINDOW",
+    "message": "Context window",
     "description": "Runtime interface message ui.context.window"
   },
   "runtime_ui_context_window_details": {
@@ -5532,7 +5592,7 @@
     "description": "Runtime interface message ui.copy.blocked.select.preview.manually"
   },
   "runtime_ui_copy_diagnostics": {
-    "message": "Copy Diagnostics",
+    "message": "Copy diagnostics",
     "description": "Runtime interface message ui.copy.diagnostics"
   },
   "runtime_ui_copy_failed": {
@@ -5564,7 +5624,7 @@
     "description": "Runtime interface message ui.copy.unavailable"
   },
   "runtime_ui_copying": {
-    "message": "Copying...",
+    "message": "Copying…",
     "description": "Runtime interface message ui.copying"
   },
   "runtime_ui_could_not_change_session": {
@@ -5832,7 +5892,7 @@
     "description": "Runtime interface message ui.edit.message"
   },
   "runtime_ui_edit_models": {
-    "message": "⚙ Edit Models...",
+    "message": "Edit models…",
     "description": "Runtime interface message ui.edit.models"
   },
   "runtime_ui_edit_models_in_hermes_desktop": {
@@ -6016,7 +6076,7 @@
     "description": "Runtime interface message ui.file"
   },
   "runtime_ui_files": {
-    "message": "▧ Files...",
+    "message": "Files…",
     "description": "Runtime interface message ui.files"
   },
   "runtime_ui_files_453f0471": {
@@ -6052,7 +6112,7 @@
     "description": "Runtime interface message ui.focused.draft"
   },
   "runtime_ui_folder": {
-    "message": "▰ Folder...",
+    "message": "Folder…",
     "description": "Runtime interface message ui.folder"
   },
   "runtime_ui_folder_30baa249": {
@@ -6088,7 +6148,7 @@
     "description": "Runtime interface message ui.gateway"
   },
   "runtime_ui_gateway_connection": {
-    "message": "Gateway Connection",
+    "message": "Gateway connection",
     "description": "Runtime interface message ui.gateway.connection"
   },
   "runtime_ui_gateway_default": {
@@ -6104,7 +6164,7 @@
     "description": "Runtime interface message ui.generated.by.hermes"
   },
   "runtime_ui_generated_image": {
-    "message": "GENERATED IMAGE",
+    "message": "Generated image",
     "description": "Runtime interface message ui.generated.image"
   },
   "runtime_ui_gmail_thread_capture_unavailable": {
@@ -6204,11 +6264,11 @@
     "description": "Runtime interface message ui.hermes.browser"
   },
   "runtime_ui_hermes_browser_bb83b5a0": {
-    "message": "HERMES BROWSER",
+    "message": "Hermes Browser",
     "description": "Runtime interface message ui.hermes.browser.bb83b5a0"
   },
   "runtime_ui_hermes_browser_extension": {
-    "message": "HERMES BROWSER EXTENSION",
+    "message": "Hermes Browser Extension",
     "description": "Runtime interface message ui.hermes.browser.extension"
   },
   "runtime_ui_hermes_browser_extension_connected": {
@@ -6228,7 +6288,7 @@
     "description": "Runtime interface message ui.hermes.browser.local.sidecar"
   },
   "runtime_ui_hermes_browser_update_channel": {
-    "message": "HERMES BROWSER / UPDATE CHANNEL",
+    "message": "Hermes Browser / update channel",
     "description": "Runtime interface message ui.hermes.browser.update.channel"
   },
   "runtime_ui_hermes_chat_actions": {
@@ -6408,7 +6468,7 @@
     "description": "Runtime interface message ui.hermes.web"
   },
   "runtime_ui_hermes_web_3336aa2f": {
-    "message": "HERMES WEB",
+    "message": "Hermes Web",
     "description": "Runtime interface message ui.hermes.web.3336aa2f"
   },
   "runtime_ui_hermes_web_could_not_start": {
@@ -6420,7 +6480,7 @@
     "description": "Runtime interface message ui.hermes.web.home"
   },
   "runtime_ui_hermes_web_ready": {
-    "message": "HERMES WEB // READY",
+    "message": "Hermes Web · ready",
     "description": "Runtime interface message ui.hermes.web.ready"
   },
   "runtime_ui_hermes_web_settings": {
@@ -6512,7 +6572,7 @@
     "description": "Runtime interface message ui.image.stayed.inline.only"
   },
   "runtime_ui_images": {
-    "message": "▧ Images...",
+    "message": "Images…",
     "description": "Runtime interface message ui.images"
   },
   "runtime_ui_images_09e871c9": {
@@ -6615,6 +6675,10 @@
     "message": "Key",
     "description": "Runtime interface message ui.key"
   },
+  "runtime_ui_key_points": {
+    "message": "Key points",
+    "description": "Runtime interface message ui.key.points"
+  },
   "runtime_ui_label": {
     "message": "Label",
     "description": "Runtime interface message ui.label"
@@ -6624,7 +6688,7 @@
     "description": "Runtime interface message ui.large"
   },
   "runtime_ui_later": {
-    "message": "LATER",
+    "message": "Later",
     "description": "Runtime interface message ui.later"
   },
   "runtime_ui_later_56e2f5d3": {
@@ -6664,11 +6728,11 @@
     "description": "Runtime interface message ui.loading"
   },
   "runtime_ui_loading_249feada": {
-    "message": "📎 Loading...",
+    "message": "📎 Loading…",
     "description": "Runtime interface message ui.loading.249feada"
   },
   "runtime_ui_loading_b04ba49f": {
-    "message": "Loading...",
+    "message": "Loading…",
     "description": "Runtime interface message ui.loading.b04ba49f"
   },
   "runtime_ui_loading_canonical_hermes_history": {
@@ -6688,7 +6752,7 @@
     "description": "Runtime interface message ui.local"
   },
   "runtime_ui_local_document_access": {
-    "message": "LOCAL DOCUMENT ACCESS",
+    "message": "Local document access",
     "description": "Runtime interface message ui.local_document_access"
   },
   "runtime_ui_local_api_server": {
@@ -6702,10 +6766,6 @@
   "runtime_ui_local_setup_keep_hermes_gateway_api_server_running_on_this_machine": {
     "message": "Local setup: keep Hermes Gateway/API Server running on this machine.",
     "description": "Runtime interface message ui.local.setup.keep.hermes.gateway.api.server.running.on.this.machine"
-  },
-  "runtime_ui_local_sidecar_chrome_panel": {
-    "message": "LOCAL SIDECAR / CHROME PANEL",
-    "description": "Runtime interface message ui.local.sidecar.chrome.panel"
   },
   "runtime_ui_longer": {
     "message": "Longer",
@@ -6808,7 +6868,7 @@
     "description": "Runtime interface message ui.missing"
   },
   "runtime_ui_mode": {
-    "message": "MODE",
+    "message": "Mode",
     "description": "Runtime interface message ui.mode"
   },
   "runtime_ui_mode_controls_brightness_theme_controls_the_accent_palette_and_0d9c3d47": {
@@ -6816,7 +6876,7 @@
     "description": "Runtime interface message ui.mode.controls.brightness.theme.controls.the.accent.palette.and.0d9c3d47"
   },
   "runtime_ui_model": {
-    "message": "MODEL",
+    "message": "Model",
     "description": "Runtime interface message ui.model"
   },
   "runtime_ui_model_68c2cc7f": {
@@ -7196,11 +7256,11 @@
     "description": "Runtime interface message ui.opening.chromium.microphone.permission.prompt"
   },
   "runtime_ui_opening_session": {
-    "message": "OPENING SESSION",
+    "message": "Opening session",
     "description": "Runtime interface message ui.opening.session"
   },
   "runtime_ui_opening_shared_session": {
-    "message": "OPENING SHARED SESSION",
+    "message": "Opening shared session",
     "description": "Runtime interface message ui.opening.shared.session"
   },
   "runtime_ui_opening_voice_dictation_tab": {
@@ -7276,7 +7336,7 @@
     "description": "Runtime interface message ui.paste.a.gateway.api.key.or.reconnect.when.you.are.ready"
   },
   "runtime_ui_paste_image": {
-    "message": "▣ Paste image",
+    "message": "Paste image",
     "description": "Runtime interface message ui.paste.image"
   },
   "runtime_ui_paste_this_into_the_hermes_api_server_environment_on_the_remote_machine": {
@@ -7308,7 +7368,7 @@
     "description": "Runtime interface message ui.pick.an.element"
   },
   "runtime_ui_pick_page_element": {
-    "message": "◈ Pick page element",
+    "message": "Pick page element",
     "description": "Runtime interface message ui.pick.page.element"
   },
   "runtime_ui_picked_element_cleared": {
@@ -7318,6 +7378,14 @@
   "runtime_ui_pinned_tab_closed": {
     "message": "Pinned tab closed",
     "description": "Runtime interface message ui.pinned.tab.closed"
+  },
+  "runtime_ui_playful_thinking_indicator": {
+    "message": "Playful thinking indicator",
+    "description": "Runtime interface message ui.playful.thinking.indicator"
+  },
+  "runtime_ui_playful_thinking_indicator_hint": {
+    "message": "Show animated faces while Hermes thinks, instead of a quiet label.",
+    "description": "Runtime interface message ui.playful.thinking.indicator.hint"
   },
   "runtime_ui_policy": {
     "message": "Policy",
@@ -7368,7 +7436,7 @@
     "description": "Runtime interface message ui.previous"
   },
   "runtime_ui_private": {
-    "message": "PRIVATE",
+    "message": "Private",
     "description": "Runtime interface message ui.private"
   },
   "runtime_ui_pro": {
@@ -7380,7 +7448,7 @@
     "description": "Runtime interface message ui.process"
   },
   "runtime_ui_profile": {
-    "message": "PROFILE",
+    "message": "Profile",
     "description": "Runtime interface message ui.profile"
   },
   "runtime_ui_profile_api_unavailable": {
@@ -7424,7 +7492,7 @@
     "description": "Runtime interface message ui.prompt.snippet"
   },
   "runtime_ui_prompt_snippets": {
-    "message": "▤ Prompt snippets...",
+    "message": "Prompt snippets…",
     "description": "Runtime interface message ui.prompt.snippets"
   },
   "runtime_ui_property": {
@@ -7452,7 +7520,7 @@
     "description": "Runtime interface message ui.public.flow.connect.to.hermes.creates.a.scoped.browser.token.wh.9184ad4d"
   },
   "runtime_ui_public_setup": {
-    "message": "PUBLIC SETUP",
+    "message": "Public setup",
     "description": "Runtime interface message ui.public.setup"
   },
   "runtime_ui_query": {
@@ -7556,11 +7624,11 @@
     "description": "Runtime interface message ui.refresh.model.catalog"
   },
   "runtime_ui_refresh_models": {
-    "message": "Refresh Models",
+    "message": "Refresh models",
     "description": "Runtime interface message ui.refresh.models"
   },
   "runtime_ui_refresh_sessions": {
-    "message": "Refresh Sessions",
+    "message": "Refresh",
     "description": "Runtime interface message ui.refresh.sessions"
   },
   "runtime_ui_refreshing_models": {
@@ -7824,7 +7892,7 @@
     "description": "Runtime interface message ui.runtime.identity"
   },
   "runtime_ui_safe_apply": {
-    "message": "SAFE APPLY",
+    "message": "Safe apply",
     "description": "Runtime interface message ui.safe.apply"
   },
   "runtime_ui_safety": {
@@ -7972,7 +8040,7 @@
     "description": "Runtime interface message ui.service"
   },
   "runtime_ui_session": {
-    "message": "SESSION",
+    "message": "Session",
     "description": "Runtime interface message ui.session"
   },
   "runtime_ui_session_actions": {
@@ -8036,7 +8104,7 @@
     "description": "Runtime interface message ui.session.unavailable"
   },
   "runtime_ui_sessions": {
-    "message": "SESSIONS",
+    "message": "Sessions",
     "description": "Runtime interface message ui.sessions"
   },
   "runtime_ui_set": {
@@ -8064,7 +8132,7 @@
     "description": "Runtime interface message ui.share"
   },
   "runtime_ui_shared_session": {
-    "message": "SHARED SESSION",
+    "message": "Shared session",
     "description": "Runtime interface message ui.shared.session"
   },
   "runtime_ui_shared_session_0a6bce9c": {
@@ -8168,7 +8236,7 @@
     "description": "Runtime interface message ui.socket"
   },
   "runtime_ui_source": {
-    "message": "SOURCE",
+    "message": "Source",
     "description": "Runtime interface message ui.source"
   },
   "runtime_ui_source_6da13add": {
@@ -8308,7 +8376,7 @@
     "description": "Runtime interface message ui.stream"
   },
   "runtime_ui_subagents": {
-    "message": "SUBAGENTS",
+    "message": "Subagents",
     "description": "Runtime interface message ui.subagents"
   },
   "runtime_ui_submit": {
@@ -8364,7 +8432,7 @@
     "description": "Runtime interface message ui.tab"
   },
   "runtime_ui_tab_screenshot": {
-    "message": "▣ Tab screenshot",
+    "message": "Tab screenshot",
     "description": "Runtime interface message ui.tab.screenshot"
   },
   "runtime_ui_tabs": {
@@ -8392,7 +8460,7 @@
     "description": "Runtime interface message ui.task"
   },
   "runtime_ui_tasks": {
-    "message": "☑ TASKS",
+    "message": "Tasks",
     "description": "Runtime interface message ui.tasks"
   },
   "runtime_ui_template": {
@@ -8404,7 +8472,7 @@
     "description": "Runtime interface message ui.test"
   },
   "runtime_ui_test_984816fd": {
-    "message": "TEST",
+    "message": "Test",
     "description": "Runtime interface message ui.test.984816fd"
   },
   "runtime_ui_test_connection": {
@@ -8412,7 +8480,7 @@
     "description": "Runtime interface message ui.test.connection"
   },
   "runtime_ui_test_connection_f7dafbab": {
-    "message": "TEST CONNECTION",
+    "message": "Test connection",
     "description": "Runtime interface message ui.test.connection.f7dafbab"
   },
   "runtime_ui_test_the_current_hermes_connection": {
@@ -8460,7 +8528,7 @@
     "description": "Runtime interface message ui.the.microphone.is.unavailable.to.the.wake.listener"
   },
   "runtime_ui_the_page_is_the_prompt": {
-    "message": "THE PAGE IS THE PROMPT",
+    "message": "The page is the prompt",
     "description": "Runtime interface message ui.the.page.is.the.prompt"
   },
   "runtime_ui_theme": {
@@ -8552,7 +8620,7 @@
     "description": "Runtime interface message ui.tool"
   },
   "runtime_ui_tool_activity": {
-    "message": "TOOL ACTIVITY",
+    "message": "Tool activity",
     "description": "Runtime interface message ui.tool.activity"
   },
   "runtime_ui_tool_and_run_events_will_appear_here": {
@@ -8648,7 +8716,7 @@
     "description": "Runtime interface message ui.upload"
   },
   "runtime_ui_url": {
-    "message": "↗ URL...",
+    "message": "URL…",
     "description": "Runtime interface message ui.url"
   },
   "runtime_ui_url_0e2d9b07": {
@@ -8804,7 +8872,7 @@
     "description": "Runtime interface message ui.voice.transcription.failed"
   },
   "runtime_ui_waiting_for_hermes_desktop_approval": {
-    "message": "Waiting for Hermes Desktop approval...",
+    "message": "Waiting for Hermes Desktop approval…",
     "description": "Runtime interface message ui.waiting.for.hermes.desktop.approval"
   },
   "runtime_ui_waiting_for_permission_request": {
@@ -8855,10 +8923,6 @@
     "message": "Web UI sections",
     "description": "Runtime interface message ui.web.ui.sections"
   },
-  "runtime_ui_what_hermes_saw": {
-    "message": "WHAT HERMES SAW",
-    "description": "Runtime interface message ui.what.hermes.saw"
-  },
   "runtime_ui_what_should_we_work_on": {
     "message": "What should we work on?",
     "description": "Runtime interface message ui.what.should.we.work.on"
@@ -8908,7 +8972,7 @@
     "description": "Runtime interface message ui.working"
   },
   "runtime_ui_working_92263e08": {
-    "message": "WORKING",
+    "message": "Working",
     "description": "Runtime interface message ui.working.92263e08"
   },
   "runtime_ui_workspace": {

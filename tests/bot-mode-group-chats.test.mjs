@@ -140,7 +140,7 @@ test('group thread menu entries retain room identity, previews, counts, and stab
   });
 
   assert.deepEqual(entries.map((entry) => entry.id), ['bot-thread:room-launch:main', 'bot-thread:room-launch:launch']);
-  assert.equal(entries[0].sourceLabel, 'Group Chat Threads');
+  assert.equal(entries[0].sourceLabel, 'Group chat threads');
   assert.equal(entries[0].roomLabel, 'Browser launch room');
   assert.equal(entries[0].messageCount, 1);
   assert.equal(entries[1].threadId, 'launch');

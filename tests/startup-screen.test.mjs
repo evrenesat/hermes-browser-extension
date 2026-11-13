@@ -5,7 +5,7 @@ import { deriveStartupView, initialStartupReadiness, reduceStartupReadiness } fr
 
 const steps = (statuses) => Object.keys(STARTUP_STEP_LINES).map((key, i) => ({
   key,
-  label: key === 'gateway' ? 'Gateway transport' : key,
+  label: key === 'gateway' ? 'Hermes connection' : key,
   status: statuses[i] || 'pending',
   detail: '',
 }));
@@ -31,7 +31,7 @@ test('while loading, the screen names the current check with its Greek count', (
   assert.equal(model.tone, 'loading');
   assert.equal(model.count, 'Β · 02 / 09');
   assert.equal(model.state, 'Connecting');
-  assert.equal(model.label, 'Gateway transport');
+  assert.equal(model.label, 'Hermes connection');
   assert.equal(model.detail, STARTUP_STEP_LINES.gateway, 'a check without its own detail gets its line');
   assert.ok(model.progress > 0.11 && model.progress < 0.2, 'the active check draws part of its unit');
 });
@@ -52,7 +52,7 @@ test('setup, error and ready read as their own states', () => {
   failing[1].detail = 'No response from 127.0.0.1:8642';
   const error = startupScreenModel({ visible: true, phase: 'error', errored: true, detail: 'Connection needs attention. See the status card below.', progress: 11, steps: failing });
   assert.deepEqual([error.tone, error.state, error.count], ['error', 'Needs attention', 'Β · 02 / 09']);
-  assert.equal(error.label, 'Gateway transport unreachable');
+  assert.equal(error.label, 'Hermes connection unreachable');
   assert.equal(error.detail, 'No response from 127.0.0.1:8642');
   assert.equal(error.progress, 0.11, 'an error stops the border where it failed');
 

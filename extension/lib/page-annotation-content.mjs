@@ -425,7 +425,7 @@ export function hidePageCommentCard(document) {
 }
 
 export function resolvePageCommentCardTheme(settings = {}) {
-  const theme = String(settings.appearanceTheme || 'nous').toLowerCase();
+  const theme = String(settings.appearanceTheme || 'calm').toLowerCase();
   const mode = String(settings.colorMode || 'dark').toLowerCase() === 'light' ? 'light' : 'dark';
   if (theme === 'mono' && mode === 'dark') {
     return { bg: '#171717', field: '#111111', fg: '#f1f1f1', muted: 'rgba(241,241,241,0.62)', border: 'rgba(229,229,229,0.44)', primary: '#e5e5e5', primaryFg: '#111111', font: 'ui-sans-serif, system-ui, sans-serif' };

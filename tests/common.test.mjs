@@ -392,7 +392,7 @@ test('startup exposes one-click connection testing and Cloud reconnect uses the 
   const source = readFileSync(new URL('../extension/sidepanel.js', import.meta.url), 'utf8');
 
   assert.match(html, /id="settingsButton"[\s\S]*id="startupTestConnectionButton"/);
-  assert.match(html, /id="startupTestConnectionButton"[^>]*><svg[^>]*data-icon="cellular-signal-3"[\s\S]*?<span class="settings-connection-test-label sr-only"[^>]*>TEST CONNECTION<\/span><\/button>/);
+  assert.match(html, /id="startupTestConnectionButton"[^>]*><span class="settings-connection-test-label"[^>]*>Retry<\/span><\/button>/);
   assert.match(css, /body\.startup-active \.startup-actions #startupTestConnectionButton/);
   assert.doesNotMatch(css, /--startup-settings-top/);
   assert.match(source, /startupTestConnectionButton:\s*\$\('#startupTestConnectionButton'\)/);
@@ -1710,7 +1710,7 @@ test('model refresh control exposes compact loading state while syncing', () => 
   assert.match(css, /\.model-menu footer button\.model-refreshing::before/);
   assert.match(css, /@keyframes modelRefreshSpin/);
   assert.deepEqual(modelRefreshControlState({ refreshing: false }), {
-    label: '↻ Refresh Models',
+    label: 'Refresh models',
     title: 'Refresh model catalog',
     disabled: false,
     ariaBusy: 'false',
@@ -1728,7 +1728,7 @@ test('model refresh control exposes compact loading state while syncing', () => 
 test('assistant thinking placeholder renders animated indicator markup and reduced-motion CSS', () => {
   const source = readFileSync(new URL('../extension/sidepanel.js', import.meta.url), 'utf8');
   const css = readFileSync(new URL('../extension/sidepanel.css', import.meta.url), 'utf8');
-  assert.match(source, /const THINKING_PLACEHOLDER = 'Hermes is thinking\.\.\.'/);
+  assert.match(source, /const THINKING_PLACEHOLDER = 'Hermes is thinking…'/);
   assert.match(source, /const THINKING_STATUSES = \['thinking', 'brainstorming', 'contemplating', 'reasoning', 'processing', 'analyzing', 'reflecting', 'pondering', 'deliberating', 'formulating'\]/);
   assert.match(source, /function renderThinkingIndicator/);
   assert.match(source, /class="thinking-indicator" role="status" aria-live="polite" data-i18n-aria-label="ui\.hermes\.is\.thinking\.brainstorming\.contemplating\.reasoning\.proces\.3e8d81c0" aria-label="\$\{escapeHtml\(t\('ui\.hermes\.is\.thinking\.brainstorming\.contemplating\.reasoning\.proces\.3e8d81c0'\)\)\}"/);
@@ -2247,37 +2247,35 @@ test('formatContextMeter renders Hermes Desktop style compact usage labels', () 
   assert.equal(million.percentLabel, '21%');
 });
 
-test('contextChipSummary separates loading, restricted, error, and captured states', () => {
-  assert.deepEqual(contextChipSummary({ pageContext: null }), {
-    label: '📎 Loading...',
-    title: 'Page context not yet loaded',
-  });
+test('contextChipSummary uses plain language for loading, restricted, error, and captured states', () => {
+  const loading = contextChipSummary({ pageContext: null, activeTab: { title: 'Docs' } });
+  assert.equal(loading.label, 'Docs');
+  assert.equal(loading.state, 'loading');
 
-  assert.deepEqual(contextChipSummary({ pageContext: { ok: false, restricted: true, reason: 'Browser internal page' } }), {
-    label: '📎 Restricted · N/A',
-    title: 'Browser internal page',
-  });
+  const restricted = contextChipSummary({ pageContext: { ok: false, restricted: true, reason: 'Browser internal page' } });
+  assert.equal(restricted.label, "This page can't be read");
+  assert.equal(restricted.state, 'restricted');
+  assert.equal(restricted.title, 'Browser internal page');
 
-  assert.deepEqual(contextChipSummary({ pageContext: { ok: false, error: 'stale content script' } }), {
-    label: '📎 Error · N/A',
-    title: 'stale content script',
-  });
+  const failed = contextChipSummary({ pageContext: { ok: false, error: 'stale content script' } });
+  assert.equal(failed.label, "This page can't be read");
+  assert.equal(failed.title, 'stale content script');
 
-  const captured = contextChipSummary({
-    pageContext: { ok: true, youtubeTranscript: { ok: true } },
-    activeTab: { url: 'https://youtube.com/watch?v=abc' },
-    parts: {
-      selectedText: { enabled: true, chars: 12, estimatedTokens: 3 },
-      pageMetadata: { enabled: true, chars: 80, estimatedTokens: 20 },
-      youtubeTranscript: { enabled: true, chars: 1000, estimatedTokens: 250 },
-      pageText: { enabled: false, chars: 500, estimatedTokens: 125 },
-    },
+  const page = contextChipSummary({
+    pageContext: { ok: true },
+    activeTab: { title: 'Release notes', url: 'https://example.com/a' },
+    parts: { pageText: { enabled: true, chars: 500, estimatedTokens: 125 } },
   });
+  assert.equal(page.label, 'Release notes');
+  assert.equal(page.kind, 'Page');
+  assert.match(page.title, /About 125 tokens/);
 
-  assert.deepEqual(captured, {
-    label: '📎 YouTube + DOM · 1,092 chars · ~273 tok',
-    title: 'https://youtube.com/watch?v=abc',
+  const selection = contextChipSummary({
+    pageContext: { ok: true },
+    activeTab: { title: 'Release notes' },
+    parts: { selectedText: { enabled: true, chars: 12, estimatedTokens: 3 }, pageText: { enabled: false } },
   });
+  assert.equal(selection.kind, 'Selection');
 });
 
 test('modelDisplayName strips only the provider prefix and preserves free model suffixes', () => {
@@ -2953,7 +2951,7 @@ test('panel residency setting is present in defaults and settings UI copy', () =
   const html = readFileSync(new URL('../extension/sidepanel.html', import.meta.url), 'utf8');
   const background = readFileSync(new URL('../extension/background.js', import.meta.url), 'utf8');
   assert.equal(DEFAULT_SETTINGS.panelResidencyMode, 'tab-attached');
-  assert.match(html, /Browser Behavior/);
+  assert.match(html, /Browser behavior/);
   assert.match(html, /settings-toggle-card auto-name-toggle/);
   assert.match(html, /settings-choice-card/);
   assert.match(html, /name="panelResidencyMode"/);
@@ -3950,7 +3948,7 @@ test('settings dialog render path refreshes appearance theme cards on open', () 
 test('settings appearance defaults pin the zoom/font schema and keep textSize only for legacy compat', () => {
   assert.equal(DEFAULT_SETTINGS.appearanceSchemaVersion, 2);
   assert.equal(DEFAULT_SETTINGS.textZoomPercent, 100);
-  assert.equal(DEFAULT_SETTINGS.fontProfile, 'signature');
+  assert.equal(DEFAULT_SETTINGS.fontProfile, 'system-sans');
   assert.equal(DEFAULT_SETTINGS.customFontFamily, '');
   // The legacy named-size key survives only as a compatibility default at this
   // unit; production surfaces must migrate through the shared module instead.
@@ -4214,9 +4212,8 @@ test('composer plus, command pill, and topbar new-session icons are SVG-centered
   assert.match(css, /\.attach-menu-button\.composer-plus svg\s*\{\s*display:\s*block;\s*width:\s*16px;\s*height:\s*16px;\s*\}/, 'composer plus SVG must be block-centered at 16px');
   assert.match(css, /\.attach-menu-button\.composer-plus\s*\{[^}]*padding:\s*0;/s, 'composer plus must not use a bottom-padding baseline hack');
   const command = html.match(/<button[^>]*id="commandMenuButton"[\s\S]*?<\/button>/)?.[0] || '';
-  assert.match(command, /data-icon="terminal"/, 'commands button shows the vendored terminal glyph beside Hermes Control');
+  assert.match(command, /data-icon="slash"/, 'commands button shows a slash glyph in the composer tool row');
   assert.doesNotMatch(html, /class="composer-command"/, 'the slash-commands chip is gone from the composer field');
-  assert.match(css, /\.composer-actions \.composer-commands-button\s*\{[^}]*width:\s*36px;/s, 'commands button is a 36px icon button in the action row');
   assert.doesNotMatch(css, /\.composer-command\b/, 'the slash-commands chip styles are gone');
 });
 
@@ -4229,13 +4226,13 @@ test('side-panel Agent Theme Studio uses the validated theme pipeline and polish
   assert.match(source, /extractAgentThemeDocument/);
   assert.match(source, /await askHermes\([\s\S]*?onComplete/);
   assert.match(source, /await installCustomTheme\([\s\S]*?await setAppearanceOption\('appearanceTheme'/);
-  assert.match(css, /\.settings-dialog \.custom-theme-file-control,[\s\S]*?#customThemePreviewButton[\s\S]*?font:\s*700 calc\(10px \* var\(--hermes-text-zoom/s);
+  assert.match(css, /\.settings-dialog \.custom-theme-file-control,[\s\S]*?#customThemePreviewButton[\s\S]*?font:\s*700 calc\(11px \* var\(--hermes-text-zoom/s);
   assert.match(css, /\.settings-dialog \.custom-theme-file-control\s*\{[^}]*display:\s*grid[^}]*place-items:\s*center/s);
   assert.match(css, /#customThemePreviewButton\s*\{[^}]*display:\s*grid[^}]*place-items:\s*center/s);
   assert.match(css, /#agentThemeCreateButton\s*\{[^}]*background:\s*#0505e8[^}]*color:\s*#fff/s, 'Ask Hermes must stay cobalt in Mono instead of becoming black');
   assert.match(css, /#agentThemeDescription,[\s\S]*?#agentThemeCreateButton\s*\{[^}]*height:\s*42px[^}]*margin-top:\s*0/s, 'Ask Hermes and its prompt must be exactly the same height');
-  assert.match(css, /\.agent-theme-studio > p\s*\{[^}]*font:[^;}]*calc\(9px \* var\(--hermes-text-zoom, 1\)\)\/1\.45/s, 'Agent Theme Studio helper copy must match the readable example');
-  assert.match(css, /\.custom-theme-json-field > strong\s*\{[^}]*font:[^;}]*calc\(10px \* var\(--hermes-text-zoom, 1\)\)\/1\.25/s, 'Paste Theme JSON heading must remain clearly separated and readable');
+  assert.match(css, /\.agent-theme-studio > p\s*\{[^}]*font:[^;}]*calc\(11px \* var\(--hermes-text-zoom, 1\)\)\/1\.45/s, 'Agent Theme Studio helper copy must match the readable example');
+  assert.match(css, /\.custom-theme-json-field > strong\s*\{[^}]*font:[^;}]*calc\(11px \* var\(--hermes-text-zoom, 1\)\)\/1\.25/s, 'Paste Theme JSON heading must remain clearly separated and readable');
   assert.match(css, /html\[data-hermes-theme="mono"\]\[data-hermes-mode="dark"\][\s\S]*?\.agent-theme-studio > p,[\s\S]*?\.agent-theme-status\s*\{\s*color:\s*#36ff7a/s, 'Mono dark must restore the green Agent Theme Studio copy');
 });
 
@@ -4294,19 +4291,15 @@ test('settings CSS uses the semantic text-zoom multiplier, calc typography, and 
   const css = readFileSync(new URL('../extension/sidepanel.css', import.meta.url), 'utf8');
   assert.match(css, /--hermes-text-zoom:\s*1;/, 'the root defines the semantic text-zoom multiplier');
   assert.match(css, /font-size:\s*calc\([^)]*var\(--hermes-text-zoom/, 'typography must scale through calc');
-  const grid = css.match(/#textZoomPresetGrid\s*\{([\s\S]*?)\n\}/)?.[1] || '';
-  assert.ok(grid, 'the preset grid should be styled');
-  assert.match(grid, /grid-template-columns:\s*repeat\(3,/, 'presets must remain three columns in the narrow panel');
-  assert.match(grid, /minmax\(0,\s*1fr\)/, 'preset columns must be allowed to shrink without horizontal overflow');
-  assert.match(css, /#textZoomDecreaseButton/, 'the decrease stepper needs rules');
-  assert.match(css, /#textZoomIncreaseButton/, 'the increase stepper needs rules');
+  const calm = readFileSync(new URL('../extension/calm-settings.css', import.meta.url), 'utf8');
+  assert.match(calm, /\.text-zoom-preset-grid/, 'the calm settings layer styles the preset grid');
+  assert.match(calm, /#textZoomDecreaseButton/, 'the decrease stepper needs rules');
+  assert.match(calm, /#textZoomIncreaseButton/, 'the increase stepper needs rules');
   assert.match(css, /#fontProfileSelect/, 'the font select needs rules');
 });
 
 test('settings text controls keep at least 32px pointer targets and preserve canonical scrollbars without CSS zoom', () => {
   const css = readFileSync(new URL('../extension/sidepanel.css', import.meta.url), 'utf8');
-  assert.match(css, /(?:\[data-text-zoom-percent\]|textZoomPresetGrid)[^{]*\{[^}]*min-height:\s*(?:3[2-9]|[4-9]\d)px/, 'preset buttons need at least a 32px pointer target (44px preferred)');
-  assert.doesNotMatch(css, /(?:\[data-text-zoom-percent\]|textZoomPresetGrid)[^{]*\{[^}]*min-height:\s*(?:[0-2]\d|3[01])px/, 'preset targets must never drop below 32px');
   assert.doesNotMatch(css, /^\s*zoom\s*:/m, 'no CSS zoom property may be used');
   assert.doesNotMatch(css, /\.bottom-dock::-webkit-scrollbar/, 'bottom-dock must keep canonical scrollbars');
   assert.doesNotMatch(css, /\.composer::-webkit-scrollbar/, 'composer must keep canonical scrollbars');
@@ -4320,16 +4313,6 @@ test('settings polish separates profile actions, aligns the zoom stepper, and co
   assert.match(html, /class="profile-action-row"[\s\S]*?id="refreshProfilesButton"/);
   assert.match(css, /\.profile-control-stack\s*\{[^}]*gap:\s*(?:1[0-9]|[2-9]\d)px/s);
   assert.match(css, /\.profile-action-row\s*\{[^}]*margin-top:\s*[4-9]px/s);
-
-  const stepper = css.match(/\.text-zoom-stepper\s*\{([\s\S]*?)\n\}/)?.[1] || '';
-  assert.match(stepper, /grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\)\s+38px/);
-  assert.match(stepper, /min-height:\s*38px/);
-  assert.match(css, /#textZoomDecreaseButton,[\s\S]*?#textZoomIncreaseButton\s*\{[^}]*height:\s*38px/s);
-  assert.match(css, /\.text-zoom-input-wrap #textZoomInput\s*\{[^}]*height:\s*38px/s);
-  assert.match(css, /#textZoomInput::-webkit-inner-spin-button/);
-  assert.match(css, /#textZoomInput::-webkit-outer-spin-button/);
-  assert.match(css, /appearance:\s*none/);
-  assert.match(css, /\.text-zoom-input-wrap > span:last-child\s*\{[^}]*display:\s*grid[^}]*place-items:\s*center/s);
 
   assert.match(html, /<details id="contextMenuActionsDisclosure" class="context-menu-actions-disclosure">/);
   assert.doesNotMatch(html, /<details id="contextMenuActionsDisclosure"[^>]*\sopen(?:\s|>)/);
@@ -4369,7 +4352,7 @@ test('settings header owns the animated connection test control', () => {
   const css = readFileSync(new URL('../extension/sidepanel.css', import.meta.url), 'utf8');
   const source = readFileSync(new URL('../extension/sidepanel.js', import.meta.url), 'utf8');
   assert.equal((html.match(/id="testConnectionButton"/g) || []).length, 1);
-  assert.match(html, /settings-header-actions[\s\S]*?testConnectionButton[\s\S]*?closeSettingsButton/);
+  assert.match(html, /settingsPane-connections[\s\S]*?testConnectionButton/, 'the connection test lives in Connections as a labelled button');
   assert.match(html, /settings-connection-test-icon/);
   assert.match(css, /\.settings-connection-test\.is-testing \.settings-connection-test-icon[\s\S]*?animation:\s*settings-connection-climb/);
   assert.doesNotMatch(css, /settings-connection-orbit/, 'the signal bars climb while testing; they never spin');

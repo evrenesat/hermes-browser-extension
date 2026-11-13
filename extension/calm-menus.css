@@ -1,0 +1,1023 @@
+/* Calm menus and popovers: model picker, attach, quick commands, slash suggestions,
+   profile switcher, context popover and the sessions drawer. Loaded after sidepanel.css and
+   sidepanel-calm.css; spec in docs/design/ui-revamp.md ("Menus and popovers").
+   Sections: 1 shared surface, 2 shared rows and labels, 3 attach, 4 quick commands and slash,
+   5 model picker, 6 context popover and profile switcher, 7 sessions drawer, 8 projects panel,
+   9 coarse pointer. */
+
+/* ------------------------------------------------------------------ */
+/* 1. Shared surface                                                   */
+/* ------------------------------------------------------------------ */
+html .attach-menu,
+html .quick-more-menu,
+html .skill-menu,
+html .model-menu,
+html .context-popover,
+html .profile-switch-menu,
+html .session-menu {
+  box-sizing: border-box;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  color: var(--calm-text);
+  box-shadow: var(--calm-shadow-popover);
+  font: 400 13px/1.4 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+  padding: 4px;
+  overflow: hidden;
+}
+
+html .attach-menu button,
+html .quick-more-item,
+html .skill-option,
+html .model-option,
+html .session-option,
+html .session-group-toggle,
+html .profile-switch-option,
+html .session-row-menu-item {
+  font: 400 13px/1.4 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Section labels */
+html .model-group-title,
+html .session-group-title,
+html .session-date-label,
+html .quick-more-heading,
+html .model-options-heading,
+html .projects-group-title,
+html .projects-label {
+  margin: 0;
+  padding: 8px 8px 2px;
+  color: var(--calm-muted);
+  font: 600 11px/1.4 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Rows */
+html .attach-menu button,
+html .quick-more-item,
+html .skill-option,
+html .model-option,
+html .session-option,
+html .profile-switch-option,
+html .session-row-menu-item {
+  box-sizing: border-box;
+  min-height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-text);
+  text-align: start;
+  cursor: pointer;
+  transition: background var(--calm-ease), color var(--calm-ease);
+}
+
+html .attach-menu button:hover,
+html .quick-more-item:hover,
+html .skill-option:hover,
+html .model-option:hover,
+html .session-option:hover,
+html .profile-switch-option:hover,
+html .session-row-menu-item:hover {
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+}
+
+html .quick-more-item:focus-visible,
+html .attach-menu button:focus-visible,
+html .skill-option.active,
+html .model-option:focus-visible,
+html .session-option:focus-visible,
+html .profile-switch-option:focus-visible,
+html .session-row-menu-item:focus-visible {
+  background: var(--calm-surface-2);
+  outline: 2px solid var(--calm-accent);
+  outline-offset: -2px;
+}
+
+html .skill-option.active { outline: none; box-shadow: inset 0 0 0 1px var(--calm-accent); }
+
+html .model-option.selected,
+html .profile-switch-option.selected,
+html .session-option.selected {
+  background: var(--calm-accent-soft);
+  color: var(--calm-accent);
+}
+
+html .model-option.selected:hover,
+html .session-option.selected:hover { background: var(--calm-accent-soft); }
+
+/* Scrolling lists */
+html .model-menu-list,
+html .session-menu-list,
+html .quick-command-list {
+  min-height: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+html .model-menu input[type="search"],
+html .session-menu input[type="search"] {
+  box-sizing: border-box;
+  width: calc(100% - 0px);
+  height: var(--calm-input-h);
+  min-height: var(--calm-input-h);
+  margin: 0 0 4px;
+  padding: 0 10px;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-bg);
+  color: var(--calm-text);
+  font: 400 13px/1 var(--calm-font-ui);
+}
+html .model-menu input[type="search"]:focus,
+html .session-menu input[type="search"]:focus {
+  border-color: var(--calm-accent);
+  outline: none;
+  box-shadow: 0 0 0 1px var(--calm-accent);
+}
+html .model-menu input::placeholder,
+html .session-menu input::placeholder { color: var(--calm-muted); opacity: 1; }
+
+/* Small ghost footer buttons */
+html .model-menu footer,
+html .session-menu footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: 4px -4px -4px;
+  padding: 4px;
+  border-top: 1px solid var(--calm-border);
+}
+html .model-menu footer button,
+html .session-menu footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  margin: 0;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-muted);
+  font: 400 12px/1 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+  box-shadow: none;
+}
+html .model-menu footer button:hover:not(:disabled),
+html .session-menu footer button:hover:not(:disabled) {
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+}
+html .model-menu footer button:disabled,
+html .session-menu footer button:disabled { opacity: 0.5; cursor: default; }
+html .model-menu footer button:last-child:not(:first-child),
+html .session-menu footer button:last-child:not(:first-child) { margin-inline-start: auto; }
+
+/* ------------------------------------------------------------------ */
+/* 3. Attach menu                                                      */
+/* ------------------------------------------------------------------ */
+html .attach-menu {
+  left: 0;
+  bottom: calc(100% + 6px);
+  width: max-content;
+  min-width: 220px;
+  max-width: calc(100vw - 24px);
+  max-height: min(70vh, 420px);
+  overflow-y: auto;
+}
+html .attach-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+html .attach-menu button[hidden] { display: none; }
+html .attach-menu-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  color: var(--calm-muted);
+  vertical-align: baseline;
+}
+html .attach-menu button:hover .attach-menu-icon { color: var(--calm-text); }
+html .attach-menu hr {
+  height: 0;
+  margin: 4px -4px;
+  border: 0;
+  border-top: 1px solid var(--calm-border);
+}
+html .attach-menu-heading { display: none; }
+
+/* ------------------------------------------------------------------ */
+/* 4. Quick commands and slash suggestions                             */
+/* ------------------------------------------------------------------ */
+html .quick-more-menu {
+  display: flex;
+  flex-direction: column;
+  max-height: min(340px, var(--hermes-composer-space, 70vh));
+}
+html .quick-more-menu[hidden],
+html .skill-menu[hidden],
+html .model-menu[hidden],
+html .session-menu[hidden],
+html .context-popover[hidden],
+html .profile-switch-menu[hidden] { display: none; }
+html .quick-more-heading { display: block; }
+html .quick-more-heading small { display: none; }
+
+html .quick-more-item,
+html .skill-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+html .qmi-token,
+html .skill-option-name {
+  flex: none;
+  min-width: 0;
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--calm-accent);
+  font: 500 13px/1.4 var(--calm-font-mono);
+}
+html .qmi-description,
+html .skill-option-command {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--calm-muted);
+  font: 400 12px/1.4 var(--calm-font-ui);
+}
+html .skill-option.mention-option .skill-option-name { font-family: var(--calm-font-ui); }
+
+html .skill-menu {
+  max-height: min(220px, var(--hermes-composer-space, 220px));
+  overflow-y: auto;
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. Model picker                                                     */
+/* ------------------------------------------------------------------ */
+html .model-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+html #modelMenu:not([data-floating]):not([data-selection-target]) {
+  max-height: min(520px, var(--hermes-composer-space, 70vh));
+}
+html .model-menu-head { display: none; }
+html .model-menu[data-selection-target="assist"] .model-menu-head,
+html .model-menu[data-selection-target="room-member"] .model-menu-head {
+  display: flex;
+  min-height: 28px;
+  padding: 0 4px 4px 8px;
+  border: 0;
+  color: var(--calm-muted);
+  font: 600 11px/1.4 var(--calm-font-ui);
+}
+html .model-menu[data-selection-target="assist"],
+html .model-menu[data-selection-target="room-member"] {
+  border-radius: var(--calm-radius-card);
+  box-shadow: var(--calm-shadow-popover);
+}
+html .model-menu-head button {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  color: var(--calm-muted);
+  font-size: 16px;
+}
+html .model-menu-head button:hover { background: var(--calm-surface-2); color: var(--calm-text); }
+
+/* Provider chips wrap instead of scrolling sideways */
+html .model-provider-list {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 0;
+  max-height: 64px;
+  margin: 0 0 4px;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 0;
+  background: transparent;
+}
+html .model-provider-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 24px;
+  padding: 0 9px;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-pill);
+  background: transparent;
+  color: var(--calm-muted);
+  font: 400 12px/1 var(--calm-font-ui);
+  cursor: pointer;
+  transition: background var(--calm-ease), color var(--calm-ease), border-color var(--calm-ease);
+}
+html .model-provider-option:hover { background: var(--calm-surface-2); color: var(--calm-text); }
+html .model-provider-option.selected {
+  border-color: transparent;
+  background: var(--calm-accent-soft);
+  color: var(--calm-accent);
+}
+html .model-provider-option:focus-visible { outline: 2px solid var(--calm-accent); outline-offset: 1px; }
+html .model-provider-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+html .model-provider-count { color: inherit; opacity: 0.7; font-size: 11px; }
+
+html .model-menu-list { flex: 1 1 auto; }
+html .model-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+html .model-option-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html .model-option-meta {
+  flex: none;
+  color: var(--calm-muted);
+  font: 400 11px/1.4 var(--calm-font-ui);
+  white-space: nowrap;
+}
+html .model-option.selected .model-option-meta { color: var(--calm-accent); opacity: 0.8; }
+html .model-option-check { flex: none; color: var(--calm-accent); }
+html .model-option.observed { color: var(--calm-muted); }
+html .model-recent-title { padding-top: 2px; }
+
+/* Options: one compact block */
+html .model-options-list {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  margin: 4px -4px 0;
+  padding: 6px 12px 8px;
+  border-top: 1px solid var(--calm-border);
+  background: transparent;
+  overflow: visible;
+}
+html .model-options-heading { flex: 0 0 100%; padding: 0 0 2px; }
+html .model-options-note { flex: 0 0 100%; margin: 0; color: var(--calm-muted); font-size: 12px; }
+html .model-toggle-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-text);
+  font: 400 13px/1 var(--calm-font-ui);
+  cursor: pointer;
+}
+html .model-menu .model-toggle-option:hover { background: transparent; }
+html .model-menu .model-toggle-option:focus-visible { outline: 2px solid var(--calm-accent); outline-offset: 2px; background: transparent; }
+html .toggle-switch {
+  box-sizing: border-box;
+  width: 32px;
+  height: 18px;
+  border: 0;
+  border-radius: var(--calm-radius-pill);
+  background: var(--calm-border-strong);
+}
+html .toggle-switch::after {
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+html .toggle-switch.on { background: var(--calm-accent); border: 0; }
+html .toggle-switch.on::after { transform: translateX(14px); background: #fff; }
+html .model-effort-list { display: none; }
+
+html :is(.model-menu, .settings-dialog) .effort-control {
+  flex: 0 0 100%;
+  margin: 4px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  --effort-ink: var(--calm-text);
+  --effort-paper: var(--calm-surface);
+  --effort-thumb: var(--calm-accent);
+  --effort-halo: var(--calm-surface);
+}
+html .settings-dialog .effort-control { --effort-paper: var(--calm-bg); --effort-halo: var(--calm-bg); }
+html :is(.model-menu, .settings-dialog) .effort-control-header { display: flex; }
+html :is(.model-menu, .settings-dialog) .effort-control-views,
+html :is(.model-menu, .settings-dialog) .effort-control-sparks { display: none; }
+html :is(.model-menu, .settings-dialog) .effort-control-title { color: var(--calm-text); font: 400 13px/1.3 var(--calm-font-ui); }
+html :is(.model-menu, .settings-dialog) .effort-control-value { color: var(--calm-accent); font: 600 12px/1.3 var(--calm-font-ui); }
+html :is(.model-menu, .settings-dialog) .effort-control-slider { margin-top: 2px; }
+html :is(.model-menu, .settings-dialog) .effort-control-ends { color: var(--calm-muted); font-size: 11px; line-height: 1.3; }
+html :is(.model-menu, .settings-dialog) .effort-control-track { height: 22px; }
+html :is(.model-menu, .settings-dialog) .effort-control-lane {
+  top: 9px;
+  bottom: 9px;
+  left: 6px;
+  right: 6px;
+  border: 0;
+  border-radius: var(--calm-radius-pill);
+  background: var(--calm-border);
+}
+html :is(.model-menu, .settings-dialog) .effort-control-fill { border-radius: var(--calm-radius-pill); background: var(--calm-accent); opacity: 0.55; }
+html :is(.model-menu, .settings-dialog) .effort-control-stop { display: none; }
+html :is(.model-menu, .settings-dialog) .effort-control input.effort-control-range { height: 22px; min-height: 22px; }
+html :is(.model-menu, .settings-dialog) .effort-control-range::-webkit-slider-runnable-track { height: 22px; }
+html :is(.model-menu, .settings-dialog) .effort-control-range::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--calm-accent);
+  box-shadow: 0 0 0 3px var(--effort-halo, var(--calm-surface));
+}
+html :is(.model-menu, .settings-dialog) .effort-control-range::-moz-range-track { height: 22px; }
+html :is(.model-menu, .settings-dialog) .effort-control-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--calm-accent);
+  box-shadow: 0 0 0 3px var(--effort-halo, var(--calm-surface));
+}
+html :is(.model-menu, .settings-dialog) .effort-control-status { margin: 4px 0 0; color: var(--calm-muted); font-size: 12px; }
+
+html .model-refresh-status { margin: 0; padding: 4px 8px 4px; color: var(--calm-muted); font: 400 12px/1.4 var(--calm-font-ui); }
+
+/* ------------------------------------------------------------------ */
+/* 6. Context popover and profile switcher                             */
+/* ------------------------------------------------------------------ */
+html .context-popover {
+  overflow-y: auto;
+  padding: 8px;
+}
+html .context-popover header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 24px;
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+}
+html .context-popover header span {
+  color: var(--calm-muted);
+  font: 600 11px/1.4 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+}
+html .context-popover header span::first-letter { text-transform: uppercase; }
+html .context-popover dt { color: var(--calm-muted); font: 400 12px/1.4 var(--calm-font-ui); letter-spacing: normal; text-transform: none; }
+html .context-popover dd { font: 400 12px/1.4 var(--calm-font-ui); }
+html .context-popover .secondary,
+html .context-popover .context-compact-button {
+  min-height: 24px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  font: 400 12px/1 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+  box-shadow: none;
+}
+html .context-popover .secondary:hover:not(:disabled) { background: var(--calm-border); }
+html .context-popover .secondary:disabled { opacity: 0.5; }
+html .context-popover .context-refresh-button {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  min-height: 24px;
+  padding: 0;
+  background: transparent;
+  color: var(--calm-muted);
+}
+html .context-popover .context-refresh-button:hover { background: var(--calm-surface-2); color: var(--calm-text); }
+
+html .profile-switch-menu { max-height: min(280px, var(--hermes-composer-space, 280px)); overflow-y: auto; }
+html .profile-switch-modes {
+  display: flex;
+  gap: 2px;
+  margin: 0 0 4px;
+  padding: 2px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-surface-2);
+}
+html .profile-switch-mode {
+  flex: 1 1 0;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--calm-muted);
+  font: 500 12px/1 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+}
+html .profile-switch-mode.on { background: var(--calm-bg); color: var(--calm-text); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+html .profile-switch-options { display: grid; gap: 0; padding: 0; }
+html .profile-switch-option { display: flex; align-items: center; gap: 8px; width: 100%; }
+
+/* ------------------------------------------------------------------ */
+/* 7. Sessions drawer                                                  */
+/* ------------------------------------------------------------------ */
+html .session-menu {
+  top: calc(var(--calm-topbar-h) + 4px);
+  right: 8px;
+  left: 8px;
+  display: flex;
+  flex-direction: column;
+  max-height: min(560px, calc(100vh - var(--calm-topbar-h) - 16px));
+  grid-template-rows: none;
+}
+
+/* Recents | Projects as a small segmented control */
+html .session-menu-tabs {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  margin: 0 0 4px;
+  padding: 2px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-surface-2);
+}
+html .session-menu-tabs[hidden] { display: none; }
+html .session-menu-tab {
+  flex: 1 1 0;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--calm-muted);
+  font: 500 12px/1 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+  cursor: pointer;
+  transition: background var(--calm-ease), color var(--calm-ease);
+}
+html .session-menu-tab:hover { color: var(--calm-text); background: transparent; }
+html .session-menu-tab[aria-pressed="true"] {
+  background: var(--calm-bg);
+  color: var(--calm-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+html .session-menu-tab:focus-visible { outline: 2px solid var(--calm-accent); outline-offset: 1px; }
+
+html .session-menu #sessionSearchInput { flex: none; }
+html .session-menu #sessionSearchInput[hidden] { display: none; }
+html .session-menu-list { flex: 1 1 auto; }
+html .session-menu-list[hidden],
+html .session-menu footer[hidden] { display: none; }
+
+html .session-group-title:not(.session-group-toggle) {
+  padding: 12px 8px;
+  text-align: center;
+  font-weight: 400;
+  font-size: 12px;
+}
+html .session-group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 24px;
+  margin: 0;
+  padding: 8px 8px 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--calm-muted);
+  font: 600 11px/1.4 var(--calm-font-ui);
+  cursor: pointer;
+}
+html .session-group-toggle:hover,
+html .session-group-toggle.open { background: transparent; color: var(--calm-text); }
+html .session-group-toggle strong { font-weight: 400; opacity: 0.8; }
+
+/* Rows: 30px, title + muted time; actions behind a hover ⋯ */
+html .session-menu-list .session-option-row:not(.renaming) {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0;
+  min-height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  box-shadow: none;
+}
+html .session-menu-list .session-option-row:not(.renaming):hover { background: var(--calm-surface-2); }
+html .session-menu-list .session-option-row.selected:not(.renaming) { background: var(--calm-accent-soft); }
+html .session-menu-list .session-option-row:not(.renaming) > .session-option {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  min-width: 0;
+  min-height: 30px;
+  padding: 0 8px;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+}
+html .session-menu-list .session-option-row:not(.renaming) > .session-option:hover { background: transparent; }
+html .session-menu-list .session-option-row.selected > .session-option { color: var(--calm-accent); }
+html .session-menu-list .session-option-row.selected > .session-option:hover { background: transparent; }
+html .session-option-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html .session-option-meta {
+  flex: none;
+  max-width: none;
+  color: var(--calm-muted);
+  font: 400 11px/1 var(--calm-font-ui);
+  white-space: nowrap;
+}
+html .session-option-meta:empty { display: none; }
+
+/* Running sessions: accent dot instead of a badge */
+html .session-menu-list .session-option-row[data-live-state="running"]:not(.renaming),
+html .session-menu-list .session-option-row[data-live-state="running"]:not(.renaming):hover {
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+html .session-menu-list .session-option-row[data-live-state="running"].selected:not(.renaming) { background: var(--calm-accent-soft); }
+html .session-menu-list .session-option-row[data-live-state="running"]:not(.renaming):hover { background: var(--calm-surface-2); }
+html .session-option-row[data-live-state="running"] .session-option { color: var(--calm-text); font-weight: 500; }
+html .session-option-row[data-live-state="running"].selected .session-option { color: var(--calm-accent); }
+html .session-option-meta.session-live-dot {
+  display: block;
+  width: 7px;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--calm-accent);
+  font-size: 0;
+  color: transparent;
+  animation: calmSessionPulse 1.6s ease-in-out infinite;
+}
+html .session-option-row[data-live-state="running"] .session-option-meta::before { display: none; }
+@keyframes calmSessionPulse { 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) {
+  html .session-option-meta.session-live-dot { animation: none; }
+}
+
+html .session-date-label { padding: 8px 8px 2px; }
+html .session-date-label:first-child { padding-top: 4px; }
+
+/* Row actions: one ⋯ trigger, visible on hover, focus or while its menu is open */
+html .session-menu-list .session-option-row:not(.renaming) > .session-actions {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 3px;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--calm-ease);
+}
+html .session-menu-list .session-option-row:not(.renaming):hover > .session-actions,
+html .session-menu-list .session-option-row:not(.renaming):focus-within > .session-actions,
+html .session-menu-list .session-option-row:not(.renaming) > .session-actions:has([aria-expanded="true"]) {
+  opacity: 1;
+  pointer-events: auto;
+}
+html .session-option-row:hover > .session-option .session-option-meta,
+html .session-option-row:focus-within:has(.session-actions-trigger) > .session-option .session-option-meta { visibility: hidden; }
+html .session-actions-trigger {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-muted);
+  cursor: pointer;
+}
+html .session-actions-trigger:hover,
+html .session-actions-trigger[aria-expanded="true"] { background: var(--calm-border); color: var(--calm-text); }
+html .session-actions-trigger:focus-visible { outline: 2px solid var(--calm-accent); outline-offset: -2px; }
+
+html .session-row-menu {
+  position: absolute;
+  z-index: 5;
+  box-sizing: border-box;
+  min-width: 160px;
+  padding: 4px;
+  border: 1px solid var(--calm-border-strong);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  box-shadow: var(--calm-shadow-popover);
+}
+html .session-row-menu-item { display: block; width: 100%; white-space: nowrap; }
+
+/* Rename editor */
+html .session-option-row.renaming {
+  margin: 2px 0;
+  padding: 4px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-surface-2);
+}
+html .session-rename-editor .session-rename-input {
+  height: var(--calm-control-h);
+  min-height: var(--calm-control-h);
+  border: 1px solid var(--calm-border-strong);
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-bg);
+  color: var(--calm-text);
+  font: 400 13px/1 var(--calm-font-ui);
+}
+html .session-action-button {
+  min-height: 24px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  font: 400 12px/1 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+}
+html .session-action-button:hover:not(:disabled),
+html .session-action-button:focus-visible { background: var(--calm-border); color: var(--calm-text); }
+html .session-rename-editor .session-action-button.session-rename-save { background: var(--calm-accent); color: var(--calm-accent-fg); }
+html .session-rename-status { color: var(--calm-muted); font-size: 12px; }
+
+html .session-refresh-icon { flex: none; width: 14px; height: 14px; }
+
+/* ------------------------------------------------------------------ */
+/* 8. Projects panel (inside the drawer)                               */
+/* ------------------------------------------------------------------ */
+html .projects-panel { padding: 0; }
+html .projects-scope,
+html .projects-hint,
+html .projects-state-text { color: var(--calm-muted); font: 400 12px/1.45 var(--calm-font-ui); }
+html .projects-scope { margin: 0; padding: 4px 8px; }
+html .projects-option {
+  min-height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-text);
+  font: 400 13px/1.4 var(--calm-font-ui);
+}
+html .projects-option:hover { background: var(--calm-surface-2); }
+html .projects-option .projects-path,
+html .projects-option .projects-recent,
+html .projects-disambiguator { color: var(--calm-muted); font: 400 11px/1.4 var(--calm-font-ui); }
+html .projects-active-dot { background: var(--calm-accent); }
+html .projects-back,
+html .projects-heading {
+  min-height: 28px;
+  border: 0;
+  background: transparent;
+  color: var(--calm-text);
+  font: 600 13px/1.4 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+}
+html .projects-back { color: var(--calm-muted); font-weight: 400; }
+html .projects-back:hover { color: var(--calm-text); }
+html .projects-state,
+html .projects-warning,
+html .projects-notice,
+html .projects-folder,
+html .projects-move-session {
+  margin: 4px 0;
+  padding: 10px;
+  border: 0;
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+}
+html .projects-state-error { box-shadow: inset 2px 0 0 var(--calm-danger); }
+html .projects-state-warn,
+html .projects-warning { box-shadow: inset 2px 0 0 var(--calm-warn); }
+html .projects-state-ok { box-shadow: inset 2px 0 0 var(--calm-ok); }
+html .projects-state-title { font: 600 13px/1.4 var(--calm-font-ui); color: var(--calm-text); }
+html .projects-state-reason {
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-border);
+  color: var(--calm-muted);
+  font: 400 11px/1.4 var(--calm-font-ui);
+}
+html .projects-state-loading { box-shadow: none; }
+html .projects-primary-action {
+  min-height: var(--calm-control-h);
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-accent);
+  color: var(--calm-accent-fg);
+  font: 500 13px/1 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+}
+html .projects-primary-action:hover:not(:disabled),
+html .projects-primary-action:focus-visible { background: var(--calm-accent); color: var(--calm-accent-fg); filter: brightness(1.08); }
+html .projects-input,
+html .projects-field input,
+html .projects-field textarea {
+  min-height: var(--calm-input-h);
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-bg);
+  color: var(--calm-text);
+  font: 400 13px/1.4 var(--calm-font-ui);
+}
+html .projects-choice,
+html .projects-folder-item {
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+}
+html .projects-choice:hover { background: var(--calm-surface-2); }
+html .projects-choice:has(input:checked) { border-color: var(--calm-accent); background: var(--calm-accent-soft); }
+html .projects-choice-name { color: var(--calm-text); font-size: 13px; }
+html .projects-choice .projects-path,
+html .projects-folder-path { color: var(--calm-muted); font: 400 11px/1.4 var(--calm-font-ui); }
+html .projects-choice-badge {
+  border: 0;
+  border-radius: var(--calm-radius-pill);
+  background: var(--calm-border);
+  color: var(--calm-muted);
+  font-size: 11px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 9. Coarse pointer                                                   */
+/* ------------------------------------------------------------------ */
+@media (pointer: coarse) {
+  html .attach-menu button,
+  html .quick-more-item,
+  html .skill-option,
+  html .model-option,
+  html .session-option,
+  html .profile-switch-option,
+  html .session-row-menu-item { min-height: 40px; }
+  html .session-menu-list .session-option-row:not(.renaming) > .session-option { min-height: 40px; }
+  html .model-menu input[type="search"],
+  html .session-menu input[type="search"] { height: 40px; min-height: 40px; }
+  html .model-provider-option,
+  html .session-menu-tab,
+  html .profile-switch-mode { min-height: 32px; }
+  html .session-menu-list .session-option-row:not(.renaming) > .session-actions { opacity: 1; pointer-events: auto; }
+  html .session-menu-list .session-option-row:not(.renaming) > .session-option { padding-inline-end: 44px; }
+  html .session-actions-trigger { width: 36px; height: 36px; }
+  html .session-option-row:hover > .session-option .session-option-meta { visibility: visible; }
+  html .model-menu footer button,
+  html .session-menu footer button { min-height: 32px; }
+}
+
+/* Tweaks found in review */
+html .quick-more-heading { border: 0; display: block; }
+html[data-hermes-mode="dark"] .session-menu-tab[aria-pressed="true"],
+html[data-hermes-mode="dark"] .profile-switch-mode.on { background: var(--calm-border); }
+html .session-menu footer button svg { flex: none; }
+html .session-menu-tab + .session-menu-tab { border-inline-start: 0; }
+html .session-menu-tab[aria-pressed="true"]:hover,
+html .session-menu-tab[aria-pressed="true"]:focus-visible { background: var(--calm-bg); color: var(--calm-text); }
+html[data-hermes-mode="dark"] .session-menu-tab[aria-pressed="true"]:hover,
+html[data-hermes-mode="dark"] .session-menu-tab[aria-pressed="true"]:focus-visible { background: var(--calm-border); }
+html .session-menu-tab:not([aria-pressed="true"]):hover,
+html .session-menu-tab:not([aria-pressed="true"]):focus-visible { background: transparent; color: var(--calm-text); }
+
+/* Context popover content */
+html .context-popover .context-usage-card { margin-top: 4px; gap: 6px; font: 400 12px/1.4 var(--calm-font-ui); color: var(--calm-text); }
+html .context-popover .context-usage-summary { font: 600 13px/1.4 var(--calm-font-ui); }
+html .context-popover .context-usage-percent { font: 400 12px/1.4 var(--calm-font-ui); color: var(--calm-muted); }
+html .context-popover .context-usage-meta,
+html .context-popover .context-usage-source,
+html .context-popover .context-usage-label { color: var(--calm-muted); font: 400 12px/1.4 var(--calm-font-ui); }
+html .context-popover .context-usage-share { font: 400 12px/1.4 var(--calm-font-ui); }
+html .context-popover .context-usage-bar {
+  height: 6px;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--calm-radius-pill);
+  background: var(--calm-surface-2);
+}
+html .context-popover .context-usage-segment { background: var(--context-usage-fill, var(--calm-accent)); }
+html .context-popover .context-usage-segment + .context-usage-segment { box-shadow: inset 1px 0 0 var(--calm-surface); }
+html .context-popover .context-control-row {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--calm-border);
+  color: var(--calm-muted);
+  font: 400 12px/1.4 var(--calm-font-ui);
+}
+html .context-popover .context-control-actions { display: flex; gap: 4px; margin-top: 8px; }
+html .context-popover .context-control-actions .secondary { flex: 1 1 0; justify-content: center; }
+
+/* ------------------------------------------------------------------ */
+/* 10. Phase 3: tab scope menu (flat rows, no boxes in boxes)          */
+/* ------------------------------------------------------------------ */
+html .context-scope-menu {
+  box-sizing: border-box;
+  padding: 4px;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  background: var(--calm-surface);
+  color: var(--calm-text);
+  box-shadow: var(--calm-shadow-popover);
+  font: 400 13px/1.4 var(--calm-font-ui);
+}
+html .context-scope-menu button {
+  box-sizing: border-box;
+  min-height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--calm-radius-control);
+  background: transparent;
+  color: var(--calm-text);
+  font: 400 13px/1.4 var(--calm-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
+}
+html .context-scope-menu button:hover,
+html .context-scope-menu button:focus-visible { background: var(--calm-surface-2); color: var(--calm-text); }
+html .context-scope-menu button.selected { background: var(--calm-accent-soft); color: var(--calm-accent); }
+html .context-scope-menu small { color: var(--calm-muted); font: 400 11px/1.4 var(--calm-font-ui); letter-spacing: normal; text-transform: none; }
+html .context-scope-prompt-controls { margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--calm-border); }
+html .context-scope-section-head { padding: 4px 8px 0; color: var(--calm-muted); font: 600 11px/1.4 var(--calm-font-ui); }
+html .context-scope-prompt-actions button { border: 0; border-radius: var(--calm-radius-control); }
+html .context-scope-search {
+  min-height: var(--calm-control-h);
+  padding: 0 8px;
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-control);
+  background: var(--calm-bg);
+  color: var(--calm-text);
+  font: 400 13px/1.4 var(--calm-font-ui);
+}
+html .context-scope-search:focus { border-color: var(--calm-accent); outline: none; }
+html .context-scope-tab-row { grid-template-columns: minmax(0, 1fr) auto; gap: 2px; margin: 0; }
+html .context-scope-menu .context-scope-include-toggle {
+  min-width: 36px;
+  border: 0;
+  border-radius: var(--calm-radius-pill);
+  background: var(--calm-surface-2);
+  color: var(--calm-muted);
+  font: 500 11px/1.4 var(--calm-font-ui);
+}
+html .context-scope-menu .context-scope-include-toggle.selected { background: var(--calm-accent-soft); color: var(--calm-accent); border: 0; }
+html .context-scope-menu .context-scope-include-toggle:not(.selected) { opacity: 1; }

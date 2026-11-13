@@ -329,7 +329,7 @@
   const brandTitle = make('strong', 'title', 'Hermes Assist');
   const contextDetail = make('span', 'head-detail', 'Focused draft');
   brandCopy.append(brandTitle, contextDetail);
-  const contextState = make('span', 'head-state secure', 'PRIVATE');
+  const contextState = make('span', 'head-state secure', 'Private');
   const close = button('close', '×', 'Close Hermes Assist');
   head.append(brandWing, brandCopy, contextState, close);
   const body = make('div', 'body');
@@ -411,10 +411,10 @@
   let assistSettings = {
     inlineAssistEnabled: true,
     inlineAssistDefaultRoute: policy.routePreferences?.ASK || 'ask',
-    appearanceTheme: appearance.defaultTheme || 'nous',
-    colorMode: appearance.defaultColorMode || 'dark',
+    appearanceTheme: appearance.defaultTheme || 'calm',
+    colorMode: appearance.defaultColorMode || 'system',
     inlineAssistIcon: 'wing',
-    fontProfile: 'signature',
+    fontProfile: 'system-sans',
     customFontFamily: '',
   };
   let requestedFontFamilies = '';
@@ -493,7 +493,7 @@
   }
 
   function applyAssistFontStacks() {
-    const profile = appearancePreferences?.normalizeFontProfile?.(assistSettings.fontProfile, assistSettings.customFontFamily) || 'signature';
+    const profile = appearancePreferences?.normalizeFontProfile?.(assistSettings.fontProfile, assistSettings.customFontFamily) || 'system-sans';
     const profileStack = appearancePreferences?.fontFamilyPreview?.(profile, assistSettings.customFontFamily) || '';
     const localFamily = profile === 'custom-local' ? appearancePreferences?.sanitizeLocalFontFamily?.(assistSettings.customFontFamily) || '' : '';
     const stacks = look?.inlineAssistFontStacks?.(profile, profileStack, fontName, { localFamily });
@@ -1698,7 +1698,7 @@
     contextDetail.textContent = translateUiText(session.hasActiveSession
       ? `Active chat · ${Number(session.messageCount || 0) || 'existing'} messages`
       : 'No active chat');
-    contextState.textContent = translateUiText('CHOOSE');
+    contextState.textContent = translateUiText('Choose');
     contextState.classList.remove('secure');
     // Back to where it was opened from; Close where the panel's own header (with its ×) is hidden.
     const nav = make('div', 'sheet-nav');
@@ -1787,7 +1787,7 @@
       return;
     }
     activeView = { name: 'working', args: [] };
-    contextState.textContent = translateUiText('WORKING');
+    contextState.textContent = translateUiText('Working');
     const wrap = make('div', 'working');
     const mark = make('i', 'working-mark');
     const title = make('h2', 'route-title', 'Hermes is drafting');
@@ -1802,7 +1802,7 @@
     // failure in that bar.
     if ((panel.hidden && panel.dataset.mode === 'quick') || (!panel.hidden && panel.dataset.mode === 'bar')) return renderFailureBar(reason);
     activeView = { name: 'failure', args: [reason] };
-    contextState.textContent = translateUiText('BLOCKED');
+    contextState.textContent = translateUiText('Blocked');
     const title = make('h2', 'route-title', 'Assist could not run');
     const detail = make('p', 'status failure-detail', reason || 'Hermes could not create this draft.');
     const back = button('failure-back', 'Back to actions');
@@ -1909,7 +1909,7 @@
       ? pending.actionLabel
       : translateUiText(pending?.actionLabel || 'Result');
     contextDetail.textContent = `${translateUiText(noModel ? 'Local utility' : 'Inline assist')} · ${actionLabel}`;
-    contextState.textContent = translateUiText('COMPLETE');
+    contextState.textContent = translateUiText('Complete');
     contextState.classList.add('secure');
     const copyOnly = pending?.applyMode === 'copy-only';
     const success = make('div', 'success');
@@ -2049,7 +2049,7 @@
   function renderOpenSessionChoices() {
     if (!resultSessionId) return;
     activeView = { name: 'open-session', args: [] };
-    contextState.textContent = translateUiText('CHOOSE');
+    contextState.textContent = translateUiText('Choose');
     contextState.classList.remove('secure');
     const title = make('h2', 'route-title', 'Where should this session open?');
     const note = make('p', 'note', 'Open the retained Assist session in the extension side panel or in Hermes Web.');
@@ -2097,7 +2097,7 @@
   // background says why; the commands are the same three the side panel's dialog offers.
   function renderWebappUnavailable(response) {
     activeView = { name: 'webapp-unavailable', args: [response] };
-    contextState.textContent = translateUiText('BLOCKED');
+    contextState.textContent = translateUiText('Blocked');
     const reasons = {
       'needs-address': 'This connection is remote, so there is no address to try. Enter the Hermes Web address in Settings.',
       'invalid-address': 'The Hermes Web address in Settings is not a valid http or https address.',
@@ -2120,7 +2120,7 @@
 
   function renderWebappOpened(hint) {
     activeView = { name: 'webapp-opened', args: [hint] };
-    contextState.textContent = translateUiText('COMPLETE');
+    contextState.textContent = translateUiText('Complete');
     const done = button('action', 'Close');
     done.addEventListener('click', trustedOnly(() => {
       hidePanel();

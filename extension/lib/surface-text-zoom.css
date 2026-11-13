@@ -35,19 +35,19 @@ html[data-hermes-text-zoom] .web-message-content h4 {
   font-family: var(--hermes-font-display, "HermesDisplay", Georgia, serif);
   font-weight: 500;
   line-height: 1.2;
-  letter-spacing: 0.03em;
+  letter-spacing: normal;
   text-transform: none;
 }
 html[data-hermes-font-profile="signature"] .web-message-content :is(h1, h2, h3, h4, h5, h6) {
-  font-family: var(--hermes-font-display);
+  font-family: var(--hermes-font-ui);
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 0.92;
   text-transform: none;
 }
 html[data-hermes-font-profile="cinzel"] .web-message-content :is(h1, h2, h3, h4, h5, h6) {
-  font-family: var(--hermes-font-display);
-  letter-spacing: 0.01em;
+  font-family: var(--hermes-font-ui);
+  letter-spacing: normal;
   line-height: 1.15;
 }
 

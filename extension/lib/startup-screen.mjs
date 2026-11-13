@@ -13,15 +13,15 @@ const KEY_UNIT = Object.freeze([[0, 8], [0, 0], [8, 0], [8, 6], [4, 6], [4, 4], 
 
 // A line for each check while it has nothing more specific to say.
 export const STARTUP_STEP_LINES = Object.freeze({
-  settings: 'Reading the scrolls',
-  gateway: 'Opening the gates',
-  capabilities: 'Arming the messenger',
-  models: 'Consulting the oracles',
-  selectedModel: 'Choosing an oracle',
-  skills: 'Gathering the arts',
-  profiles: 'Calling the pantheon',
-  sessions: 'Recalling past journeys',
-  sessionBinding: 'Binding the golden thread',
+  settings: 'Reading settings',
+  gateway: 'Connecting to Hermes',
+  capabilities: 'Checking what Hermes can do',
+  models: 'Loading models',
+  selectedModel: 'Checking the selected model',
+  skills: 'Loading skills',
+  profiles: 'Loading profiles',
+  sessions: 'Loading sessions',
+  sessionBinding: 'Opening your chat',
 });
 
 const FAILED_STATUSES = new Set(['error', 'unreachable', 'unconfigured']);
@@ -78,6 +78,20 @@ export function meanderGeometry(width, height, { inset = 12, cell = 2.2, unitWid
   };
 }
 
+const SUMMARY_MAX_CHARS = 96;
+
+// One plain line for the card; the full technical text goes behind "Details".
+export function startupSummary(step, detail, translate = (text) => text) {
+  const text = String(detail || '').trim();
+  if (text.length <= SUMMARY_MAX_CHARS) return text;
+  const address = text.match(/https?:\/\/([^\s/]+)/i)?.[1];
+  if (address && (step?.key === 'gateway' || step?.status === 'unreachable')) {
+    return `${translate("Can't reach Hermes at")} ${address}`;
+  }
+  const firstSentence = text.match(/^.*?[.!?](?=\s|$)/)?.[0] || text;
+  return firstSentence.length <= SUMMARY_MAX_CHARS ? firstSentence : `${firstSentence.slice(0, SUMMARY_MAX_CHARS - 1).trimEnd()}…`;
+}
+
 /** What the screen says for a readiness view: count, state, label, detail and progress. */
 export function startupScreenModel(view, translate = (text) => text) {
   const steps = Array.isArray(view?.steps) ? view.steps : [];
@@ -112,6 +126,7 @@ export function startupScreenModel(view, translate = (text) => text) {
     detail = translate(STARTUP_STEP_LINES[step.key] || view?.detail || '');
   }
 
+  const summary = (tone === 'error' || tone === 'setup') ? startupSummary(step, detail, translate) : detail;
   const state = { loading: 'Connecting', setup: 'Not connected', error: 'Needs attention', ready: 'Ready' }[tone];
   return {
     tone,
@@ -119,6 +134,7 @@ export function startupScreenModel(view, translate = (text) => text) {
     state: translate(state),
     label,
     detail,
+    summary,
     progress: tone === 'ready' ? 1 : Math.min(1, completed + (tone === 'loading' ? 0.45 / total : 0)),
   };
 }
@@ -245,6 +261,19 @@ export function createStartupScreen({ root, meander, count, state, label, detail
     meander.setAttribute('class', 'startup-meander');
     meander.setAttribute('aria-hidden', 'true');
     root.prepend(meander);
+  }
+  let detailsBox = null;
+  let detailsSummary = null;
+  let detailsBody = null;
+  if (detail?.parentNode) {
+    detailsBox = doc.createElement('details');
+    detailsBox.className = 'startup-details';
+    detailsBox.hidden = true;
+    detailsSummary = doc.createElement('summary');
+    detailsBody = doc.createElement('p');
+    detailsBody.className = 'startup-details-body';
+    detailsBox.append(detailsSummary, detailsBody);
+    detail.after(detailsBox);
   }
   let geometry = null;
   let size = '';
@@ -391,7 +420,17 @@ export function createStartupScreen({ root, meander, count, state, label, detail
       swapText(count, model.count);
       swapText(state, model.state);
       swapText(label, model.label);
-      swapText(detail, model.detail);
+      swapText(detail, model.summary);
+      if (detailsBox) {
+        const hasMore = model.summary !== model.detail;
+        detailsBox.hidden = !hasMore;
+        if (hasMore) {
+          detailsBody.textContent = model.detail;
+          detailsSummary.textContent = translate('Details');
+        } else {
+          detailsBox.open = false;
+        }
+      }
       if (label) label.title = model.label;
       progress = model.progress;
       if (!root.hidden && build()) paint(progress);

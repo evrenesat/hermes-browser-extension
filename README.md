@@ -1,4 +1,7 @@
-# Hermes Browser Extension
+# Hermes Browser Extension (calm fork)
+
+> **This is a hard fork** of [abundantbeing/hermes-browser-extension](https://github.com/abundantbeing/hermes-browser-extension) by Jon Komet, redesigned as a calm, desktop-first side panel: neutral theme, system fonts, compact controls, searchable settings and keyboard navigation. Upstream compatibility is not a goal. Design notes: [docs/design/ui-revamp.md](./docs/design/ui-revamp.md). The upstream README follows; links and release badges below still point at upstream.
+
 
 Browser-native side panel for [Hermes Agent](https://hermes-agent.nousresearch.com/docs) — connect active web context through a local gateway, Hermes Cloud, or a self-hosted remote gateway.
 

@@ -113,7 +113,7 @@ test('wiring: panel imports the module, styles exist, locales carry the string',
 
 test('headers: Hermes keeps its original label; avatar headers and steers are scoped', () => {
   const css = fs.readFileSync('extension/sidepanel.css', 'utf8');
-  assert.ok(css.includes('.message.assistant .message-role { font: 700 calc(9px'));
+  assert.ok(css.includes('.message.assistant .message-role { font: 700 calc(11px'));
   assert.ok(css.includes('.message.assistant .message-role:has(.room-avatar)'));
   const steer = css.match(/\.message\.steer-sent \.message-role \{[^}]*\}/)[0];
   assert.ok(!/border-radius|background/.test(steer));

@@ -69,7 +69,7 @@ test('reduced motion shows a still glyph and never starts a timer', () => {
 });
 
 test('only the loading tone counts as in progress', () => {
-  const step = (status) => [{ key: 'gateway', label: 'Gateway transport', status, detail: '' }];
+  const step = (status) => [{ key: 'gateway', label: 'Hermes connection', status, detail: '' }];
   assert.equal(startupScreenModel({ visible: true, phase: 'boot', steps: step('active') }).tone, 'loading');
   assert.equal(startupScreenModel({ visible: true, phase: 'setup-needed', steps: step('unconfigured') }).tone, 'setup');
   assert.equal(startupScreenModel({ visible: true, phase: 'error', errored: true, steps: step('failed') }).tone, 'error');

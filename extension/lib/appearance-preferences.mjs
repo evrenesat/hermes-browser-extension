@@ -37,9 +37,9 @@ export const FONT_PROFILES = Object.freeze([
   'custom-local',
 ]);
 
-export const FONT_PROFILE_DEFAULT = 'signature';
+export const FONT_PROFILE_DEFAULT = 'system-sans';
 
-const SYSTEM_SANS_STACK = '-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif';
+const SYSTEM_SANS_STACK = '-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif';
 const HIGH_LEGIBILITY_STACK = 'Verdana, Tahoma, Arial, sans-serif';
 const MONO_STACK = 'var(--hermes-font-mono)';
 const PROFILE_STACKS = Object.freeze({

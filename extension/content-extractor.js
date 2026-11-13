@@ -872,11 +872,18 @@ const CONTENT_EXTRACTION_API = Object.freeze({
   hermesGlobal.HermesContentExtractor = CONTENT_EXTRACTION_API;
 })(globalThis);
 
-/* extension/lib/appearance-themes.mjs · SHA-256 668c0366c68e7abe */
+/* extension/lib/appearance-themes.mjs · SHA-256 c8380c9ac2d30c63 */
 (function hermesAppearanceRuntime(hermesGlobal) {
   'use strict';
 
 const APPEARANCE_THEMES = Object.freeze([
+  {
+    value: 'calm',
+    name: 'Calm',
+    description: 'Neutral graphite and paper with a quiet blue accent',
+    preview: { bg: '#1b1b1e', panel: '#232327', text: '#e7e7ea', muted: '#9b9ba4', accent: '#7c93ff' },
+    previewLight: { bg: '#ffffff', panel: '#f6f6f8', text: '#1c1c21', muted: '#6a6a75', accent: '#3a5ad9' },
+  },
   {
     value: 'nous',
     name: 'Nous',
@@ -964,6 +971,10 @@ const APPEARANCE_THEMES = Object.freeze([
 ]);
 
 const INLINE_ASSIST_THEME_TOKENS = Object.freeze({
+  calm: Object.freeze({
+    dark: Object.freeze({ surface: '#1b1b1e', panel: '#232327', ink: '#e7e7ea', fg: '#e7e7ea', accent: '#7c93ff', primary: '#3a5ad9' }),
+    light: Object.freeze({ surface: '#ffffff', panel: '#f6f6f8', ink: '#1c1c21', fg: '#1c1c21', accent: '#3a5ad9', primary: '#3a5ad9' }),
+  }),
   nous: Object.freeze({
     dark: Object.freeze({ surface: '#082f67', panel: '#0a3572', ink: '#edf4ff', fg: '#f4f8ff', accent: '#8bb7ff', primary: '#0505e8' }),
     light: Object.freeze({ surface: '#0505e8', panel: '#ffffff', ink: '#0505e8', fg: '#f8faff', accent: '#dbe6ff', primary: '#0505e8' }),
@@ -1020,8 +1031,8 @@ function themePreviewForMode(theme, mode = DEFAULT_COLOR_MODE) {
   return (mode === 'light' && theme?.previewLight) || theme?.preview || {};
 }
 
-const DEFAULT_APPEARANCE_THEME = 'nous';
-const DEFAULT_COLOR_MODE = 'dark';
+const DEFAULT_APPEARANCE_THEME = 'calm';
+const DEFAULT_COLOR_MODE = 'system';
 const COLOR_MODES = Object.freeze(['light', 'dark', 'system']);
 
 function normalizeAppearanceTheme(value = DEFAULT_APPEARANCE_THEME) {
@@ -1060,6 +1071,20 @@ const APPEARANCE_RUNTIME_API = Object.freeze({
   resolveColorMode,
   resolveInlineAssistTheme,
 });
+
+// One-time move of an existing install onto the calm look. The fork changed
+// the defaults; installs that stored the old ones would otherwise keep the
+// retro theme and display font on the new layout. Runs once per install.
+const CALM_UI_MIGRATION_VERSION = 1;
+const RETRO_FONT_PROFILES = new Set(['signature', 'collapse']);
+
+function migrateToCalmAppearance(settings) {
+  if (!settings || typeof settings !== 'object') return { settings, changed: false };
+  if (Number(settings.calmUiMigration) >= CALM_UI_MIGRATION_VERSION) return { settings, changed: false };
+  const next = { ...settings, calmUiMigration: CALM_UI_MIGRATION_VERSION, appearanceTheme: DEFAULT_APPEARANCE_THEME };
+  if (!settings.fontProfile || RETRO_FONT_PROFILES.has(settings.fontProfile)) next.fontProfile = 'system-sans';
+  return { settings: next, changed: true };
+}
 
   hermesGlobal.HermesAppearance = APPEARANCE_RUNTIME_API;
 })(globalThis);
@@ -3341,7 +3366,7 @@ const INLINE_DRAFT_API = Object.freeze({
   hermesGlobal.HermesInlineDraft = INLINE_DRAFT_API;
 })(globalThis);
 
-/* extension/lib/appearance-preferences.mjs · SHA-256 6a50d76677377924 */
+/* extension/lib/appearance-preferences.mjs · SHA-256 2617b6065bf295ea */
 (function hermesAppearancePreferencesRuntime(hermesGlobal) {
   'use strict';
 
@@ -3384,9 +3409,9 @@ const FONT_PROFILES = Object.freeze([
   'custom-local',
 ]);
 
-const FONT_PROFILE_DEFAULT = 'signature';
+const FONT_PROFILE_DEFAULT = 'system-sans';
 
-const SYSTEM_SANS_STACK = '-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif';
+const SYSTEM_SANS_STACK = '-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif';
 const HIGH_LEGIBILITY_STACK = 'Verdana, Tahoma, Arial, sans-serif';
 const MONO_STACK = 'var(--hermes-font-mono)';
 const PROFILE_STACKS = Object.freeze({
@@ -4155,7 +4180,7 @@ const OVERLAY_SCROLLBAR_API = Object.freeze({
   hermesGlobal.HermesOverlayScrollbar = OVERLAY_SCROLLBAR_API;
 })(globalThis);
 
-/* extension/lib/page-annotation-content.mjs · SHA-256 b97ab46ad11b8032 */
+/* extension/lib/page-annotation-content.mjs · SHA-256 eddb825bc423cdb8 */
 (function hermesPageAnnotationRuntime(hermesGlobal) {
   'use strict';
 
@@ -4586,7 +4611,7 @@ function hidePageCommentCard(document) {
 }
 
 function resolvePageCommentCardTheme(settings = {}) {
-  const theme = String(settings.appearanceTheme || 'nous').toLowerCase();
+  const theme = String(settings.appearanceTheme || 'calm').toLowerCase();
   const mode = String(settings.colorMode || 'dark').toLowerCase() === 'light' ? 'light' : 'dark';
   if (theme === 'mono' && mode === 'dark') {
     return { bg: '#171717', field: '#111111', fg: '#f1f1f1', muted: 'rgba(241,241,241,0.62)', border: 'rgba(229,229,229,0.44)', primary: '#e5e5e5', primaryFg: '#111111', font: 'ui-sans-serif, system-ui, sans-serif' };
