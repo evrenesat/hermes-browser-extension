@@ -1,0 +1,435 @@
+/* Calm design layer. Loaded after every other stylesheet; see docs/design/ui-revamp.md.
+   Sections: 1 tokens, 2 legacy variable mapping, 3 base typography, 4 buttons,
+   5 form controls, 6 scrollbars/focus/popovers, 7 artwork off, 8 top bar,
+   9 icons. Later phases append per-surface sections below. */
+
+/* ------------------------------------------------------------------ */
+/* 1. Tokens                                                           */
+/* ------------------------------------------------------------------ */
+:root {
+  color-scheme: light dark;
+  --calm-bg: #ffffff;
+  --calm-surface: #f6f6f8;
+  --calm-surface-2: #ececf0;
+  --calm-border: #e1e1e6;
+  --calm-border-strong: #c9c9d1;
+  --calm-text: #1c1c21;
+  --calm-muted: #6a6a75;
+  --calm-accent: #3a5ad9;
+  --calm-accent-fg: #ffffff;
+  --calm-accent-soft: rgba(58, 90, 217, 0.1);
+  --calm-danger: #c7353a;
+  --calm-ok: #1f8a55;
+  --calm-warn: #a86b00;
+  --calm-shadow-popover: 0 8px 24px rgba(20, 20, 40, 0.12);
+  --calm-font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --calm-font-mono: ui-monospace, "SF Mono", Menlo, "JetBrains Mono", Consolas, monospace;
+  --calm-radius-control: 6px;
+  --calm-radius-card: 8px;
+  --calm-radius-composer: 12px;
+  --calm-radius-pill: 999px;
+  --calm-gutter: 12px;
+  --calm-control-h: 28px;
+  --calm-input-h: 32px;
+  --calm-topbar-h: 40px;
+  --calm-ease: 120ms ease;
+}
+
+html[data-hermes-mode="dark"] {
+  color-scheme: dark;
+  --calm-bg: #1b1b1e;
+  --calm-surface: #232327;
+  --calm-surface-2: #2c2c31;
+  --calm-border: #36363c;
+  --calm-border-strong: #4a4a52;
+  --calm-text: #e7e7ea;
+  --calm-muted: #9b9ba4;
+  --calm-accent: #7c93ff;
+  --calm-accent-fg: #0f1020;
+  --calm-accent-soft: rgba(124, 147, 255, 0.16);
+  --calm-danger: #f07b7e;
+  --calm-ok: #62c08f;
+  --calm-warn: #e5b45f;
+  --calm-shadow-popover: 0 8px 28px rgba(0, 0, 0, 0.28);
+}
+
+html[data-hermes-mode="light"] { color-scheme: light; }
+
+/* Before the panel script stamps a mode, follow the system. */
+@media (prefers-color-scheme: dark) {
+  html:not([data-hermes-mode]) {
+    --calm-bg: #1b1b1e;
+    --calm-surface: #232327;
+    --calm-surface-2: #2c2c31;
+    --calm-border: #36363c;
+    --calm-border-strong: #4a4a52;
+    --calm-text: #e7e7ea;
+    --calm-muted: #9b9ba4;
+    --calm-accent: #7c93ff;
+    --calm-accent-fg: #0f1020;
+    --calm-accent-soft: rgba(124, 147, 255, 0.16);
+    --calm-danger: #f07b7e;
+    --calm-ok: #62c08f;
+    --calm-warn: #e5b45f;
+    --calm-shadow-popover: 0 8px 28px rgba(0, 0, 0, 0.28);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. Legacy variable mapping (calm theme and unthemed pages only)     */
+/* ------------------------------------------------------------------ */
+html[data-hermes-theme="calm"],
+html:not([data-hermes-theme]) {
+  --hermes-blue: var(--calm-bg);
+  --hermes-blue-deep: var(--calm-surface);
+  --hermes-paper: var(--calm-surface);
+  --hermes-white: var(--calm-text);
+  --hermes-fg: var(--calm-text);
+  --hermes-ink: var(--calm-text);
+  --hermes-accent: var(--calm-accent);
+  --hermes-app-bg: var(--calm-bg);
+  --hermes-app-bg-deep: var(--calm-bg);
+  --hermes-menu-bg: var(--calm-surface);
+  --hermes-card-bg: var(--calm-surface);
+  --hermes-canvas: var(--calm-surface);
+  --hermes-panel-bg: var(--calm-bg);
+  --hermes-panel-border: var(--calm-border);
+  --hermes-line: var(--calm-border);
+  --hermes-line-strong: var(--calm-border-strong);
+  --hermes-muted: var(--calm-muted);
+  --hermes-blue-muted: var(--calm-muted);
+  --hermes-blue-line: var(--calm-border);
+  --hermes-control-bg: var(--calm-surface-2);
+  --hermes-control-fg: var(--calm-text);
+  --hermes-control-border: var(--calm-border);
+  --hermes-input-bg: var(--calm-surface);
+  --hermes-primary-bg: var(--calm-accent);
+  --hermes-primary-fg: var(--calm-accent-fg);
+  --hermes-primary-border: var(--calm-accent);
+  --hermes-user-bg: var(--calm-surface-2);
+  --hermes-user-fg: var(--calm-text);
+  --hermes-user-border: transparent;
+  --hermes-system-bg: var(--calm-surface);
+  --hermes-system-fg: var(--calm-muted);
+  --hermes-pill-bg: var(--calm-surface-2);
+  --hermes-pill-fg: var(--calm-text);
+  --hermes-pill-border: transparent;
+  --hermes-pill-ok-bg: var(--calm-accent-soft);
+  --hermes-pill-ok-fg: var(--calm-accent);
+  --hermes-pill-ok-border: transparent;
+  --hermes-meter-fill: var(--calm-accent);
+  --hermes-success: var(--calm-ok);
+  --hermes-warning: var(--calm-warn);
+  --hermes-danger: var(--calm-danger);
+  --hermes-on-danger: var(--calm-bg);
+  --hermes-brand-mark: var(--calm-text);
+  --danger: var(--calm-danger);
+  --ok: var(--calm-ok);
+  --radius: var(--calm-radius-card);
+  --hermes-bubble-user-alpha: 100%;
+  --hermes-bubble-assistant-alpha: 100%;
+  --hermes-bubble-blur: 0px;
+  --hermes-bubble-saturate: 1;
+  --hermes-font-ui: var(--calm-font-ui);
+  --hermes-font-display: var(--calm-font-ui);
+  --hermes-font-brand: var(--calm-font-ui);
+  --hermes-font-mono: var(--calm-font-mono);
+  --hermes-display-scale: 1;
+}
+
+/* rgb triplets drive the legacy rgba(var(--x-rgb), a) recipes. */
+html[data-hermes-theme="calm"][data-hermes-mode="light"],
+html:not([data-hermes-theme])[data-hermes-mode="light"] {
+  --hermes-bg-rgb: 255, 255, 255;
+  --hermes-panel-rgb: 246, 246, 248;
+  --hermes-paper-rgb: 246, 246, 248;
+  --hermes-fg-rgb: 28, 28, 33;
+  --hermes-ink-rgb: 28, 28, 33;
+  --hermes-accent-rgb: 58, 90, 217;
+  --hermes-shadow-rgb: 20, 20, 40;
+}
+html[data-hermes-theme="calm"][data-hermes-mode="dark"],
+html:not([data-hermes-theme])[data-hermes-mode="dark"] {
+  --hermes-bg-rgb: 27, 27, 30;
+  --hermes-panel-rgb: 35, 35, 39;
+  --hermes-paper-rgb: 35, 35, 39;
+  --hermes-fg-rgb: 231, 231, 234;
+  --hermes-ink-rgb: 231, 231, 234;
+  --hermes-accent-rgb: 124, 147, 255;
+  --hermes-shadow-rgb: 0, 0, 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* 3. Base typography                                                  */
+/* ------------------------------------------------------------------ */
+body {
+  font-family: var(--calm-font-ui);
+  font-size: calc(13px * var(--hermes-text-zoom, 1));
+  line-height: 1.5;
+  background: var(--calm-bg);
+  color: var(--calm-text);
+  -webkit-font-smoothing: antialiased;
+}
+.shell { background: var(--calm-bg); }
+
+/* Legacy rules no longer set caps, tracking or display/mono faces on UI chrome.
+   Form controls inherit the UI face; code keeps the mono face. */
+button, input, select, textarea { font-family: var(--calm-font-ui); text-transform: none; letter-spacing: normal; }
+code, pre, kbd, samp { font-family: var(--calm-font-mono); letter-spacing: normal; }
+:is(code, kbd, samp) { font-size: 12px; }
+pre { font-size: 12px; line-height: 1.5; }
+
+h1, h2, h3, h4, h5, h6 { font-weight: 600; }
+.eyebrow, [class*="eyebrow"] { font-size: 11px; font-weight: 600; color: var(--calm-muted); }
+
+/* Markdown headings (chat) */
+.message-content :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--calm-font-ui);
+  font-weight: 600;
+  line-height: 1.3;
+  text-transform: none;
+  letter-spacing: normal;
+  margin: 1em 0 0.4em;
+}
+.message-content h1 { font-size: 17px; }
+.message-content h2 { font-size: 15px; }
+.message-content h3 { font-size: 14px; }
+.message-content :is(h4, h5, h6) { font-size: 13px; }
+.message-content :is(h1, h2, h3, h4, h5, h6):first-child { margin-top: 0; }
+
+::selection { background: var(--calm-accent-soft); color: inherit; }
+
+/* ------------------------------------------------------------------ */
+/* 4. Buttons                                                          */
+/* ------------------------------------------------------------------ */
+button {
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--calm-radius-control);
+  transition: background-color var(--calm-ease), color var(--calm-ease), border-color var(--calm-ease);
+}
+button:not(.icon-button):not([class*="icon"]):not([class*="option"]):not([class*="row"]) {
+  min-height: var(--calm-control-h);
+}
+
+/* Secondary: surface-2, no border. */
+button,
+.secondary {
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+button:hover:not(:disabled),
+.secondary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--calm-surface-2) 82%, var(--calm-text) 18%);
+  color: var(--calm-text);
+}
+button:disabled,
+button[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+
+/* Primary: accent fill. */
+button.primary,
+button[type="submit"],
+.primary-action,
+.startup-connect-action,
+button.primary:hover:not(:disabled),
+button[type="submit"]:hover:not(:disabled) {
+  background: var(--calm-accent);
+  color: var(--calm-accent-fg);
+  border-color: transparent;
+}
+button.primary:hover:not(:disabled),
+button[type="submit"]:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--calm-accent) 88%, var(--calm-text) 12%);
+}
+
+/* Ghost / icon buttons: transparent until hover. */
+.icon-button,
+.settings-button,
+.ghost,
+button.link-button,
+.composer-icon {
+  background: transparent;
+  color: var(--calm-muted);
+  border-color: transparent;
+}
+.icon-button:hover:not(:disabled),
+.settings-button:hover:not(:disabled),
+.ghost:hover:not(:disabled),
+button.link-button:hover:not(:disabled),
+.composer-icon:hover:not(:disabled) {
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+}
+.icon-button,
+.settings-button {
+  inline-size: var(--calm-control-h);
+  block-size: var(--calm-control-h);
+  min-inline-size: var(--calm-control-h);
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+}
+
+@media (pointer: coarse) {
+  :root { --calm-control-h: 36px; --calm-input-h: 40px; }
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. Form controls                                                    */
+/* ------------------------------------------------------------------ */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+select,
+textarea {
+  font-family: var(--calm-font-ui);
+  font-size: 13px;
+  color: var(--calm-text);
+  background: var(--calm-surface);
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  box-shadow: none;
+  transition: border-color var(--calm-ease), background-color var(--calm-ease);
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+select {
+  min-height: var(--calm-input-h);
+}
+input::placeholder, textarea::placeholder { color: var(--calm-muted); opacity: 1; }
+input:not([type="checkbox"]):not([type="radio"]):hover,
+select:hover,
+textarea:hover { border-color: var(--calm-border-strong); }
+input[type="checkbox"], input[type="radio"], input[type="range"] { accent-color: var(--calm-accent); }
+
+/* ------------------------------------------------------------------ */
+/* 6. Scrollbars, focus, popovers                                      */
+/* ------------------------------------------------------------------ */
+* { scrollbar-width: thin; scrollbar-color: var(--calm-border-strong) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: var(--calm-border-strong);
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: var(--calm-radius-pill);
+}
+
+:focus { outline: none; }
+:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--calm-accent);
+  outline-offset: 1px;
+}
+
+.quick-more-menu, .model-menu, .context-popover, .context-scope-menu, .session-menu,
+.skill-menu, .attach-menu, [role="menu"], [role="listbox"], [role="dialog"]:not(.settings-dialog) {
+  background: var(--calm-surface);
+  border: 1px solid var(--calm-border);
+  border-radius: var(--calm-radius-card);
+  box-shadow: var(--calm-shadow-popover);
+  color: var(--calm-text);
+}
+
+hr { border: 0; border-top: 1px solid var(--calm-border); }
+a { color: var(--calm-accent); }
+
+/* ------------------------------------------------------------------ */
+/* 7. Background artwork off                                           */
+/* ------------------------------------------------------------------ */
+html[data-hermes-theme="calm"] .shell::before,
+html[data-hermes-theme="calm"] .shell::after,
+html[data-hermes-theme="calm"] .startup-screen::before,
+html[data-hermes-theme="calm"] .startup-screen::after,
+html[data-hermes-theme="calm"] .onboarding::before,
+html[data-hermes-theme="calm"] .onboarding::after {
+  display: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* 8. Top bar (40px, flat)                                             */
+/* ------------------------------------------------------------------ */
+.topbar {
+  min-height: var(--calm-topbar-h);
+  block-size: var(--calm-topbar-h);
+  padding: 0 8px;
+  gap: 2px;
+  background: var(--calm-bg);
+  border-bottom: 1px solid var(--calm-border);
+  backdrop-filter: none;
+  color: var(--calm-text);
+}
+.topbar .brand-mini { display: none; }
+.topbar .session-menu-button {
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  min-height: var(--calm-control-h);
+  padding: 0 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--calm-text);
+  line-height: 1.2;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+.topbar .session-menu-button:hover:not(:disabled),
+.topbar .session-menu-button[aria-expanded="true"] { background: var(--calm-surface-2); }
+.topbar .session-menu-chevron { flex: none; color: var(--calm-muted); }
+.topbar .session-menu-button::after { display: none; }
+.topbar .session-menu-button > svg { display: block; }
+.topbar #currentSessionName { flex: 0 1 auto; }
+.topbar { justify-content: flex-start; }
+.topbar .session-menu-button + .icon-button { margin-inline-start: auto; }
+.topbar .icon-button svg { inline-size: 16px; block-size: 16px; }
+
+/* ------------------------------------------------------------------ */
+/* 9. Icons: Lucide-style line art                                     */
+/* ------------------------------------------------------------------ */
+svg[data-icon] {
+  fill: none !important;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  shape-rendering: auto;
+  scale: 1;
+  translate: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* 10. Legacy normalization (phase 1 stopgaps; later phases replace)   */
+/* ------------------------------------------------------------------ */
+.settings-header-actions > button,
+.settings-close-icon,
+.settings-connection-test,
+.settings-pane-back {
+  border-color: transparent;
+  background: var(--calm-surface-2);
+  color: var(--calm-text);
+  min-block-size: var(--calm-control-h);
+}
+.settings-close-icon, .settings-pane-back { inline-size: var(--calm-control-h); block-size: var(--calm-control-h); min-inline-size: var(--calm-control-h); background: transparent; color: var(--calm-muted); }
+.settings-header-actions > button:hover,
+.settings-close-icon:hover,
+.settings-connection-test:hover,
+.settings-pane-back:hover { background: var(--calm-surface-2); color: var(--calm-text); border-color: transparent; }
+
+/* Headings inside Settings and dialogs: one UI size, no display scale. */
+html .settings-dialog :is(h2, h3, h4),
+html .settings-pane-title,
+html [class*="-heading"] :is(h2, h3) {
+  font-family: var(--calm-font-ui);
+  font-size: calc(15px * var(--hermes-text-zoom, 1));
+  font-weight: 600;
+  line-height: 1.3;
+}
+html .settings-dialog :is(h3, h4) { font-size: calc(13px * var(--hermes-text-zoom, 1)); }

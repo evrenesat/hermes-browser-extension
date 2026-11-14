@@ -134,7 +134,6 @@ test('sidepanel startup and conversation chrome use the compact branded shell', 
   const css = readFileSync(new URL('../extension/sidepanel.css', import.meta.url), 'utf8');
   const js = readFileSync(new URL('../extension/sidepanel.js', import.meta.url), 'utf8');
 
-  assert.match(html, /assets\/img\/hermes-browser-logo-left\.svg/);
   assert.match(html, /class="startup-brand-icon"/);
   assert.match(css, /\.startup-brand-icon\s*\{[^}]*assets\/img\/hermes-extension-icon-outline\.png/s);
   assert.match(css, /html\[data-hermes-mode="light"\] \.startup-brand-icon\s*\{[^}]*assets\/img\/hermes-extension-icon-solid\.png/s);

@@ -36,10 +36,10 @@
   min-width: 0;
   overflow: hidden;
   color: var(--hermes-ink);
-  font: calc(10px * var(--hermes-text-zoom, 1))/1.25 var(--hermes-font-mono);
-  letter-spacing: 0.08em;
+  font: calc(11px * var(--hermes-text-zoom, 1))/1.25 var(--hermes-font-ui);
+  letter-spacing: normal;
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
 }
 
@@ -56,9 +56,9 @@
 }
 
 .context-menu-enabled-label {
-  font: calc(8px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font: calc(11px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .context-menu-editor .hermes-switch-input {
@@ -126,7 +126,7 @@
   border-radius: 0 !important;
   background: transparent !important;
   color: var(--hermes-ink) !important;
-  font: calc(15px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-mono) !important;
+  font: calc(15px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-ui) !important;
 }
 
 .context-menu-icon-button:hover:not(:disabled),
@@ -164,9 +164,9 @@
 
 .context-menu-editor-field-label {
   color: var(--hermes-muted);
-  font: calc(8px * var(--hermes-text-zoom, 1))/1.2 var(--hermes-font-mono);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font: calc(11px * var(--hermes-text-zoom, 1))/1.2 var(--hermes-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .context-menu-editor-input,
@@ -182,8 +182,8 @@
   border-radius: 0 !important;
   background: transparent !important;
   color: var(--hermes-ink) !important;
-  font: calc(10px * var(--hermes-text-zoom, 1))/1.35 var(--hermes-font-mono) !important;
-  letter-spacing: 0 !important;
+  font: calc(11px * var(--hermes-text-zoom, 1))/1.35 var(--hermes-font-ui) !important;
+  letter-spacing: normal!important;
   text-align: left !important;
   text-transform: none !important;
 }
@@ -291,8 +291,8 @@ html[data-hermes-mode="dark"] .context-menu-editor-select {
 .context-menu-context-label {
   min-width: 0;
   overflow: hidden;
-  font: calc(9px * var(--hermes-text-zoom, 1))/1.2 var(--hermes-font-mono);
-  letter-spacing: 0.04em;
+  font: calc(11px * var(--hermes-text-zoom, 1))/1.2 var(--hermes-font-ui);
+  letter-spacing: normal;
   text-overflow: ellipsis;
   text-transform: none;
   white-space: nowrap;
@@ -306,7 +306,7 @@ html[data-hermes-mode="dark"] .context-menu-editor-select {
   padding: 8px 9px;
   border: 1px solid var(--hermes-line);
   color: var(--hermes-muted);
-  font: calc(9px * var(--hermes-text-zoom, 1))/1.4 var(--hermes-font-mono);
+  font: calc(11px * var(--hermes-text-zoom, 1))/1.4 var(--hermes-font-ui);
 }
 
 .context-menu-editor-error,
@@ -333,9 +333,9 @@ html[data-hermes-mode="dark"] .context-menu-editor-select {
   padding: 0 10px;
   border: 1px solid var(--hermes-line-strong);
   border-radius: 0;
-  font: calc(9px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font: calc(11px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .context-menu-editor-add {
@@ -379,7 +379,7 @@ html[data-hermes-mode="dark"] .context-menu-editor-select {
 :lang(zh-CN) .context-menu-editor-field-label,
 :lang(zh-CN) .context-menu-editor-add,
 :lang(zh-CN) .context-menu-editor-restore {
-  letter-spacing: 0.025em;
+  letter-spacing: normal;
   text-transform: none;
 }
 
@@ -431,7 +431,7 @@ html[data-hermes-mode="dark"] .context-menu-editor-select {
 .context-menu-editor-card-chevron {
   flex: 0 0 auto;
   color: var(--hermes-muted);
-  font: calc(14px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-mono);
+  font: calc(14px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-ui);
 }
 
 .context-menu-editor .hermes-switch-input:checked + .hermes-switch-track {
@@ -461,7 +461,7 @@ html[data-hermes-mode="dark"] .context-menu-editor-select {
 .context-menu-editor .context-menu-context-input:checked + .context-menu-context-box::after {
   content: "✓";
   color: var(--hermes-primary-fg, var(--hermes-paper));
-  font: calc(10px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-mono);
+  font: calc(11px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-ui);
 }
 
 .context-menu-settings > label > span {

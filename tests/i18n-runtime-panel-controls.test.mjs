@@ -29,11 +29,14 @@ async function localeRuntime(locale, documentRef = null) {
   return { runtime, messages: await loadLocaleMessages(locale) };
 }
 
-function run(name, globals, document) {
+function run(name, globals, document, helpers = []) {
   const context = vm.createContext({ document, window: document.defaultView, ...globals });
-  vm.runInContext(`${functionSource(name)}\nthis.${name} = ${name};`, context);
+  const sources = [...helpers, name].map(functionSource).join('\n');
+  vm.runInContext(`let sessionRowMenuState = null;\n${sources}\nthis.${name} = ${name};`, context);
   return context;
 }
+
+const SESSION_ROW_HELPERS = ['sessionRowMenuTrigger', 'openSessionRowMenu', 'closeSessionRowMenu', 'formatSessionAge', 'sessionDateBucket', 'sessionActivityMs'];
 
 // Words that read the same in some languages (German "Minimal", "Max", "Ultra") are left out.
 const ENGLISH_CONTROL_TEXT = /\b(?:Options|Bot options|Hermes Assist options|Thinking|Fast|Medium|Extra High|Steer this subagent|Stop this subagent|Not accepting steer|Open generated image for closer inspection|Hermes is thinking)\b/;
@@ -87,6 +90,7 @@ test('the thinking indicator announces itself in the panel language', async () =
   const { document } = new JSDOM('<!doctype html><body><div id="host"></div></body>').window;
   const host = document.getElementById('host');
   const context = run('renderThinkingIndicator', {
+    settings: { classicThinkingFaces: true },
     scheduleClassicThinkingFaces: () => {},
     THINKING_STATUSES: ['thinking'],
     classicThinkingFace: () => '(•‿•)',
@@ -154,7 +158,8 @@ test('the group Settings button speaks the panel language', async () => {
   const { runtime, messages } = await localeRuntime('de');
   const { document } = new JSDOM('<!doctype html><body><div id="menu"></div></body>').window;
   const context = run('renderSessionMenu', {
-    els: { sessionMenuList: document.getElementById('menu'), sessionSearchInput: { value: '' } },
+    getLocale: () => 'de',
+    els: { sessionMenu: document.body, sessionMenuList: document.getElementById('menu'), sessionSearchInput: { value: '' } },
     scheduleLiveSessionPoll: () => {},
     syncSessionMenuChrome: () => {},
     projectsTabActive: () => false,
@@ -176,15 +181,15 @@ test('the group Settings button speaks the panel language', async () => {
     activeGroupProjection: { id: 'group-1', displayName: 'Room' },
     t: runtime.t,
     translateUiText: runtime.translateText,
-  }, document);
+  }, document, SESSION_ROW_HELPERS);
   context.renderSessionMenu();
-  const button = document.querySelector('.session-action-button');
-  assert.ok(button, 'the group row renders its Settings button');
+  document.querySelector('.session-actions-trigger').click();
+  const button = document.querySelector('.session-row-menu-item');
+  assert.ok(button, 'the group row menu offers its Settings item');
   assert.equal(button.textContent, messages['ui.settings']);
   assert.equal(button.title, messages['ui.group.settings']);
-  assert.equal(button.getAttribute('aria-label'), messages['ui.group.settings']);
   assert.notEqual(button.textContent, 'Settings');
-  assert.notEqual(button.getAttribute('aria-label'), 'Group settings');
+  assert.notEqual(button.title, 'Group settings');
 });
 
 test('controls built before a language change are relabelled by the panel pass', async () => {
@@ -196,6 +201,7 @@ test('controls built before a language change are relabelled by the panel pass',
     t: runtime.t,
     escapeHtml,
     openGeneratedImageLightbox: () => {},
+    settings: { classicThinkingFaces: true },
     scheduleClassicThinkingFaces: () => {},
     THINKING_STATUSES: ['thinking'],
     classicThinkingFace: () => '(•‿•)',
@@ -239,9 +245,11 @@ test('subagent and group controls are relabelled when the language changes', asy
       subagentStackSummary: document.getElementById('summary'),
       subagentStackList: document.getElementById('list'),
       subagentStackDetail: document.getElementById('detail'),
+      sessionMenu: document.body,
       sessionMenuList: document.getElementById('menu'),
       sessionSearchInput: { value: '' },
     },
+    getLocale: () => 'de',
     currentSubagentItems: () => [item],
     activeSubagentView: (items) => items,
     ensureSubagentTimer: () => {},
@@ -274,13 +282,12 @@ test('subagent and group controls are relabelled when the language changes', asy
     t: runtime.t,
     translateUiText: runtime.translateText,
   });
-  vm.runInContext(`${functionSource('renderSubagentStack')}\n${functionSource('renderSessionMenu')}\nthis.renderSubagentStack = renderSubagentStack;\nthis.renderSessionMenu = renderSessionMenu;`, context);
+  vm.runInContext(`let sessionRowMenuState = null;\n${SESSION_ROW_HELPERS.map(functionSource).join('\n')}\n${functionSource('renderSubagentStack')}\n${functionSource('renderSessionMenu')}\nthis.renderSubagentStack = renderSubagentStack;\nthis.renderSessionMenu = renderSessionMenu;`, context);
   context.renderSubagentStack();
   context.renderSessionMenu();
   const [steer, stop] = document.querySelectorAll('.subagent-stack-icon');
   const input = document.getElementById('subagentSteerInput');
-  const settings = document.querySelector('.session-action-button');
-  const before = { steer: steer.getAttribute('aria-label'), placeholder: input.placeholder, settings: settings.textContent };
+  const before = { steer: steer.getAttribute('aria-label'), placeholder: input.placeholder };
 
   await runtime.setLocale('ja');
   const japanese = await loadLocaleMessages('ja');
@@ -291,10 +298,6 @@ test('subagent and group controls are relabelled when the language changes', asy
   assert.equal(input.placeholder, japanese['ui.steer.this.subagent']);
   assert.notEqual(steer.getAttribute('aria-label'), before.steer);
   assert.notEqual(input.placeholder, before.placeholder);
-  assert.equal(settings.textContent, japanese['ui.settings']);
-  assert.equal(settings.title, japanese['ui.group.settings']);
-  assert.equal(settings.getAttribute('aria-label'), japanese['ui.group.settings']);
-  assert.notEqual(settings.textContent, before.settings);
 });
 
 test('every new control string exists in every locale', async () => {

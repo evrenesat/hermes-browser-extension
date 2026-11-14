@@ -550,3 +550,18 @@ body.opening-page {
     scrollbar-color: rgba(var(--cobalt-rgb), 0.55) transparent;
   }
 }
+
+/* Calm UI: the hand-off page is one quiet centred card (no rail, art, globe or display type). */
+:root { color-scheme: light dark; --calm-page: #f6f6f8; --calm-card: #ffffff; --calm-line: #e1e1e6; --calm-fg: #1c1c21; --calm-dim: #6a6a75; --calm-accent: #3a5ad9; }
+@media (prefers-color-scheme: dark) { :root { --calm-page: #1b1b1e; --calm-card: #232327; --calm-line: #36363c; --calm-fg: #e7e7ea; --calm-dim: #9b9ba4; --calm-accent: #7c93ff; } }
+body.opening-page { background: var(--calm-page); color: var(--calm-fg); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif; }
+.opening-frame { display: grid; place-items: center; min-height: 100vh; padding: 16px; background: transparent; }
+.opening-rail, .opening-art, .opening-foot { display: none !important; }
+.opening-pane { position: static; display: block; inline-size: min(100%, 340px); min-height: 0; padding: 16px; border: 1px solid var(--calm-line); border-radius: 12px; background: var(--calm-card); color: var(--calm-fg); box-shadow: 0 8px 24px rgba(20, 20, 40, 0.12); }
+.opening-inner { display: grid; gap: 8px; padding: 0; margin: 0; max-inline-size: none; }
+.opening-title { margin: 0; font: 600 15px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; letter-spacing: normal; text-transform: none; color: var(--calm-fg); }
+.opening-lede { margin: 0; font: 400 13px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; letter-spacing: normal; text-transform: none; color: var(--calm-dim); }
+.opening-bar { block-size: 3px; border-radius: 2px; background: var(--calm-line); overflow: hidden; }
+.opening-bar > span { background: var(--calm-accent); }
+.opening-slow { display: grid; gap: 8px; }
+.opening-show { justify-self: end; min-block-size: 28px; padding: 0 12px; border: 0; border-radius: 6px; background: var(--calm-accent); color: #fff; font: 500 13px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; text-transform: none; letter-spacing: normal; cursor: pointer; }

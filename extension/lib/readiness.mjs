@@ -14,7 +14,7 @@ const DEFAULT_STEP_ORDER = Object.freeze([
 
 const STEP_LABELS = Object.freeze({
   settings: 'Settings',
-  gateway: 'Gateway transport',
+  gateway: 'Hermes connection',
   capabilities: 'Capabilities',
   models: 'Model catalog',
   selectedModel: 'Selected model',

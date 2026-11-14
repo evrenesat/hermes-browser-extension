@@ -47,7 +47,5 @@ Thumbs.db
 __pycache__/
 *.pyc
 
-docs/
 .omx/
-CLAUDE.md
-AGENTS.md
+temp/

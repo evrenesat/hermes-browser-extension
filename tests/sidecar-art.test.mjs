@@ -45,13 +45,11 @@ test('the css value only accepts known art entries', () => {
   assert.equal(sidecarArtCssValue(''), '');
 });
 
-test('both sidecar surfaces read the shared art variable and the panel picks one per load', () => {
+test('the hero card reads the shared art variable and the panel picks one per load', () => {
   const uses = css.match(/var\(--sidecar-art, url\("assets\/img\/hermes-browse\.webp"\)\) center \/ cover no-repeat/g) || [];
-  assert.equal(uses.length, 2, 'card + settings hero both use the variable');
+  assert.equal(uses.length, 1, 'the hero card uses the variable');
   assert.match(js, /import \{ pickSidecarArt, sidecarArtCssValue \} from '\.\/lib\/sidecar-art\.mjs';/);
   assert.match(js, /document\.documentElement\.style\.setProperty\('--sidecar-art', sidecarArtCssValue\(entry\)\);/);
   assert.match(js, /pickSidecarArt\(Math\.random, lastSidecarArt\)/);
   assert.match(js, /^applySidecarArt\(\);/m);
-  // The mini badge image stays a fixed asset, untouched by the rotation.
-  assert.match(readFileSync(new URL('../extension/sidepanel.html', import.meta.url), 'utf8'), /class="release-sidecar-badge" src="assets\/img\/hermes-badge\.webp"/);
 });

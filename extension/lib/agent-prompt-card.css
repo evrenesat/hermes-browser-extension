@@ -18,9 +18,9 @@
 .agent-prompt-kicker {
   color: var(--hermes-accent, currentColor);
   font-family: var(--hermes-font-ui);
-  font-size: calc(9px * var(--hermes-text-zoom, 1));
+  font-size: calc(11px * var(--hermes-text-zoom, 1));
   line-height: 1;
-  letter-spacing: 0.16em;
+  letter-spacing: normal;
 }
 .agent-prompt-title {
   font-family: var(--hermes-font-ui);
@@ -50,7 +50,7 @@
 .agent-prompt-queue {
   color: color-mix(in srgb, currentColor 70%, transparent);
   font-family: var(--hermes-font-ui);
-  font-size: calc(10.5px * var(--hermes-text-zoom, 1));
+  font-size: calc(11px * var(--hermes-text-zoom, 1));
   line-height: 1.35;
 }
 .agent-prompt-reason:empty { display: none; }
@@ -76,7 +76,7 @@
   border-radius: 6px;
   background: color-mix(in srgb, currentColor 6%, transparent);
   font-family: var(--hermes-font-mono);
-  font-size: calc(10.5px * var(--hermes-text-zoom, 1));
+  font-size: calc(11px * var(--hermes-text-zoom, 1));
   text-align: left;
 }
 .agent-prompt-diff-row {
@@ -95,8 +95,8 @@
 .agent-prompt-card .agent-prompt-body > button {
   min-height: 28px;
   padding: 6px 9px;
-  font-size: calc(9px * var(--hermes-text-zoom, 1));
-  letter-spacing: 0.1em;
+  font-size: calc(11px * var(--hermes-text-zoom, 1));
+  letter-spacing: normal;
 }
 .agent-prompt-deny { border-style: dashed; }
 .agent-prompt-deny:focus-visible,

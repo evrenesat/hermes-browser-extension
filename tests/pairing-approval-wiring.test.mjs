@@ -50,7 +50,7 @@ test('dismissing clears both places the page can be', () => {
 
 test('polling keeps its 1.5 second beat and 90 tries, and does not talk over the page', () => {
   assert.match(poll, /attempts = 90, delay = 1500/);
-  assert.match(poll, /if \(!pairingApproval\?\.showing\) els\.connectStatus\.textContent = translateUiText\('Waiting for Hermes Desktop approval\.\.\.'\)/);
+  assert.match(poll, /if \(!pairingApproval\?\.showing\) els\.connectStatus\.textContent = translateUiText\('Waiting for Hermes Desktop approval…'\)/);
   assert.match(poll, /await sleep\(delay\)/);
 });
 
@@ -67,7 +67,8 @@ test('the Connect pop-up has a place for the page, and the HTML itself never car
 test('the pop-up and setup make room for the page, and the page has a size', () => {
   assert.match(css, /\.connect-panel-card\.is-approving > ol,\s*\.connect-panel-card\.is-approving #connectButton \{ display: none; \}/, 'the pop-up keeps Open in a tab and Manual setup, not a disabled Connecting button');
   assert.match(css, /\.pairing-approval-tab \{ width: 100%; min-height: 36px;/, 'the same size as the buttons around it');
-  assert.match(css, /\.onboarding\.is-approving \.onboarding-preview,\s*\.onboarding-connect\.is-approving \.onboarding-connect-actions \{ display: none; \}/);
+  const calm = fs.readFileSync(new URL('../extension/calm-onboarding.css', import.meta.url), 'utf8');
+  assert.match(calm, /\.onboarding-connect\.is-approving :is\([^)]*\.onboarding-connect-actions[^)]*\) \{ display: none; \}/);
   assert.match(css, /\.pairing-approval-frame \{[^}]*width: 100%;[^}]*height: min\(340px, 56dvh\);/s);
   assert.match(css, /\.pairing-approval\[hidden\] \{ display: none; \}/);
 });

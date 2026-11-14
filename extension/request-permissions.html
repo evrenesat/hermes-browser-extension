@@ -7,50 +7,57 @@
     <link rel="stylesheet" href="sidepanel.css" />
     <link rel="stylesheet" href="lib/fonts.css" />
     <link rel="stylesheet" href="lib/surface-text-zoom.css" />
+    <link rel="stylesheet" href="sidepanel-calm.css" />
     <style>
       body {
         min-height: 100vh;
         display: grid;
         place-items: center;
-        padding: 24px;
-        background: var(--bg, #080719);
-        color: var(--text, #f2eeff);
+        margin: 0;
+        padding: 16px;
+        background: var(--calm-bg);
+        color: var(--calm-text);
+        font: 13px/1.5 var(--calm-font-ui);
       }
       .permission-card {
-        width: min(520px, 100%);
-        border: 1px solid color-mix(in srgb, var(--border, #8d7cff) 50%, transparent);
-        border-radius: 24px;
-        padding: 28px;
-        background: color-mix(in srgb, var(--panel, #100d29) 92%, transparent);
-        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+        display: grid;
+        gap: 8px;
+        width: min(380px, 100%);
+        border: 1px solid var(--calm-border);
+        border-radius: 12px;
+        padding: 16px;
+        background: var(--calm-surface);
+        box-shadow: var(--calm-shadow-popover);
       }
-      .permission-card h1 {
-        margin: 0 0 12px;
-        font-size: 28px;
-        letter-spacing: -0.04em;
+      .permission-card .eyebrow { display: none; }
+      html body .permission-card h1 {
+        margin: 0;
+        font: 600 15px/1.35 var(--calm-font-ui) !important;
+        letter-spacing: normal;
+        text-transform: none;
       }
       .permission-card p {
-        margin: 0 0 18px;
-        color: var(--muted, #a9a1d7);
+        margin: 0;
+        color: var(--calm-muted);
         line-height: 1.5;
       }
       .permission-actions {
         display: flex;
-        gap: 10px;
+        gap: 6px;
         flex-wrap: wrap;
-        margin-top: 20px;
+        justify-content: flex-end;
+        margin-top: 8px;
       }
       #permissionStatus {
-        margin-top: 18px;
-        font-size: 13px;
-        color: var(--muted, #a9a1d7);
+        font-size: 12px;
+        color: var(--calm-muted);
         white-space: pre-wrap;
       }
     </style>
   </head>
-  <body data-hermes-theme="nous" data-hermes-mode="dark" data-hermes-color-mode="dark">
+  <body>
     <main class="permission-card" aria-labelledby="permissionTitle">
-      <p class="eyebrow" data-i18n="ui.hermes.browser.extension">HERMES BROWSER EXTENSION</p>
+      <p class="eyebrow" data-i18n="ui.hermes.browser.extension">Hermes Browser Extension</p>
       <h1 id="permissionTitle" data-i18n="ui.allow.microphone.access">Allow microphone access</h1>
       <p data-i18n="ui.chrome.can.suppress.microphone.prompts.inside.extension.side.pa.79f6cc35">Some browsers suppress microphone prompts inside extension sidebars. This temporary extension page asks your browser for microphone access, then sends you back to Hermes.</p>
       <p data-i18n="ui.no.audio.is.saved.here.the.permission.only.lets.hermes.browser.e6a9c0e1">No audio is saved here. The permission only lets the Hermes Browser Extension record your voice when you click the mic button.</p>

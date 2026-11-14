@@ -9,6 +9,8 @@ import test from 'node:test';
 import english from '../extension/lib/locales/en.mjs';
 
 const BRAND_MARK_KEYS = new Set([
+  'ui.hermes.browser.bb83b5a0',
+  'ui.hermes.browser.update.channel',
   'ui.hermes.browser',
   'ui.hermes.browser.intro',
   'ui.hermes.browser.local.sidecar',

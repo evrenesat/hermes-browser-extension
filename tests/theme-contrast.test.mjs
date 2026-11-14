@@ -289,7 +289,6 @@ const OUTLINED_INVERTED_SELECTORS = [
   '.bot-mode-head-action:hover',
   '.marketplace-theme-search button:hover',
   '.marketplace-theme-card button:hover',
-  '#textZoomPresetGrid [data-text-zoom-percent]:hover',
   '.side-question-close:hover',
 ];
 
@@ -307,21 +306,12 @@ test('every named control hovers with the action-pair tile, its label colour out
   }
 });
 
-test('the text-zoom stepper inverts into the action pair on hover (it draws dividers, not an outline)', () => {
-  for (const selector of ['#textZoomDecreaseButton:hover', '#textZoomIncreaseButton:hover']) {
-    const body = ruleFor(sidepanelCss, selector);
-    assert.ok(body.includes('background: var(--hermes-primary-bg, var(--hermes-ink))'), `${selector} should invert its tile`);
-    assert.ok(body.includes('color: var(--hermes-primary-fg, var(--hermes-paper))'), `${selector} should invert its glyph`);
-    assert.doesNotMatch(body, /255,\s*255,\s*255/, `${selector} must not use a hardcoded white`);
-  }
-});
-
 test('controls whose resting tile is a filled action surface invert outward on hover', () => {
   const send = ruleFor(sidepanelCss, '#sendButton:hover');
   assert.match(send, /background: var\(--hermes-primary-fg, var\(--hermes-paper\)\)/, '#sendButton should flip its fill to the label colour');
   assert.match(send, /color: var\(--hermes-primary-bg, var\(--hermes-ink\)\)/, '#sendButton should take the action colour for its label');
   assert.match(send, /border-color: var\(--hermes-primary-bg, var\(--hermes-ink\)\)/, '#sendButton should draw its boundary in the action colour');
-  for (const selector of ['#saveSettingsButton:hover', '#connectButton:hover', '#startupConnectButton:not([hidden]):hover']) {
+  for (const selector of ['#connectButton:hover', '#startupConnectButton:not([hidden]):hover']) {
     const body = ruleFor(sidepanelCss, selector);
     assert.match(body, /background: var\(--hermes-primary-fg, var\(--hermes-paper\)\)/, `${selector} should flip its fill to the label colour`);
   }

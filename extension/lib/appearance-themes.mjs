@@ -1,5 +1,12 @@
 export const APPEARANCE_THEMES = Object.freeze([
   {
+    value: 'calm',
+    name: 'Calm',
+    description: 'Neutral graphite and paper with a quiet blue accent',
+    preview: { bg: '#1b1b1e', panel: '#232327', text: '#e7e7ea', muted: '#9b9ba4', accent: '#7c93ff' },
+    previewLight: { bg: '#ffffff', panel: '#f6f6f8', text: '#1c1c21', muted: '#6a6a75', accent: '#3a5ad9' },
+  },
+  {
     value: 'nous',
     name: 'Nous',
     description: 'Ink blue with soft-white Desktop accents',
@@ -86,6 +93,10 @@ export const APPEARANCE_THEMES = Object.freeze([
 ]);
 
 export const INLINE_ASSIST_THEME_TOKENS = Object.freeze({
+  calm: Object.freeze({
+    dark: Object.freeze({ surface: '#1b1b1e', panel: '#232327', ink: '#e7e7ea', fg: '#e7e7ea', accent: '#7c93ff', primary: '#3a5ad9' }),
+    light: Object.freeze({ surface: '#ffffff', panel: '#f6f6f8', ink: '#1c1c21', fg: '#1c1c21', accent: '#3a5ad9', primary: '#3a5ad9' }),
+  }),
   nous: Object.freeze({
     dark: Object.freeze({ surface: '#082f67', panel: '#0a3572', ink: '#edf4ff', fg: '#f4f8ff', accent: '#8bb7ff', primary: '#0505e8' }),
     light: Object.freeze({ surface: '#0505e8', panel: '#ffffff', ink: '#0505e8', fg: '#f8faff', accent: '#dbe6ff', primary: '#0505e8' }),
@@ -142,8 +153,8 @@ export function themePreviewForMode(theme, mode = DEFAULT_COLOR_MODE) {
   return (mode === 'light' && theme?.previewLight) || theme?.preview || {};
 }
 
-export const DEFAULT_APPEARANCE_THEME = 'nous';
-export const DEFAULT_COLOR_MODE = 'dark';
+export const DEFAULT_APPEARANCE_THEME = 'calm';
+export const DEFAULT_COLOR_MODE = 'system';
 export const COLOR_MODES = Object.freeze(['light', 'dark', 'system']);
 
 export function normalizeAppearanceTheme(value = DEFAULT_APPEARANCE_THEME) {
@@ -182,3 +193,17 @@ export const APPEARANCE_RUNTIME_API = Object.freeze({
   resolveColorMode,
   resolveInlineAssistTheme,
 });
+
+// One-time move of an existing install onto the calm look. The fork changed
+// the defaults; installs that stored the old ones would otherwise keep the
+// retro theme and display font on the new layout. Runs once per install.
+export const CALM_UI_MIGRATION_VERSION = 1;
+const RETRO_FONT_PROFILES = new Set(['signature', 'collapse']);
+
+export function migrateToCalmAppearance(settings) {
+  if (!settings || typeof settings !== 'object') return { settings, changed: false };
+  if (Number(settings.calmUiMigration) >= CALM_UI_MIGRATION_VERSION) return { settings, changed: false };
+  const next = { ...settings, calmUiMigration: CALM_UI_MIGRATION_VERSION, appearanceTheme: DEFAULT_APPEARANCE_THEME };
+  if (!settings.fontProfile || RETRO_FONT_PROFILES.has(settings.fontProfile)) next.fontProfile = 'system-sans';
+  return { settings: next, changed: true };
+}

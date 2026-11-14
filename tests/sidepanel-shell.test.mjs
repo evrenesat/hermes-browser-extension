@@ -61,8 +61,6 @@ test('side panel keeps Browser onboarding, refresh feedback, updates, and messag
   assert.match(css, /--hermes-bubble-user-alpha:\s*100%/);
   assert.match(css, /--hermes-bubble-assistant-alpha:\s*100%/);
   assert.match(css, /backdrop-filter:\s*blur\(/);
-  assert.match(html, /class="release-sidecar"/);
-  assert.match(html, /LOCAL SIDECAR \/ CHROME PANEL/);
   assert.match(html, /id="reviewUpdateButton"/);
   assert.match(html, /id="updateDialog"/);
   assert.match(html, /class="update-dialog-mark"\s+aria-hidden="true"/);
@@ -74,8 +72,6 @@ test('side panel keeps Browser onboarding, refresh feedback, updates, and messag
   assert.match(css, /html\[data-hermes-theme="nous"\]\[data-hermes-mode="light"\]\s+\.update-dialog-mark\s*\{[^}]*background:\s*var\(--hermes-ink\)/s);
   assert.equal(fs.existsSync(path.join(root, 'extension/assets/img/hermes-browser-extension-icon-box-white.png')), true);
   assert.match(css, /\.operation-toast/);
-  assert.match(css, /\.release-sidecar\s*\{[^}]*background-blend-mode:\s*normal,\s*luminosity,\s*normal/s);
-  assert.doesNotMatch(css, /\.release-sidecar::before/);
   assert.match(css, /\.operation-toast\s*\{(?=[^}]*left:\s*50%)(?=[^}]*right:\s*auto)(?=[^}]*transform:\s*translateX\(-50%\))[^}]*\}/s);
   assert.match(css, /@keyframes operationToastIn\s*\{[\s\S]*translate\(-50%,\s*-10px\)[\s\S]*translate\(-50%,\s*0\)/);
   assert.match(css, /#refreshSessionsButton\.is-refreshing\s+\.session-refresh-icon\s*\{[^}]*animation:/s);

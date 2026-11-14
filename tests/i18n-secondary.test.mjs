@@ -48,7 +48,7 @@ test('the pick-element button localizes its fixed fallbacks without translating 
   const sidepanel = read('extension/sidepanel.js');
   const pickState = sidepanel.match(/function setPickButtonState\([^)]*\)\s*\{[\s\S]*?\n\}/)?.[0] || '';
 
-  for (const english of ['◈ Picking element...', '◈ Pick a different element', '◈ Pick page element']) {
+  for (const english of ['◈ Picking element…', '◈ Pick a different element', '◈ Pick page element']) {
     assert.match(pickState, new RegExp(`translateUiText\\('${escapeRegExp(english)}'\\)`));
   }
 });

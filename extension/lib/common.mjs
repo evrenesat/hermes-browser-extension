@@ -131,13 +131,15 @@ export const DEFAULT_SETTINGS = Object.freeze({
   agentDiscoveryScheme: 'http',
   autoNameSessions: true,
   showMessageTimes: true,
+  classicThinkingFaces: false,
   groupRoomModelBindings: {},
   sessionStartupMode: 'new-session',
-  colorMode: 'dark',
-  appearanceTheme: 'nous',
+  colorMode: 'system',
+  appearanceTheme: 'calm',
+  calmUiMigration: 1,
   appearanceSchemaVersion: 2,
   textZoomPercent: 100,
-  fontProfile: 'signature',
+  fontProfile: 'system-sans',
   customFontFamily: '',
   textSize: 'default',
   panelResidencyMode: 'tab-attached',
@@ -1190,38 +1192,56 @@ function formatWholeNumber(value = 0) {
 }
 
 export function contextChipSummary({ pageContext = null, activeTab = null, parts = {} } = {}) {
+  const tabTitle = String(activeTab?.title || '').trim() || hostnameLabel(activeTab?.url) || 'This page';
   if (!pageContext) {
     return {
-      label: '📎 Loading...',
+      label: tabTitle,
+      kind: 'Reading…',
+      state: 'loading',
       title: 'Page context not yet loaded',
     };
   }
 
   if (pageContext.restricted) {
     return {
-      label: '📎 Restricted · N/A',
+      label: "This page can't be read",
+      kind: '',
+      state: 'restricted',
       title: pageContext.reason || activeTab?.url || 'Restricted page',
     };
   }
 
   if (pageContext.ok === false) {
     return {
-      label: '📎 Error · N/A',
+      label: "This page can't be read",
+      kind: '',
+      state: 'error',
       title: pageContext.error || pageContext.reason || 'Context capture failed',
     };
   }
 
+  const hasSelection = Boolean(parts.selectedText?.enabled);
+  const hasPage = Boolean(parts.pageText?.enabled || parts.pageMetadata?.enabled || parts.youtubeTranscript?.enabled);
   const attachedParts = [parts.selectedText, parts.pageMetadata, parts.youtubeTranscript, parts.pageText, parts.pickedElement]
     .filter((part) => part?.enabled);
-  const attachedChars = attachedParts.reduce((total, part) => total + Number(part.chars || 0), 0);
   const attachedTokens = attachedParts.reduce((total, part) => total + Number(part.estimatedTokens || 0), 0);
-  const adapter = pageContext.youtubeTranscript?.ok ? 'YouTube + DOM' : 'DOM';
-  const pickMarker = pageContext.pickedElement?.selector ? '◈ ' : '';
+  let kind = 'Page';
+  if (hasSelection && hasPage) kind = 'Page + selection';
+  else if (hasSelection) kind = 'Selection';
+  else if (!hasPage) kind = 'Title only';
+  if (pageContext.pickedElement?.selector) kind = `${kind} + element`;
+  const sizeNote = attachedTokens ? ` About ${formatWholeNumber(attachedTokens)} tokens.` : '';
 
   return {
-    label: `${pickMarker}📎 ${adapter} · ${formatWholeNumber(attachedChars)} chars · ~${formatWholeNumber(attachedTokens)} tok`,
-    title: activeTab?.url || '',
+    label: tabTitle,
+    kind,
+    state: 'ok',
+    title: `Hermes will read ${kind.toLowerCase()} from this tab with your next message.${sizeNote} Click to preview.`,
   };
+}
+
+function hostnameLabel(url) {
+  try { return new URL(String(url || '')).hostname.replace(/^www\./, ''); } catch { return ''; }
 }
 
 export function formatContextMeter({ estimatedTokens = 0, modelContextTokens = 0 } = {}) {
@@ -2347,7 +2367,7 @@ export function modelRefreshControlState({ refreshing = false } = {}) {
     };
   }
   return {
-    label: '↻ Refresh Models',
+    label: 'Refresh models',
     title: 'Refresh model catalog',
     disabled: false,
     ariaBusy: 'false',

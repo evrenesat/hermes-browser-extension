@@ -53,8 +53,7 @@ test('sidepanel render path mounts the copy control', () => {
 });
 
 test('copy control uses branded icon chrome without fat OS scrollbar overrides', () => {
-  assert.match(CODE_COPY_ICON, /fill="currentColor"/);
-  assert.doesNotMatch(CODE_COPY_ICON, /stroke=/);
+  assert.match(CODE_COPY_ICON, /stroke="currentColor"/);
   assert.match(sidepanelCss, /\.md-code-copy/);
   assert.match(sidepanelCss, /\.md-code \{/);
   assert.doesNotMatch(sidepanelCss, /\.md-code[^{]*\{[^}]*scrollbar-color/);

@@ -29,13 +29,13 @@ test('every category pane opens with an icon-only back button and a proper headi
   assert.doesNotMatch(html, /&larr;<\/span><span data-i18n="settings\.categories\.back">/, 'the old text button is gone');
 });
 
-test('the back button mirrors the close button and the title uses the display face', () => {
+test('the back button mirrors the close button and the title uses the UI face', () => {
   const css = read('extension/sidepanel.css');
   const back = css.match(/\.settings-pane-back \{[^}]*\}/)?.[0] || '';
   for (const declaration of ['width: 30px', 'height: 30px', 'padding: 0', 'border-color: var(--hermes-line-strong)']) assert.ok(back.includes(declaration), declaration);
   assert.match(css, /\.settings-close-icon \{[^}]*width: 30px;/);
   const title = css.match(/\.settings-pane-title \{[^}]*\}/)?.[0] || '';
-  assert.match(title, /font-family: var\(--hermes-font-display\)/);
+  assert.match(title, /font-family: var\(--hermes-font-ui\)/);
   assert.match(css, /\.settings-pane-bar \{[^}]*grid-template-columns: auto minmax\(0, 1fr\) auto;/, 'back, heading, edited hint');
   assert.match(css, /html\[dir="rtl"\] \.settings-pane-back svg \{ transform: scaleX\(-1\); \}/);
 });

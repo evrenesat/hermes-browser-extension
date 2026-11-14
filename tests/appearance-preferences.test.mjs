@@ -251,11 +251,11 @@ test('normalizeFontProfile accepts case and whitespace variants', () => {
   assert.equal(normalizeFontProfile('Custom-Local', 'Inter'), 'custom-local');
 });
 
-test('normalizeFontProfile rejects unknown profiles with the signature default', () => {
-  assert.equal(normalizeFontProfile('serif'), 'signature');
-  assert.equal(normalizeFontProfile('comic-sans'), 'signature');
-  assert.equal(normalizeFontProfile(undefined), 'signature');
-  assert.equal(normalizeFontProfile(''), 'signature');
+test('normalizeFontProfile rejects unknown profiles with the system-sans default', () => {
+  assert.equal(normalizeFontProfile('serif'), 'system-sans');
+  assert.equal(normalizeFontProfile('comic-sans'), 'system-sans');
+  assert.equal(normalizeFontProfile(undefined), 'system-sans');
+  assert.equal(normalizeFontProfile(''), 'system-sans');
 });
 
 test('custom-local falls back to system-sans without a valid local family', () => {
@@ -271,7 +271,7 @@ test('custom-local falls back to system-sans without a valid local family', () =
 // ---------------------------------------------------------------------------
 const PREFERENCE_DEFAULTS = {
   textZoomPercent: 100,
-  fontProfile: 'signature',
+  fontProfile: 'system-sans',
   customFontFamily: '',
 };
 
@@ -485,7 +485,7 @@ test('bundled font profiles keep code mono and use the named family for UI text'
   applyAppearancePreferences(root, { textZoomPercent: 100, fontProfile: 'times-new-roman' });
   assert.match(root.style.getPropertyValue('--hermes-font-ui'), /Times New Roman/);
   applyAppearancePreferences(root, { textZoomPercent: 100, fontProfile: 'smokum' });
-  assert.equal(root.dataset.hermesFontProfile, 'signature', 'a removed poster face falls back to signature');
+  assert.equal(root.dataset.hermesFontProfile, 'system-sans', 'a removed poster face falls back to the system-sans default');
 });
 
 test('apply sets ui/display font variables for non-signature profiles', () => {
@@ -509,7 +509,7 @@ test('surface extraction composes with custom-local CSSOM application', () => {
   assert.deepEqual(applyAppearancePreferences(root, preferences), preferences);
   assert.equal(
     root.style.getPropertyValue('--hermes-font-ui'),
-    '"Atkinson Hyperlegible", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif',
+    '"Atkinson Hyperlegible", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif',
   );
   assert.equal(
     root.style.getPropertyValue('--hermes-font-display'),

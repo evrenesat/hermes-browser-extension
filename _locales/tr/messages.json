@@ -1316,7 +1316,7 @@
     "description": "Runtime interface message browser_control.help_stop"
   },
   "runtime_browser_control_kicker": {
-    "message": "HERMES KONTROLÜ",
+    "message": "Hermes Control",
     "description": "Runtime interface message browser_control.kicker"
   },
   "runtime_browser_control_local_document_detail": {
@@ -2052,7 +2052,7 @@
     "description": "Runtime interface message clarify.expired"
   },
   "runtime_clarify_kicker": {
-    "message": "QUESTION FROM HERMES",
+    "message": "Questıon from Hermes",
     "description": "Runtime interface message clarify.kicker"
   },
   "runtime_clarify_multi_hint": {
@@ -2262,6 +2262,26 @@
   "runtime_composer_restore_held_draft": {
     "message": "Taslağı geri yükle",
     "description": "Runtime interface message composer.restore_held_draft"
+  },
+  "runtime_composer_tip_attach": {
+    "message": "Attach files, images or a URL (drag and drop works too)",
+    "description": "Runtime interface message composer.tip.attach"
+  },
+  "runtime_composer_tip_commands": {
+    "message": "Quick commands (type / in the message box)",
+    "description": "Runtime interface message composer.tip.commands"
+  },
+  "runtime_composer_tip_mic": {
+    "message": "Dictate with your microphone",
+    "description": "Runtime interface message composer.tip.mic"
+  },
+  "runtime_composer_tip_model": {
+    "message": "Model and reasoning options",
+    "description": "Runtime interface message composer.tip.model"
+  },
+  "runtime_composer_tip_send": {
+    "message": "Send (Enter)",
+    "description": "Runtime interface message composer.tip.send"
   },
   "runtime_connect_approve_or_paste": {
     "message": "Uygun olduğunda eşleştirmeyi onaylayın veya yapıştırın",
@@ -3051,6 +3071,18 @@
     "message": "Hermes'e bağlan",
     "description": "Runtime interface message onboarding.connect.title"
   },
+  "runtime_onboarding_connect_url_invalid": {
+    "message": "Enter an address like http://127.0.0.1:8642.",
+    "description": "Runtime interface message onboarding.connect.url_invalid"
+  },
+  "runtime_onboarding_connect_url_label": {
+    "message": "Gateway address",
+    "description": "Runtime interface message onboarding.connect.url_label"
+  },
+  "runtime_onboarding_connect_url_scheme": {
+    "message": "The address must start with http:// or https://.",
+    "description": "Runtime interface message onboarding.connect.url_scheme"
+  },
   "runtime_onboarding_first_prompt": {
     "message": "İlk istemi deneyin",
     "description": "Runtime interface message onboarding.first_prompt"
@@ -3140,7 +3172,7 @@
     "description": "Runtime interface message onboarding.theme.title"
   },
   "runtime_onboarding_welcome_body": {
-    "message": "Birlikte kuralım. Yaklaşık bir dakika sürer.",
+    "message": "Hermes Browser'a hoş geldiniz",
     "description": "Runtime interface message onboarding.welcome.body"
   },
   "runtime_onboarding_welcome_greeting": {
@@ -3152,11 +3184,11 @@
     "description": "Runtime interface message onboarding.welcome.skip"
   },
   "runtime_onboarding_welcome_start": {
-    "message": "Başlayın",
+    "message": "Hermes'e bağlan",
     "description": "Runtime interface message onboarding.welcome.start"
   },
   "runtime_onboarding_welcome_title": {
-    "message": "Hermes Browser'a hoş geldiniz",
+    "message": "Hermes Browser",
     "description": "Runtime interface message onboarding.welcome.title"
   },
   "runtime_pairing_approve_below": {
@@ -3980,7 +4012,7 @@
     "description": "Runtime interface message session.long_shared_notice"
   },
   "runtime_session_new_extension_session": {
-    "message": "＋ Yeni Hermes Browser Extension Oturumu",
+    "message": "Yeni Hermes Browser Extension Oturumu",
     "description": "Runtime interface message session.new_extension_session"
   },
   "runtime_session_origin_refused": {
@@ -4002,6 +4034,10 @@
   "runtime_session_row_model": {
     "message": "Model: {model}",
     "description": "Runtime interface message session.row_model"
+  },
+  "runtime_settings_advanced": {
+    "message": "Advanced",
+    "description": "Runtime interface message settings.advanced"
   },
   "runtime_settings_back_to_top": {
     "message": "Başa dön",
@@ -4139,6 +4175,10 @@
     "message": "Dil",
     "description": "Runtime interface message settings.language.label"
   },
+  "runtime_settings_learn_more": {
+    "message": "Learn more",
+    "description": "Runtime interface message settings.learn_more"
+  },
   "runtime_settings_local_api_setup_hint": {
     "message": "Yerel API sunucusu (varsayılan http://127.0.0.1:8642). Anahtarını aşağıya yapıştırın.",
     "description": "Runtime interface message settings.local_api_setup_hint"
@@ -4270,6 +4310,26 @@
   "runtime_settings_save_sources_invalid": {
     "message": "Bu model kaynağı adresleri geçerli değil: {sources}",
     "description": "Runtime interface message settings.save.sources_invalid"
+  },
+  "runtime_settings_search_none": {
+    "message": "No matching settings",
+    "description": "Runtime interface message settings.search_none"
+  },
+  "runtime_settings_search_placeholder": {
+    "message": "Search settings",
+    "description": "Runtime interface message settings.search_placeholder"
+  },
+  "runtime_settings_search_results": {
+    "message": "Search results",
+    "description": "Runtime interface message settings.search_results"
+  },
+  "runtime_settings_show_less": {
+    "message": "Show less",
+    "description": "Runtime interface message settings.show_less"
+  },
+  "runtime_settings_test_connection": {
+    "message": "Test connection",
+    "description": "Runtime interface message settings.test_connection"
   },
   "runtime_settings_transcript_auto": {
     "message": "Otomatik",
@@ -4600,7 +4660,7 @@
     "description": "Runtime interface message ui.ask.hermes"
   },
   "runtime_ui_ask_hermes_36d55d5a": {
-    "message": "HERMES'E SORUN",
+    "message": "Hermes'e sor",
     "description": "Runtime interface message ui.ask.hermes.36d55d5a"
   },
   "runtime_ui_ask_hermes_about_the_active_page_context": {
@@ -5032,7 +5092,7 @@
     "description": "Runtime interface message ui.clear.comments"
   },
   "runtime_ui_clear_picked_element": {
-    "message": "✕ Seçilen öğeyi temizle",
+    "message": "Seçilen öğeyi temizle",
     "description": "Runtime interface message ui.clear.picked.element"
   },
   "runtime_ui_clear_stored_token": {
@@ -5216,7 +5276,7 @@
     "description": "Runtime interface message ui.composer.ask_hermes"
   },
   "runtime_ui_composer_ask_hermes_label": {
-    "message": "HERMES'E SOR",
+    "message": "Hermes'e sor",
     "description": "Runtime interface message ui.composer.ask_hermes_label"
   },
   "runtime_ui_composer_bot_running": {
@@ -5832,7 +5892,7 @@
     "description": "Runtime interface message ui.edit.message"
   },
   "runtime_ui_edit_models": {
-    "message": "⚙ Modelleri Düzenle...",
+    "message": "Modelleri Düzenle...",
     "description": "Runtime interface message ui.edit.models"
   },
   "runtime_ui_edit_models_in_hermes_desktop": {
@@ -6016,7 +6076,7 @@
     "description": "Runtime interface message ui.file"
   },
   "runtime_ui_files": {
-    "message": "▧ Dosyalar...",
+    "message": "Dosyalar...",
     "description": "Runtime interface message ui.files"
   },
   "runtime_ui_files_453f0471": {
@@ -6052,7 +6112,7 @@
     "description": "Runtime interface message ui.focused.draft"
   },
   "runtime_ui_folder": {
-    "message": "▰ Klasör...",
+    "message": "Klasör...",
     "description": "Runtime interface message ui.folder"
   },
   "runtime_ui_folder_30baa249": {
@@ -6204,11 +6264,11 @@
     "description": "Runtime interface message ui.hermes.browser"
   },
   "runtime_ui_hermes_browser_bb83b5a0": {
-    "message": "HERMES BROWSER",
+    "message": "Hermes Browser",
     "description": "Runtime interface message ui.hermes.browser.bb83b5a0"
   },
   "runtime_ui_hermes_browser_extension": {
-    "message": "HERMES BROWSER EXTENSION",
+    "message": "Hermes Browser Extension",
     "description": "Runtime interface message ui.hermes.browser.extension"
   },
   "runtime_ui_hermes_browser_extension_connected": {
@@ -6228,7 +6288,7 @@
     "description": "Runtime interface message ui.hermes.browser.local.sidecar"
   },
   "runtime_ui_hermes_browser_update_channel": {
-    "message": "HERMES BROWSER / GÜNCELLEME KANALI",
+    "message": "Hermes Browser / güncelleme kanalı",
     "description": "Runtime interface message ui.hermes.browser.update.channel"
   },
   "runtime_ui_hermes_chat_actions": {
@@ -6408,7 +6468,7 @@
     "description": "Runtime interface message ui.hermes.web"
   },
   "runtime_ui_hermes_web_3336aa2f": {
-    "message": "HERMES WEB",
+    "message": "Hermes Web",
     "description": "Runtime interface message ui.hermes.web.3336aa2f"
   },
   "runtime_ui_hermes_web_could_not_start": {
@@ -6420,7 +6480,7 @@
     "description": "Runtime interface message ui.hermes.web.home"
   },
   "runtime_ui_hermes_web_ready": {
-    "message": "HERMES WEB // HAZIR",
+    "message": "Hermes Web · ready",
     "description": "Runtime interface message ui.hermes.web.ready"
   },
   "runtime_ui_hermes_web_settings": {
@@ -6512,7 +6572,7 @@
     "description": "Runtime interface message ui.image.stayed.inline.only"
   },
   "runtime_ui_images": {
-    "message": "▧ Resimler...",
+    "message": "Resimler...",
     "description": "Runtime interface message ui.images"
   },
   "runtime_ui_images_09e871c9": {
@@ -6615,6 +6675,10 @@
     "message": "Anahtar",
     "description": "Runtime interface message ui.key"
   },
+  "runtime_ui_key_points": {
+    "message": "Key points",
+    "description": "Runtime interface message ui.key.points"
+  },
   "runtime_ui_label": {
     "message": "Etiket",
     "description": "Runtime interface message ui.label"
@@ -6702,10 +6766,6 @@
   "runtime_ui_local_setup_keep_hermes_gateway_api_server_running_on_this_machine": {
     "message": "Yerel kurulum: Hermes Gatewayni/API Sunucusunu bu makinede çalışır durumda tutun.",
     "description": "Runtime interface message ui.local.setup.keep.hermes.gateway.api.server.running.on.this.machine"
-  },
-  "runtime_ui_local_sidecar_chrome_panel": {
-    "message": "YEREL SIDECAR / CHROME PANELİ",
-    "description": "Runtime interface message ui.local.sidecar.chrome.panel"
   },
   "runtime_ui_longer": {
     "message": "Daha uzun",
@@ -7276,7 +7336,7 @@
     "description": "Runtime interface message ui.paste.a.gateway.api.key.or.reconnect.when.you.are.ready"
   },
   "runtime_ui_paste_image": {
-    "message": "▣ Resmi yapıştır",
+    "message": "Resmi yapıştır",
     "description": "Runtime interface message ui.paste.image"
   },
   "runtime_ui_paste_this_into_the_hermes_api_server_environment_on_the_remote_machine": {
@@ -7308,7 +7368,7 @@
     "description": "Runtime interface message ui.pick.an.element"
   },
   "runtime_ui_pick_page_element": {
-    "message": "◈ Sayfa öğesini seç",
+    "message": "Sayfa öğesini seç",
     "description": "Runtime interface message ui.pick.page.element"
   },
   "runtime_ui_picked_element_cleared": {
@@ -7318,6 +7378,14 @@
   "runtime_ui_pinned_tab_closed": {
     "message": "Sabitlenen sekme kapatıldı",
     "description": "Runtime interface message ui.pinned.tab.closed"
+  },
+  "runtime_ui_playful_thinking_indicator": {
+    "message": "Playful thinking indicator",
+    "description": "Runtime interface message ui.playful.thinking.indicator"
+  },
+  "runtime_ui_playful_thinking_indicator_hint": {
+    "message": "Show animated faces while Hermes thinks, instead of a quiet label.",
+    "description": "Runtime interface message ui.playful.thinking.indicator.hint"
   },
   "runtime_ui_policy": {
     "message": "Politika",
@@ -7424,7 +7492,7 @@
     "description": "Runtime interface message ui.prompt.snippet"
   },
   "runtime_ui_prompt_snippets": {
-    "message": "▤ Bilgi istemi parçacıkları...",
+    "message": "Bilgi istemi parçacıkları...",
     "description": "Runtime interface message ui.prompt.snippets"
   },
   "runtime_ui_property": {
@@ -8364,7 +8432,7 @@
     "description": "Runtime interface message ui.tab"
   },
   "runtime_ui_tab_screenshot": {
-    "message": "▣ Tab screenshot",
+    "message": "Tab screenshot",
     "description": "Runtime interface message ui.tab.screenshot"
   },
   "runtime_ui_tabs": {
@@ -8648,7 +8716,7 @@
     "description": "Runtime interface message ui.upload"
   },
   "runtime_ui_url": {
-    "message": "↗URL...",
+    "message": "URL...",
     "description": "Runtime interface message ui.url"
   },
   "runtime_ui_url_0e2d9b07": {
@@ -8854,10 +8922,6 @@
   "runtime_ui_web_ui_sections": {
     "message": "Web kullanıcı arayüzü bölümleri",
     "description": "Runtime interface message ui.web.ui.sections"
-  },
-  "runtime_ui_what_hermes_saw": {
-    "message": "HERMES’İN GÖRDÜKLERİ",
-    "description": "Runtime interface message ui.what.hermes.saw"
   },
   "runtime_ui_what_should_we_work_on": {
     "message": "Ne üzerinde çalışmalıyız?",

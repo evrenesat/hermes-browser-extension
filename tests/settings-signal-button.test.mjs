@@ -8,11 +8,11 @@ const js = readFileSync(new URL('../extension/sidepanel.js', import.meta.url), '
 
 const button = (html.match(/<button id="testConnectionButton"[\s\S]*?<\/button>/) || [''])[0];
 
-test('the Settings connection test is the signal glyph alone', () => {
+test('the Settings connection test is a labelled signal button', () => {
   assert.ok(button, 'testConnectionButton not found');
   assert.match(button, /data-icon="cellular-signal-3"/);
-  // The word stays for screen readers and the tooltip, not on screen.
-  assert.match(button, /class="settings-connection-test-label sr-only"/);
+  // Connections shows it as a labelled button.
+  assert.match(button, /class="settings-connection-test-label"/);
   assert.match(button, /title="/);
 });
 

@@ -18,6 +18,8 @@ async function drawer(sessions, { canMove = true } = {}) {
   scope.localSessionStream = null;
   scope.activeRunControl = null;
   scope.activeGroupProjection = null;
+  scope.getLocale = () => 'en';
+  scope.sessionRowMenuState = null;
   scope.openSessionGroups = new Set(['Recent']);
   scope.closedSessionGroups = new Set();
   scope.scheduleLiveSessionPoll = () => {};
@@ -40,7 +42,7 @@ async function drawer(sessions, { canMove = true } = {}) {
 
 const rows = (h) => [...h.els.sessionMenuList.querySelectorAll('.session-option-row')];
 
-test('a drawer row has the title and the ID, Rename and Move buttons, and no model column', async () => {
+test('a drawer row has the title and one actions trigger, and no model column', async () => {
   const h = await drawer([
     { id: 'a1', title: 'Fix the login bug', rawModelId: 'claude-haiku-4-5', messageCount: 12, selected: false },
     { id: 'b2', title: 'Plan the launch', model: 'gpt-5', selected: false },
@@ -49,11 +51,28 @@ test('a drawer row has the title and the ID, Rename and Move buttons, and no mod
   for (const row of [first, second]) {
     const button = row.querySelector('.session-option');
     assert.equal(button.querySelector('.session-option-name').textContent.length > 0, true);
-    assert.equal(button.querySelector('.session-option-meta'), null, 'no model or count in the row');
-    assert.equal(button.children.length, 1, 'the title is the only cell, so it gets the room');
-    assert.deepEqual([...row.querySelectorAll('.session-action-button')].map((node) => node.textContent), ['ID', 'Rename', 'projects.move.action']);
+    assert.equal(row.querySelectorAll('.session-action-button').length, 0, 'ID, Rename and Move are behind the trigger, not on the row');
+    assert.equal(row.querySelectorAll('.session-actions-trigger').length, 1);
   }
   assert.ok(!first.textContent.includes('friendly('), 'the model name is not drawn in the row');
+});
+
+test('the actions trigger opens a menu with ID, Rename and Move', async () => {
+  const h = await drawer([{ id: 'a1', title: 'Fix the login bug', selected: false }]);
+  const [row] = rows(h);
+  const trigger = row.querySelector('.session-actions-trigger');
+  assert.equal(trigger.getAttribute('aria-haspopup'), 'menu');
+  trigger.click();
+  assert.equal(trigger.getAttribute('aria-expanded'), 'true');
+  const items = [...h.document.querySelectorAll('.session-row-menu [role="menuitem"]')].map((node) => node.textContent);
+  assert.deepEqual(items, ['Copy session ID', 'Rename', 'projects.move.action']);
+});
+
+test('Move only appears where the gateway offers it', async () => {
+  const h = await drawer([{ id: 'a1', title: 'Fix the login bug', selected: true }], { canMove: false });
+  h.document.querySelector('.session-actions-trigger').click();
+  const items = [...h.document.querySelectorAll('.session-row-menu [role="menuitem"]')].map((node) => node.textContent);
+  assert.deepEqual(items, ['Copy session ID', 'Rename']);
 });
 
 test('the model and message count are in the row tooltip instead', async () => {
@@ -66,20 +85,23 @@ test('the model and message count are in the row tooltip instead', async () => {
   assert.equal(second.querySelector('.session-option').title, 'Plan the launch');
 });
 
-test('the selected row still shows its check, and ID, Rename and Move are unchanged', async () => {
-  const h = await drawer([{ id: 'a1', title: 'Fix the login bug', rawModelId: 'claude-haiku-4-5', selected: true }], { canMove: false });
-  const [row] = rows(h);
-  assert.equal(row.querySelector('.session-option-meta').textContent, '✓');
-  assert.deepEqual([...row.querySelectorAll('.session-action-button')].map((node) => node.textContent), ['ID', 'Rename'], 'Move only where the gateway offers it');
+test('rows are grouped under Today, Yesterday and Earlier with a muted relative time', async () => {
+  const now = Math.floor(Date.now() / 1000);
+  const h = await drawer([
+    { id: 'a1', title: 'Just now', lastActive: now - 600, selected: false },
+    { id: 'b2', title: 'Long ago', lastActive: now - 10 * 86400, selected: false },
+  ]);
+  const labels = [...h.els.sessionMenuList.querySelectorAll('.session-date-label')].map((node) => node.textContent);
+  assert.equal(labels[0], 'Today');
+  assert.equal(labels.at(-1), 'Earlier');
+  assert.equal(rows(h)[0].querySelector('.session-option-meta').textContent, '10m');
 });
 
-test('long titles ellipsize and the buttons keep one line at narrow widths and with text zoom', () => {
+test('long titles ellipsize and the row keeps one 30px line', () => {
+  const calm = readFileSync(new URL('../extension/calm-menus.css', import.meta.url), 'utf8');
   assert.match(css, /\.session-option-name \{ min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; \}/);
-  assert.match(css, /\.session-action-button \{ flex: none; white-space: nowrap; \}/);
-  assert.match(css, /\.session-actions \{ flex: none; flex-wrap: nowrap; \}/);
-  // The title keeps about 9em; below that the buttons drop under it instead of crowding it.
-  const wrap = css.match(/\.session-menu-list \.session-option-row:not\(\.renaming\) \{([^}]*)\}/)?.[1] || '';
-  assert.match(wrap, /display: flex;/);
-  assert.match(wrap, /flex-wrap: wrap;/);
-  assert.match(css, /\.session-menu-list \.session-option-row:not\(\.renaming\) > \.session-option \{[^}]*flex: 1 1 9em;[^}]*min-width: 0;/);
+  assert.match(calm, /\.session-option-name \{[^}]*text-overflow: ellipsis;[^}]*white-space: nowrap;/);
+  const row = calm.match(/\.session-menu-list \.session-option-row:not\(\.renaming\) \{([^}]*)\}/)?.[1] || '';
+  assert.match(row, /flex-wrap: nowrap;/);
+  assert.match(row, /min-height: 30px;/);
 });

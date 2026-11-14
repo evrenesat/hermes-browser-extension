@@ -27,9 +27,9 @@
 }
 .effort-control-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; min-width: 0; }
 .effort-control-title {
-  font: calc(10px * var(--hermes-text-zoom, 1))/1.25 var(--hermes-font-mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font: calc(11px * var(--hermes-text-zoom, 1))/1.25 var(--hermes-font-ui);
+  letter-spacing: normal;
+  text-transform: none;
   color: color-mix(in srgb, var(--effort-ink) 72%, transparent);
 }
 .effort-control-value { font-size: calc(13px * var(--hermes-text-zoom, 1)); line-height: 1.3; font-weight: 600; }
@@ -48,8 +48,8 @@ html[data-hermes-font-profile="signature"] .effort-control-value {
   border-radius: 0;
   background: transparent;
   color: color-mix(in srgb, var(--effort-ink) 75%, transparent);
-  font: calc(10px * var(--hermes-text-zoom, 1))/1.3 var(--hermes-font-mono);
-  letter-spacing: 0;
+  font: calc(11px * var(--hermes-text-zoom, 1))/1.3 var(--hermes-font-ui);
+  letter-spacing: normal;
   text-transform: none;
   cursor: pointer;
 }
@@ -63,7 +63,7 @@ html[data-hermes-font-profile="signature"] .effort-control-value {
   justify-content: space-between;
   gap: 12px;
   color: color-mix(in srgb, var(--effort-ink) 72%, transparent);
-  font-size: calc(10px * var(--hermes-text-zoom, 1));
+  font-size: calc(11px * var(--hermes-text-zoom, 1));
   line-height: 1.35;
 }
 .effort-control-track { position: relative; height: 44px; direction: ltr; }

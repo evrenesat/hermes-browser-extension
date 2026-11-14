@@ -15,12 +15,12 @@
   display: grid; place-items: center; width: 34px; height: 42px;
   border: 1px solid color-mix(in srgb, currentColor 32%, transparent);
   border-radius: 5px;
-  font: 650 calc(9px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-mono);
-  letter-spacing: .025em;
+  font: 650 calc(11px * var(--hermes-text-zoom, 1))/1 var(--hermes-font-ui);
+  letter-spacing: normal;
 }
 .user-file-info { display: grid; gap: 4px; min-width: 0; }
-.user-file-info strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 600 calc(12px * var(--hermes-text-zoom, 1))/1.35 var(--hermes-font-ui); text-transform: none; letter-spacing: 0; }
-.user-file-info small { font: 400 calc(10.5px * var(--hermes-text-zoom, 1))/1.25 var(--hermes-font-ui); opacity: .72; }
+.user-file-info strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 600 calc(12px * var(--hermes-text-zoom, 1))/1.35 var(--hermes-font-ui); text-transform: none; letter-spacing: normal; }
+.user-file-info small { font: 400 calc(11px * var(--hermes-text-zoom, 1))/1.25 var(--hermes-font-ui); opacity: .72; }
 .user-file-actions { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; }
 .user-file-actions button {
   display: inline-flex; align-items: center; justify-content: center;
@@ -28,7 +28,7 @@
   border: 1px solid color-mix(in srgb, currentColor 35%, transparent); border-radius: 6px;
   background: transparent; color: inherit; box-shadow: none;
   font: 550 calc(11px * var(--hermes-text-zoom, 1))/1.2 var(--hermes-font-ui);
-  letter-spacing: 0; text-transform: none; cursor: pointer;
+  letter-spacing: normal; text-transform: none; cursor: pointer;
 }
 .user-file-actions button:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
 .user-file-actions button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
@@ -51,12 +51,12 @@
   width: auto; min-height: 34px; padding: 7px 12px; border-radius: 7px;
   border: 1px solid var(--hermes-line-strong); background: var(--hermes-paper); color: var(--hermes-ink);
   font: 550 calc(12px * var(--hermes-text-zoom, 1))/1.2 var(--hermes-font-ui);
-  text-transform: none; letter-spacing: 0; cursor: pointer;
+  text-transform: none; letter-spacing: normal; cursor: pointer;
 }
 .user-file-viewer button:focus-visible { outline: 2px solid var(--hermes-ink); outline-offset: 2px; }
 .user-file-viewer button:disabled { opacity: .4; }
 .user-file-viewer-body { max-height: 62dvh; overflow: auto; margin-block-end: 18px; }
 .user-file-viewer pre { margin: 0; padding: 14px; white-space: pre-wrap; overflow-wrap: anywhere; color: inherit; background: color-mix(in srgb, var(--hermes-ink) 4%, transparent); border: 1px solid var(--hermes-line); border-radius: 8px; font: 400 calc(12px * var(--hermes-text-zoom, 1))/1.55 var(--hermes-font-mono); }
 .user-file-viewer video, .user-file-viewer audio { display: block; width: 100%; max-height: 58dvh; }
-.attachment-open { min-height: 0; padding: 0; border: 0; background: transparent; color: inherit; text-transform: none; letter-spacing: 0; cursor: pointer; font: inherit; }
+.attachment-open { min-height: 0; padding: 0; border: 0; background: transparent; color: inherit; text-transform: none; letter-spacing: normal; cursor: pointer; font: inherit; }
 .attachment-open:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }

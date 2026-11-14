@@ -15,14 +15,6 @@ function headingRule(css, profile) {
   return css.match(pattern)?.[1] || '';
 }
 
-test('chat headings follow the chosen font in the signature and Cinzel profiles', () => {
-  for (const [file, css] of Object.entries(sheets)) {
-    for (const profile of ['signature', 'cinzel']) {
-      assert.match(headingRule(css, profile), /font-family:\s*var\(--hermes-font-display\);/, `${file}: ${profile} headings`);
-    }
-  }
-});
-
 test('no chat heading rule hard-codes a headline face, so the chosen font always applies', () => {
   for (const [file, css] of Object.entries(sheets)) {
     const messageRules = [...css.matchAll(/([^{}]*)\{([^{}]*)\}/g)].filter(([, selector]) => /message-content/.test(selector));

@@ -182,7 +182,6 @@ export const CHECK_JS_COMMANDS = Object.freeze([
   'node --check extension/lib/local-dashboard-scope.mjs',
   'node --check extension/lib/session-lineage.mjs',
   'node --check extension/lib/replay-watermarks.mjs',
-  'node --check extension/lib/dither-hover.mjs',
   'node --check extension/lib/hermes-account.mjs',
   'node --check extension/lib/host-folders.mjs',
 ]);

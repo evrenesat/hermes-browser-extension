@@ -143,7 +143,7 @@ export function hasCredentialBearingUrl(value = '') {
   if (names.some((name) => CREDENTIAL_URL_PARAMETER_NAMES.has(name) || isSensitiveAssignmentKey(name))) return true;
   if (parameters.has('state') && (parameters.get('code') || []).some((code) => code.length >= OAUTH_CODE_MIN_LENGTH)) return true;
   if (looksLikeOpaqueTicket(parameters.get('ticket') || [])) return true;
-  // A recognisable secret shape (for example `?key=AIza...`) is credential
+  // A recognisable secret shape (for example `?key=AIza…`) is credential
   // bearing whatever the parameter is called.
   return [parsed.search, parsed.hash].some((part) => (
     decodedUrlLayers(part).some((layer) => redactSensitiveTextWithCount(layer).count > 0)
