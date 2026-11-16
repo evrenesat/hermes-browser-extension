@@ -8,7 +8,10 @@ through a few tools. The plugin version is the `version` in `plugin.yaml`.
 
 ## What it is, and is not
 
-- It registers **seven context tools**, three lifecycle hooks (`pre_llm_call`,
+- It registers **eight context tools** (`browser_context_status`,
+  `browser_get_context`, `browser_get_capture_chunk`, `browser_clear_context`,
+  `browser_event_log`, `browser_control_status`, `browser_context_journal`,
+  `browser_text_utility`), three lifecycle hooks (`pre_llm_call`,
   `pre_tool_call`, `post_tool_call`), one bundled skill (`hermes-browser-extension`),
   the context and readiness routes, and read-only profile roster and avatar routes.
   It also carries Hermes Control: **twenty Hermes Control tools** and two more

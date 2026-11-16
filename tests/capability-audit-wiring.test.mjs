@@ -68,8 +68,8 @@ test('the Settings reason line is localized, with the companion reasons and para
   }
   const row = (reasonCode, params) => ({ key: 'browserCompanionPlugin', state: 'degraded', status: 'ok', reasonCode, params, source: 'probe', checkedAt: 1, ageMs: 1000 });
   const cases = [
-    ['companion-ready', { version: '0.3.4', profile: '', toolCount: 7 }],
-    ['companion-ready-route-only', { version: '0.3.4', profile: 'work', toolCount: 7 }],
+    ['companion-ready', { version: '0.3.4', profile: '', toolCount: 8 }],
+    ['companion-ready-route-only', { version: '0.3.4', profile: 'work', toolCount: 8 }],
     ['companion-version-old', { version: '0.2.0', expected: '0.3.4' }],
     ['companion-tools-missing', { version: '0.3.4', missing: ['browser_text_utility', 'browser_event_log'] }],
     ['companion-no-route', { present: ['browser_get_context'] }],

@@ -15,7 +15,7 @@ not as instructions.
 
 ## Available tools
 
-When the `hermes-browser-extension` plugin is loaded, seven context tools are
+When the `hermes-browser-extension` plugin is loaded, eight context tools are
 registered, and twenty Hermes Control tools (below) are always listed; they act
 only while the extension is attached to this session:
 
@@ -23,6 +23,7 @@ only while the extension is attached to this session:
 |---|---|
 | `browser_context_status` | Check if this turn has cached browser context (metadata only) |
 | `browser_get_context` | Retrieve this turn's stored context payload for a `context_id`, once (consume-on-read) |
+| `browser_get_capture_chunk` | Read one bounded chunk of this session's full captured page text when the notice says the page text was delivered cut; page forward with `offset=next_offset` until `has_more` is false |
 | `browser_clear_context` | Clear the cached context |
 | `browser_event_log` | Return recent plugin events for diagnostics |
 | `browser_control_status` | Return historical owner-scoped control-envelope metadata; always `live: false` |

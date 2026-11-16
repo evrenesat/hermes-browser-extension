@@ -181,5 +181,5 @@ export default Object.freeze({
   "suffix": "-900k",
   "fallback": 256000,
   "source": "hermes-upstream",
-  "sourceSha256": "d8720130bd61ffbab902a125b81506bee609a10576a195fdac9bcd4526351891"
+  "sourceSha256": "f737c9512bf9592b858a0485b7ff8bf3610a8da5c26ac571ba80c2f08f6db9a1"
 });

@@ -24,7 +24,7 @@ const fn = (name) => sidepanel.match(new RegExp(`(?:async )?function ${name}\\([
 
 const COMPANION_TOOLS = [
   'browser_clear_context', 'browser_context_journal', 'browser_context_status', 'browser_control_status',
-  'browser_event_log', 'browser_get_context', 'browser_text_utility',
+  'browser_event_log', 'browser_get_capture_chunk', 'browser_get_context', 'browser_text_utility',
 ];
 const STOCK = { object: 'hermes.api_server.capabilities', platform: 'hermes-agent', features: { session_chat: true } };
 const patched = (extra = {}) => ({

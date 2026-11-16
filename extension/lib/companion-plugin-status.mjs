@@ -40,6 +40,7 @@ export const COMPANION_STATUS_OBJECT = 'hermes.browser_companion.status';
 // (companion-plugin/context_routes.py); companion-context-client.mjs calls them.
 export const COMPANION_CONTEXT_STATUS_PATH = `/api/plugins/${COMPANION_PLUGIN_NAME}/context/status`;
 export const COMPANION_CONTEXT_UPLOAD_PATH = `/api/plugins/${COMPANION_PLUGIN_NAME}/context`;
+export const COMPANION_CAPTURE_UPLOAD_PATH = `/api/plugins/${COMPANION_PLUGIN_NAME}/capture`;
 export const COMPANION_ACTIONS_PATH = `/api/plugins/${COMPANION_PLUGIN_NAME}/actions`;
 // Hermes Control's register route (companion-plugin/control_routes.py), the one Hermes
 // without a built-in broker offers: stock Hermes since it removed its own.
@@ -54,6 +55,7 @@ export const COMPANION_EXPECTED_TOOLS = Object.freeze([
   'browser_context_status',
   'browser_control_status',
   'browser_event_log',
+  'browser_get_capture_chunk',
   'browser_get_context',
   'browser_text_utility',
 ]);

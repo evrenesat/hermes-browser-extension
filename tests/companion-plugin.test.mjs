@@ -144,6 +144,7 @@ module.register(ctx)
 assert [tool["name"] for tool in ctx.tools] == [
     "browser_context_status",
     "browser_get_context",
+    "browser_get_capture_chunk",
     "browser_clear_context",
     "browser_event_log",
     "browser_control_status",
@@ -161,7 +162,7 @@ for tool in ctx.tools:
     assert schema["parameters"]["type"] == "object"
 assert [name for name, _callback in ctx.hooks] == ["pre_llm_call", "pre_tool_call", "post_tool_call"]
 assert ctx.skills and ctx.skills[0][0] == "hermes-browser-extension"
-assert ctx.config_reads == [("durable_receipts", True), ("receipt_limit", 8)]
+assert ctx.config_reads == [("durable_receipts", True), ("receipt_limit", 8), ("capture_enabled", True), ("capture_ttl_seconds", 1800), ("capture_max_chars", 512_000)]
 `;
   runPluginPython(script);
 });
@@ -173,6 +174,7 @@ from companion_plugin import schemas
 schema_map = {
     "browser_context_status": schemas.SCHEMA_STATUS,
     "browser_get_context": schemas.SCHEMA_GET_CONTEXT,
+    "browser_get_capture_chunk": schemas.SCHEMA_CAPTURE_CHUNK,
     "browser_clear_context": schemas.SCHEMA_CLEAR_CONTEXT,
     "browser_event_log": schemas.SCHEMA_EVENT_LOG,
     "browser_control_status": schemas.SCHEMA_CONTROL_STATUS,

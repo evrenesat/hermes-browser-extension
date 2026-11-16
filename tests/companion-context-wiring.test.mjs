@@ -209,3 +209,17 @@ test('a refused or failing upload never throws, and a vanished route stops later
   const helperD = await loadUploadHelper(broken);
   assert.equal(await helperD.run({ ...TURN(), context: null }), false, 'a malformed turn is swallowed');
 });
+
+test('capture wiring: the upload happens before the final consent read and stays fail-soft', () => {
+  const sender = panel.match(/async function askHermes\([\s\S]*?\n\}/)?.[0] || '';
+  assert.ok(sender.includes('uploadCompanionCapture('), 'the send path uploads the capture');
+  const resolverIndex = sender.indexOf('await turnOptions.resolveUserText()');
+  const submitIndex = sender.indexOf('answer = await streamSessionChat', resolverIndex);
+  const uploadAt = sender.indexOf('await uploadCompanionCapture(');
+  assert.ok(uploadAt >= 0 && uploadAt < resolverIndex, 'the capture upload is awaited before the consent resolver');
+  const consentSlice = sender.slice(sender.indexOf('\n', resolverIndex) + 1, submitIndex);
+  assert.doesNotMatch(consentSlice, /\bawait\b/, 'the consent gate stays the last await before the send');
+  assert.match(sender, /captureIdForFingerprint\(/);
+  assert.match(sender, /rememberCaptureForFingerprint\(/);
+  assert.match(sender, /if \(uploaded\.ok\) \{/, 'fail-soft: a failed upload leaves the turn unchanged');
+});

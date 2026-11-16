@@ -21,16 +21,21 @@
 
 import {
   COMPANION_ACTIONS_PATH,
+  COMPANION_CAPTURE_UPLOAD_PATH,
   COMPANION_CONTEXT_STATUS_PATH,
   COMPANION_CONTEXT_UPLOAD_PATH,
+  COMPANION_STATES,
   companionRouteRecordFields,
 } from './companion-plugin-status.mjs';
 
-export { COMPANION_ACTIONS_PATH, COMPANION_CONTEXT_STATUS_PATH, COMPANION_CONTEXT_UPLOAD_PATH };
+export { COMPANION_ACTIONS_PATH, COMPANION_CAPTURE_UPLOAD_PATH, COMPANION_CONTEXT_STATUS_PATH, COMPANION_CONTEXT_UPLOAD_PATH };
 export const COMPANION_SESSION_HEADER = 'X-Hermes-Session-Id';
 
 const CONTEXT_STATUS_OBJECT = 'hermes.browser_companion.context_status';
 const CONTEXT_UPLOAD_OBJECT = 'hermes.browser_companion.context_upload';
+const CAPTURE_UPLOAD_OBJECT = 'hermes.browser_companion.capture_upload';
+// The plugin route refuses more than ~3.2MB; guard well under it.
+const MAX_CAPTURE_BODY_CHARS = 600_000;
 const ACTIONS_OBJECT = 'hermes.browser_companion.actions';
 const DEFAULT_TIMEOUT_MS = 2500;
 // The plugin refuses a longer envelope; do not send one it will refuse.
@@ -171,6 +176,56 @@ export function companionUploadPlan(probe, { deliveryMode = '', dashboardTranspo
   if (!companionRouteRecordFields(probe, 'browserContextUpload')) return 'skip';
   const age = Number(now) - Number(probe.checkedAt);
   return Number.isFinite(age) && age >= 0 && age <= maxAgeMs ? 'upload' : 'reprobe';
+}
+
+/**
+ * The capture side channel needs the same proof the context upload needs: the
+ * plugin's status route must list the capture route, the transport must be the
+ * panel's REST gateway, and the probe must be fresh. Full turns only; the
+ * caller gates that (a reference turn carries no page text to upload).
+ */
+export function companionCapturePlan(probe, { dashboardTransport = false, sessionId = '', now = Date.now(), maxAgeMs = COMPANION_PROBE_MAX_AGE_MS } = {}) {
+  if (dashboardTransport || !clean(sessionId)) return 'skip';
+  // Same readiness proof companionRouteRecordFields applies, proved directly
+  // against the capture route: it is plumbing, not a capability-UI row.
+  if (!probe || probe.state !== COMPANION_STATES.ready || probe.via !== 'route') return 'skip';
+  if (!Array.isArray(probe.routes) || !probe.routes.includes(COMPANION_CAPTURE_UPLOAD_PATH)) return 'skip';
+  const age = Number(now) - Number(probe.checkedAt);
+  return Number.isFinite(age) && age >= 0 && age <= maxAgeMs ? 'upload' : 'reprobe';
+}
+
+/**
+ * Park one full processed page capture for the session; the plugin issues the
+ * opaque capture id the envelope must name. Bounded and never throws: any
+ * problem returns `{ ok: false }` and the turn goes out without chunking.
+ */
+export async function uploadCompanionCapture({ fetchFn, sessionId, text, timeoutMs = DEFAULT_TIMEOUT_MS } = {}) {
+  try {
+    const captureText = String(text || '');
+    if (typeof fetchFn !== 'function' || !clean(sessionId) || !captureText.trim() || captureText.length > MAX_CAPTURE_BODY_CHARS) {
+      return { ok: false, error: 'capture-unusable' };
+    }
+    const response = await fetchFn(COMPANION_CAPTURE_UPLOAD_PATH, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', [COMPANION_SESSION_HEADER]: sessionId },
+      body: JSON.stringify({ text: captureText }),
+      signal: timeoutSignal(timeoutMs),
+    });
+    if (!response?.ok) return { ok: false, status: Number(response?.status) || 0, error: 'capture-upload-refused' };
+    const payload = await readJson(response);
+    const captureId = clean(payload?.capture_id);
+    if (payload?.object !== CAPTURE_UPLOAD_OBJECT || !/^[a-f0-9]{32}$/.test(captureId)) {
+      return { ok: false, error: 'invalid-capture-answer' };
+    }
+    return {
+      ok: true,
+      capture_id: captureId,
+      chunk_chars: Number(payload.chunk_chars) > 0 ? Number(payload.chunk_chars) : 24_000,
+      max_chars: Number(payload.max_chars) || 0,
+    };
+  } catch {
+    return { ok: false, error: 'capture-upload-failed' };
+  }
 }
 
 /** One diagnostics line for a status read; no page data, no ids. */

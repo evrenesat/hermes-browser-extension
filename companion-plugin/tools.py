@@ -26,6 +26,7 @@ from typing import Any
 from .context_store import _trusted_identifier
 
 from .schemas import (
+    SCHEMA_CAPTURE_CHUNK,
     SCHEMA_CLEAR_CONTEXT,
     SCHEMA_CONTROL_STATUS,
     SCHEMA_EVENT_LOG,

@@ -437,7 +437,7 @@ import { capabilityIdentity } from './lib/capability-status.mjs';
 import { createCapabilityRuntime } from './lib/capability-runtime.mjs';
 import { COMPANION_ROUTE_CAPABILITIES, COMPANION_STATES, companionRecordFields, companionRouteRecordFields, probeCompanionPlugin } from './lib/companion-plugin-status.mjs';
 import { botAvatarRoute } from './lib/bot-roster-source.mjs';
-import { companionContextSummary, companionUploadPlan, readCompanionActions, readCompanionContextStatus, uploadCompanionContext } from './lib/companion-context-client.mjs';
+import { companionCapturePlan, companionContextSummary, companionUploadPlan, readCompanionActions, readCompanionContextStatus, uploadCompanionCapture, uploadCompanionContext } from './lib/companion-context-client.mjs';
 import { stageImageViaSessionSocket } from './lib/session-socket-image.mjs';
 import { DASHBOARD_ROUTE_CAPABILITIES, dashboardRouteRecordFields, probeDashboardRoutes, readDashboardModelInfo, uploadImageViaDashboard } from './lib/dashboard-routes.mjs';
 import {
@@ -28460,6 +28460,40 @@ async function askHermes(userText, turnAttachments = [...attachments], turnOptio
       }
     }
     if (!runIsViewed()) throw new Error('Session changed before submission. The original draft is held and was not sent.');
+    // Capture chunk-pull: when the page text was cut and the plugin accepts
+    // captures, park the full processed text BEFORE the final consent read (the
+    // consent gate allows no awaits between its read and the send). The
+    // plugin-issued id rides in the envelope; reuse it while the page text is
+    // unchanged (the plugin refreshes the binding on every turn that names it).
+    // Fail-soft: any problem sends the turn exactly as it would have been
+    // without chunking, and the dashboard-WS transport is untouched.
+    let pageContextForEnvelope = context.pageContext;
+    const captureTextForTurn = String(context.pageContext?.captureText || '');
+    if (settings.contextDepth === 'full' && settings.includePageText !== false && !dashboardTransport && captureTextForTurn) {
+      const capturePlanFor = () => {
+        syncCapabilityRuntime();
+        const current = companionProbe && companionProbe.identityKey === capabilityRuntime.ledger.identityKey ? companionProbe.result : null;
+        return companionCapturePlan(current, { dashboardTransport, sessionId: currentSessionId });
+      };
+      let capturePlan = capturePlanFor();
+      if (capturePlan === 'reprobe') {
+        await refreshCompanionPluginStatus({ force: true });
+        capturePlan = capturePlanFor();
+      }
+      if (capturePlan === 'upload') {
+        const fingerprint = captureTextFingerprint(captureTextForTurn);
+        const reused = captureIdForFingerprint(fingerprint);
+        if (reused) {
+          context.pageContext = { ...context.pageContext, capture: { id: reused.id, chunkChars: reused.chunkChars } };
+        } else {
+          const uploaded = await uploadCompanionCapture({ fetchFn: (path, init) => apiFetch(path, init), sessionId: currentSessionId, text: captureTextForTurn });
+          if (uploaded.ok) {
+            rememberCaptureForFingerprint(fingerprint, uploaded);
+            context.pageContext = { ...context.pageContext, capture: { id: uploaded.capture_id, chunkChars: uploaded.chunk_chars } };
+          }
+        }
+      }
+    }
     const browserControl = await resolveBrowserControlForTurn({ context, scope: turnContextScope, sessionId: runSessionId });
     if (typeof turnOptions.resolveUserText === 'function') {
       userText = String(await turnOptions.resolveUserText() || '');
@@ -29515,6 +29549,40 @@ function serializePreparedContextMenuTurn(turn, browserControl) {
 // right before the turn goes out; the plugin binds it to that turn only if the turn names
 // the same hash. Fail-soft: any problem leaves the turn exactly as it would have been, and
 // a gateway without the plugin (or without the route) never sees a request.
+// Capture chunk-pull reuse: while the page hash is unchanged, the same
+// plugin-issued capture id stays valid — every turn whose envelope names it
+// refreshes the plugin-side binding, so re-uploading identical text would
+// only burn the route's budget.
+const CAPTURE_REUSE_TTL_MS = 25 * 60 * 1000;
+const captureIdsByContextHash = new Map();
+
+function captureTextFingerprint(text) {
+  let hash = 5381;
+  for (let index = 0; index < text.length; index += 1) {
+    hash = ((hash * 33) ^ text.charCodeAt(index)) >>> 0;
+  }
+  return `${text.length}:${hash.toString(16)}`;
+}
+
+function rememberCaptureForFingerprint(fingerprint, uploaded) {
+  const key = String(fingerprint || '');
+  if (!key || !uploaded?.capture_id) return;
+  const now = Date.now();
+  for (const [existing, entry] of captureIdsByContextHash) {
+    if (now - entry.at > CAPTURE_REUSE_TTL_MS) captureIdsByContextHash.delete(existing);
+  }
+  captureIdsByContextHash.set(key, { id: uploaded.capture_id, chunkChars: uploaded.chunk_chars, at: now });
+  while (captureIdsByContextHash.size > 8) {
+    captureIdsByContextHash.delete(captureIdsByContextHash.keys().next().value);
+  }
+}
+
+function captureIdForFingerprint(fingerprint) {
+  const entry = captureIdsByContextHash.get(String(fingerprint || ''));
+  if (!entry || Date.now() - entry.at > CAPTURE_REUSE_TTL_MS) return null;
+  return entry;
+}
+
 async function uploadReferenceContextToCompanion({ context, promptTabs, selectedPromptTabs, scope, protocolSettings, contextHash, dashboardTransport = false } = {}) {
   try {
     const sessionId = String(settings.sessionId || '').trim();

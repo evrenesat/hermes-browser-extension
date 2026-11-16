@@ -80,6 +80,7 @@ print(json.dumps({"tools": ctx.tools, "hooks": ctx.hooks, "skills": ctx.skills, 
   assert.equal(data.payload.version, manifest.match(/^version:\s*(\S+)/m)[1]);
   assert.deepEqual(data.payload.routes, [
     '/api/plugins/hermes-browser-extension/actions',
+    '/api/plugins/hermes-browser-extension/capture',
     '/api/plugins/hermes-browser-extension/context',
     '/api/plugins/hermes-browser-extension/context/status',
     '/api/plugins/hermes-browser-extension/status',
@@ -161,6 +162,7 @@ print(json.dumps({"good": good, "raising": [raising["ok"], raising["anonymous"]]
   const expectGetHead = (path) => [`GET ${path}`, `HEAD ${path}`, `GET ${mirror(path)}`, `HEAD ${mirror(path)}`];
   const expected = [
     ...expectGetHead('/api/plugins/hermes-browser-extension/actions'),
+    ...expectGetHead('/api/plugins/hermes-browser-extension/capture'),
     ...expectGetHead('/api/plugins/hermes-browser-extension/context/status'),
     ...expectGetHead('/api/plugins/hermes-browser-extension/control/ws'),
     ...expectGetHead('/api/plugins/hermes-browser-extension/status'),
@@ -168,6 +170,8 @@ print(json.dumps({"good": good, "raising": [raising["ok"], raising["anonymous"]]
     'HEAD /api/plugins/hermes-browser-extension/profiles',
     'GET /api/plugins/hermes-browser-extension/profiles/{name}/avatar',
     'HEAD /api/plugins/hermes-browser-extension/profiles/{name}/avatar',
+    'POST /api/plugins/hermes-browser-extension/capture',
+    `POST ${mirror('/api/plugins/hermes-browser-extension/capture')}`,
     'POST /api/plugins/hermes-browser-extension/context',
     `POST ${mirror('/api/plugins/hermes-browser-extension/context')}`,
     'POST /api/plugins/hermes-browser-extension/control/register',
@@ -201,7 +205,7 @@ module.register(ctx)
 print(json.dumps({"tools": len(ctx.tools), "hooks": ctx.hooks, "skills": ctx.skills, "factories": len(ctx.factories)}))
 `);
   const data = JSON.parse(out);
-  assert.equal(data.tools, 27);
+  assert.equal(data.tools, 28);
   assert.deepEqual(data.hooks, ['pre_llm_call', 'pre_tool_call', 'post_tool_call']);
   assert.deepEqual(data.skills, ['hermes-browser-extension']);
   assert.equal(data.factories, 0);
@@ -220,7 +224,7 @@ wire(None, object())            # no native app (another platform's shape)
 wire(object(), object())        # a native without a router
 print(json.dumps({"tools": len(ctx.tools)}))
 `);
-  assert.equal(JSON.parse(out).tools, 27);
+  assert.equal(JSON.parse(out).tools, 28);
 });
 
 test('profile and version labels are bounded to a safe alphabet', () => {

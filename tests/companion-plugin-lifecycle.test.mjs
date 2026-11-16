@@ -682,6 +682,7 @@ with tempfile.TemporaryDirectory() as home:
 const CONTEXT_TOOLS = [
   'browser_context_status',
   'browser_get_context',
+  'browser_get_capture_chunk',
   'browser_clear_context',
   'browser_event_log',
   'browser_control_status',
@@ -741,8 +742,8 @@ print(json.dumps({"tools": ctx.tools, "hooks": ctx.hooks}))
     assert.ok(skill.includes(`\`${name}\``), `SKILL.md lists ${name}`);
     assert.ok(install.includes(`\`${name}\``), `install.md lists ${name}`);
   }
-  assert.match(skill, /\bseven context tools\b/);
-  assert.match(install, /\bseven context tools\b/);
+  assert.match(skill, /\beight context tools\b/);
+  assert.match(install, /\beight context tools\b/);
   assert.match(skill, /\btwenty Hermes Control tools\b/);
   assert.match(install, /\btwenty Hermes Control tools\b/);
   assert.doesNotMatch(`${skill}\n${install}`, /\b(six|four|five|6|4|5) (companion )?tools\b/i);
@@ -769,7 +770,7 @@ def call(name, args=None):
     assert hooks.pre_tool_call(tool_name=name, args=args or {}, **ids()) is None
     return json.loads(getattr(tools, name)(args or {}, **runtime_kwargs()))
 
-assert set(call("browser_context_status")) == {"available", "context_id", "protocol", "payload_hash", "scope", "created_at", "expires_at"}
+assert set(call("browser_context_status")) == {"available", "context_id", "protocol", "payload_hash", "scope", "created_at", "expires_at", "capture"}
 control = call("browser_control_status")
 assert set(control) == {"context_id", "observed_at", "age_ms", "live", "control"} and control["live"] is False
 assert set(control["control"]) == {"availability", "lease_owned", "controller_id", "browser_profile_id", "tab_id", "frame_id", "document_generation"}
@@ -779,7 +780,7 @@ assert set(journal["rows"][0]) == {"ts", "context_id", "payload_hash", "scope", 
 events = call("browser_event_log")
 assert set(events) == {"available", "events"} and set(events["events"][0]) == {"name", "data", "ts", "owner"}
 got = call("browser_get_context", {"context_id": context_id})
-assert set(got) == {"available", "context_id", "protocol", "payload_hash", "scope", "created_at", "expires_at", "payload", "provenance"}
+assert set(got) == {"available", "context_id", "protocol", "payload_hash", "scope", "created_at", "expires_at", "capture", "payload", "provenance"}
 assert call("browser_clear_context") == UNAVAILABLE
 `;
   runPluginPython(script);

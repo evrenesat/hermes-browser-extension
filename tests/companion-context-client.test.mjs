@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   COMPANION_ACTIONS_PATH,
+  COMPANION_CAPTURE_UPLOAD_PATH,
   COMPANION_CONTEXT_STATUS_PATH,
   COMPANION_CONTEXT_UPLOAD_PATH,
   COMPANION_ROUTE_CAPABILITIES,
@@ -16,10 +17,12 @@ import {
 import {
   COMPANION_MAX_ENVELOPE_CHARS,
   COMPANION_PROBE_MAX_AGE_MS,
+  companionCapturePlan,
   companionContextSummary,
   companionUploadPlan,
   readCompanionActions,
   readCompanionContextStatus,
+  uploadCompanionCapture,
   uploadCompanionContext,
 } from '../extension/lib/companion-context-client.mjs';
 import { capabilityStatusRows, deriveCapabilityRecords, normalizeGatewayCapabilities } from '../extension/lib/capabilities.mjs';
@@ -29,9 +32,9 @@ const NOW = 5_000_000;
 const ROW_IDS = ['browserContextUpload', 'browserContextStatus', 'pluginActions'];
 const ALL_TOOLS = [
   'browser_clear_context', 'browser_context_journal', 'browser_context_status', 'browser_control_status',
-  'browser_event_log', 'browser_get_context', 'browser_text_utility',
+  'browser_event_log', 'browser_get_capture_chunk', 'browser_get_context', 'browser_text_utility',
 ];
-const ALL_ROUTES = [COMPANION_ACTIONS_PATH, COMPANION_CONTEXT_UPLOAD_PATH, COMPANION_CONTEXT_STATUS_PATH, COMPANION_STATUS_PATH];
+const ALL_ROUTES = [COMPANION_ACTIONS_PATH, COMPANION_CAPTURE_UPLOAD_PATH, COMPANION_CONTEXT_UPLOAD_PATH, COMPANION_CONTEXT_STATUS_PATH, COMPANION_STATUS_PATH];
 
 function probe({ routes = ALL_ROUTES, version = '0.4.0', state = 'ready' } = {}) {
   const parsed = parseCompanionStatusPayload({
@@ -226,4 +229,59 @@ test('the upload plan uploads only for a reference turn on a proven route, and r
   assert.equal(plan(null), 'skip');
   assert.equal(plan(probe({ routes: [COMPANION_STATUS_PATH, COMPANION_CONTEXT_STATUS_PATH, COMPANION_ACTIONS_PATH] })), 'skip', 'an older copy without the upload route');
   assert.equal(plan(probe({ state: 'not-installed' })), 'skip');
+});
+
+test('uploadCompanionCapture: happy path, bounds, and never-throw', async () => {
+  const calls = [];
+  const fetchFn = async (path, init) => {
+    calls.push({ path, init });
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({ object: 'hermes.browser_companion.capture_upload', plugin: 'hermes-browser-extension', capture_id: 'a'.repeat(32), chunk_chars: 24000, max_chars: 512000 }),
+    };
+  };
+  const good = await uploadCompanionCapture({ fetchFn, sessionId: 'session-1', text: 'page text' });
+  assert.equal(good.ok, true);
+  assert.equal(good.capture_id, 'a'.repeat(32));
+  assert.equal(good.chunk_chars, 24000);
+  assert.equal(calls[0].path, COMPANION_CAPTURE_UPLOAD_PATH);
+  assert.equal(calls[0].init.method, 'POST');
+  assert.equal(calls[0].init.headers['X-Hermes-Session-Id'], 'session-1');
+  assert.deepEqual(JSON.parse(calls[0].init.body), { text: 'page text' });
+
+  const refused = await uploadCompanionCapture({ fetchFn: async () => ({ ok: false, status: 413 }), sessionId: 's', text: 'page' });
+  assert.equal(refused.ok, false);
+  assert.equal(refused.status, 413);
+
+  const invalid = await uploadCompanionCapture({ fetchFn: async () => ({ ok: true, status: 200, json: async () => ({ object: 'other' }) }), sessionId: 's', text: 'page' });
+  assert.equal(invalid.ok, false);
+  assert.equal(invalid.error, 'invalid-capture-answer');
+
+  const oversize = await uploadCompanionCapture({ fetchFn, sessionId: 's', text: 'x'.repeat(600_001) });
+  assert.equal(oversize.ok, false);
+  assert.equal(oversize.error, 'capture-unusable');
+  assert.equal(calls.length, 1, 'oversize text never reaches the route');
+
+  const broken = await uploadCompanionCapture({ fetchFn: async () => { throw new Error('boom'); }, sessionId: 's', text: 'page' });
+  assert.equal(broken.ok, false);
+  assert.equal(broken.error, 'capture-upload-failed');
+
+  const noSession = await uploadCompanionCapture({ fetchFn, sessionId: '', text: 'page' });
+  assert.equal(noSession.ok, false);
+});
+
+test('companionCapturePlan: fresh proven route uploads; dashboard, missing session, old plugin and stale probes skip or reprobe', () => {
+  const probe = {
+    state: COMPANION_STATES.ready,
+    via: 'route',
+    version: '1.0.0',
+    routes: ['/api/plugins/hermes-browser-extension/capture'],
+    checkedAt: Date.now(),
+  };
+  assert.equal(companionCapturePlan(probe, { sessionId: 's' }), 'upload');
+  assert.equal(companionCapturePlan(probe, { sessionId: 's', dashboardTransport: true }), 'skip');
+  assert.equal(companionCapturePlan(probe, { sessionId: '' }), 'skip');
+  assert.equal(companionCapturePlan({ ...probe, routes: [] }, { sessionId: 's' }), 'skip', 'an older plugin without the route skips');
+  assert.equal(companionCapturePlan({ ...probe, checkedAt: Date.now() - 10 * 60 * 1000 }, { sessionId: 's' }), 'reprobe');
 });

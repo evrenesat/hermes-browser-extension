@@ -138,7 +138,7 @@ test('ready: the route answers, the version and tools match, and the toolset is 
   assert.equal(result.toolsetEnabled, true);
   assert.equal(result.via, 'route');
   assert.equal(result.checkedAt, NOW);
-  assert.match(result.reason, /Loaded: version 0.4.0, profile luxord, 7 tools\./);
+  assert.match(result.reason, /Loaded: version 0.4.0, profile luxord, 8 tools\./);
   // Read-only and credentialed exactly once per request, never with cookies.
   assert.deepEqual(calls.map((call) => call.url), [`${BASE}${COMPANION_STATUS_PATH}`, `${BASE}${COMPANION_TOOLSETS_PATH}`]);
   for (const { init } of calls) {
@@ -181,7 +181,7 @@ test('outdated: a loaded copy that has no status route (the v0.2.0 case) is told
   assert.equal(result.state, 'outdated');
   assert.equal(result.reasonCode, 'companion-no-route');
   assert.equal(result.via, 'toolsets');
-  assert.match(result.reason, /6 of 7 tools/);
+  assert.match(result.reason, /7 of 8 tools/);
   assert.match(result.reason, /older copy/);
 });
 
