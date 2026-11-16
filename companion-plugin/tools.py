@@ -34,6 +34,7 @@ from .schemas import (
     SCHEMA_STATUS,
     SCHEMA_TEXT_UTILITY,
 )
+from .capture_store import clamp_chunk_args
 from .text_utilities import run_text_utility
 
 _UNAVAILABLE = {"available": False, "reason": "Browser context unavailable."}
@@ -263,6 +264,15 @@ def browser_context_status(args: dict[str, Any] | None = None, **kwargs: Any) ->
 def browser_get_context(args: dict[str, Any] | None = None, **kwargs: Any) -> str:
     """Return only a pre-authorized, consume-once BCP payload lease."""
     return _json(_take_lease("get", _context_id(args), identity=runtime_identity(kwargs)))
+
+
+def browser_get_capture_chunk(args: dict[str, Any] | None = None, **kwargs: Any) -> str:
+    """Return one pre-authorized bounded slice of this session's page capture."""
+    values = args if isinstance(args, dict) else {}
+    capture_id = str(values.get("capture_id") or "")[:64]
+    offset, chunk_chars = clamp_chunk_args(args)
+    parameter = f"{capture_id}:{offset}:{chunk_chars}"
+    return _json(_take_lease("capture_chunk", parameter, identity=runtime_identity(kwargs)))
 
 
 def browser_clear_context(args: dict[str, Any] | None = None, **kwargs: Any) -> str:

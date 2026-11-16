@@ -21,6 +21,7 @@ import threading
 from time import time
 from typing import Any, Callable, Optional
 
+from .capture_store import CaptureStore, DEFAULT_CHUNK_CHARS
 from .journal import BrowserContextJournal
 
 BCP_TURN_PROTOCOL_ID = "hermes.browser.turn.v2"
@@ -272,6 +273,33 @@ def _principal_fingerprint(owner: ContextOwner) -> str:
     return hmac.new(_FINGERPRINT_SALT, owner.principal_id.encode("utf-8"), hashlib.sha256).hexdigest()[:16]
 
 
+def _capture_meta_from_payload(payload: Any) -> dict[str, Any]:
+    """The envelope's bounded capture block, or {} when absent/malformed."""
+    try:
+        capture = payload["pageContext"]["capture"]
+    except (KeyError, TypeError):
+        return {}
+    if not isinstance(capture, dict):
+        return {}
+    capture_id = str(capture.get("id") or "")
+    if not capture_id:
+        return {}
+
+    def _count(value: Any) -> int:
+        try:
+            number = int(value)
+        except (TypeError, ValueError):
+            return 0
+        return max(0, number)
+
+    return {
+        "id": capture_id[:64],
+        "total_chars": _count(capture.get("totalChars")),
+        "delivered_chars": _count(capture.get("deliveredChars")),
+        "chunk_chars": _count(capture.get("chunkChars")) or DEFAULT_CHUNK_CHARS,
+    }
+
+
 def _owner_fingerprint(owner: ContextOwner) -> str:
     """Bind durable diagnostics to the exact trusted execution owner tuple."""
     material = "\0".join((owner.principal_id, owner.session_id, owner.turn_id, owner.task_id))
@@ -333,11 +361,21 @@ class BrowserContextStore:
     _durable_receipts_enabled: bool = field(default=False, init=False, repr=False)
     _receipt_limit: int = field(default=DEFAULT_RECEIPT_LIMIT, init=False, repr=False)
     _journal: Optional[BrowserContextJournal] = field(default=None, init=False, repr=False)
+    capture_ttl_seconds: float = 1800.0
+    capture_max_chars: int = 512_000
+    capture_chunk_chars: int = DEFAULT_CHUNK_CHARS
+    captures: CaptureStore = field(default=None, init=False, repr=False)
     _lock: threading.RLock = field(default_factory=threading.RLock, init=False, repr=False)
     _stop: threading.Event = field(default_factory=threading.Event, init=False, repr=False)
     _expiry: threading.Thread = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
+        self.captures = CaptureStore(
+            ttl_seconds=self.capture_ttl_seconds,
+            max_chars=self.capture_max_chars,
+            chunk_chars=self.capture_chunk_chars,
+            clock=self.clock,
+        )
         self._expiry = threading.Thread(
             target=self._expire_loop,
             name="browser-context-expiry",
@@ -480,7 +518,17 @@ class BrowserContextStore:
             "scope": record.scope,
             "created_at": record.created_at,
             "expires_at": record.expires_at,
+            "capture": _capture_meta_from_payload(record.payload),
         }
+
+    def configure_captures(self, *, enabled=None, ttl_seconds=None, max_chars=None, chunk_chars=None) -> None:
+        """Pass plugin config through to the capture component."""
+        self.captures.configure(
+            enabled=enabled,
+            ttl_seconds=ttl_seconds,
+            max_chars=max_chars,
+            chunk_chars=chunk_chars,
+        )
 
     def put_bcp_v2(self, text: str, owner: ContextOwner) -> dict[str, Any]:
         """Validate and store one BCP v2 full-context turn for ``owner``."""
@@ -515,7 +563,14 @@ class BrowserContextStore:
                 now,
             )
             self._record_journal_locked(record, owner, now)
-            return self._metadata(record)
+            metadata = self._metadata(record)
+            # A turn naming a capture (re)binds it to this session's fence, so
+            # browser_get_capture_chunk stays readable across turns. Both the
+            # full-turn and the reference-adoption paths go through here.
+            capture = metadata.get("capture") or {}
+            if isinstance(capture, dict) and capture.get("id"):
+                self.captures.adopt_or_refresh(capture.get("id"), owner)
+            return metadata
 
     # -- Side-channel upload (the extension's HTTP route) ------------------
     #

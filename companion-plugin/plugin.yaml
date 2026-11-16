@@ -25,6 +25,7 @@ capabilities: []
 provides_tools:
   - browser_context_status
   - browser_get_context
+  - browser_get_capture_chunk
   - browser_clear_context
   - browser_event_log
   - browser_control_status
@@ -52,6 +53,18 @@ provides_tools:
   - tab_type
 
 config_schema:
+  capture_enabled:
+    type: bool
+    default: true
+    description: Let the extension upload full-page captures and the agent page through them.
+  capture_ttl_seconds:
+    type: int
+    default: 1800
+    description: How long an adopted capture stays readable (seconds, clamped to >= 1).
+  capture_max_chars:
+    type: int
+    default: 512000
+    description: Maximum characters of page text accepted per capture upload.
   durable_receipts:
     type: bool
     default: true

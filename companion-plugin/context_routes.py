@@ -29,6 +29,7 @@ No other route is added, and no route here moves anything but that one envelope.
 
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any, Callable, Iterable
 
@@ -38,6 +39,7 @@ from .multiplex_routes import add_get_listener_routes, add_post_listener_routes
 from .profile_registry import lookup_listener_profile
 from .status_route import (
     ACTIONS_PATH,
+    CAPTURE_UPLOAD_PATH,
     CONTEXT_STATUS_PATH,
     CONTEXT_UPLOAD_PATH,
     PLUGIN_NAME,
@@ -49,11 +51,15 @@ logger = logging.getLogger(__name__)
 SESSION_HEADER = "X-Hermes-Session-Id"
 CONTEXT_STATUS_OBJECT = "hermes.browser_companion.context_status"
 CONTEXT_UPLOAD_OBJECT = "hermes.browser_companion.context_upload"
+CAPTURE_UPLOAD_OBJECT = "hermes.browser_companion.capture_upload"
 ACTIONS_OBJECT = "hermes.browser_companion.actions"
 
 # The context parser refuses a turn longer than this (context_store), so a
 # longer body cannot be valid; refuse it before reading it all.
 MAX_UPLOAD_BYTES = 4 * 64_000
+# Capture uploads carry the full processed page text (default bound 512k
+# chars); the byte ceiling leaves headroom for multi-byte characters.
+MAX_CAPTURE_UPLOAD_BYTES = 3_200_000
 _MAX_SESSION_ID_CHARS = 256
 _NO_STORE = {"Cache-Control": "no-store"}
 
@@ -180,6 +186,56 @@ def make_upload_handler(adapter: Any) -> Callable[..., Any]:
     return handler
 
 
+def make_capture_upload_handler(adapter: Any) -> Callable[..., Any]:
+    """Park one full-page capture for the named session; the plugin issues the id.
+
+    The body is ``{"text": <processed page text>}``.  The answer is metadata
+    only and names the capture id the extension must copy into its envelope's
+    ``pageContext.capture`` block.  Binding happens when a trusted hook sees a
+    turn whose envelope names that id for the same session.
+    """
+    async def handler(request):
+        from aiohttp import web
+
+        denied = authorize(adapter, request)
+        if denied is not None:
+            return denied
+        lp, name = lookup_listener_profile(request)
+        if lp is None:
+            return _unavailable_profile_error(name)
+        session = _session_id(request)
+        if not session:
+            return _error(400, "session_required", f"Send the session id in the {SESSION_HEADER} header.")
+        body = await _read_bounded(request, MAX_CAPTURE_UPLOAD_BYTES)
+        if body is None:
+            return _error(413, "capture_too_large", "The capture text exceeds the route byte bound.")
+        try:
+            payload = json.loads(body.decode("utf-8"))
+        except (UnicodeDecodeError, ValueError):
+            return _error(400, "invalid_capture", "The body must be UTF-8 JSON with a text field.")
+        if not isinstance(payload, dict) or not isinstance(payload.get("text"), str):
+            return _error(400, "invalid_capture", "The body must be UTF-8 JSON with a text field.")
+        stored = lp.store.captures.upload(session, payload["text"])
+        if not stored.get("available"):
+            return _error(422, "capture_unusable", str(stored.get("reason") or "The capture was not stored."), )
+        return web.json_response(
+            {
+                "object": CAPTURE_UPLOAD_OBJECT,
+                "plugin": PLUGIN_NAME,
+                "stored": True,
+                "capture_id": stored["capture_id"],
+                "max_chars": stored["max_chars"],
+                "chunk_chars": stored["chunk_chars"],
+                "expires_in_seconds": stored["expires_in_seconds"],
+                "adopts": "named-turn",
+                "live": False,
+            },
+            headers=_NO_STORE,
+        )
+
+    return handler
+
+
 def make_actions_handler(adapter: Any) -> Callable[..., Any]:
     async def handler(request):
         from aiohttp import web
@@ -214,6 +270,7 @@ def make_wire_extra() -> Callable[[Any, Any], None]:
         add_get_listener_routes(router, CONTEXT_STATUS_PATH, make_status_handler(adapter))
         add_get_listener_routes(router, ACTIONS_PATH, make_actions_handler(adapter))
         add_post_listener_routes(router, CONTEXT_UPLOAD_PATH, make_upload_handler(adapter))
+        add_post_listener_routes(router, CAPTURE_UPLOAD_PATH, make_capture_upload_handler(adapter))
 
     return wire_extra
 

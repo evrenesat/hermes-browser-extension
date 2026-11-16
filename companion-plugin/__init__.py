@@ -32,6 +32,7 @@ STORE = BrowserContextStore()
 TOOL_NAMES = (
     "browser_context_status",
     "browser_get_context",
+    "browser_get_capture_chunk",
     "browser_clear_context",
     "browser_event_log",
     "browser_control_status",
@@ -57,6 +58,9 @@ def register(ctx) -> None:
     global STORE
     durable_receipts = ctx.get_config("durable_receipts", default=True)
     receipt_limit = ctx.get_config("receipt_limit", default=8)
+    capture_enabled = ctx.get_config("capture_enabled", default=True)
+    capture_ttl_seconds = ctx.get_config("capture_ttl_seconds", default=1800)
+    capture_max_chars = ctx.get_config("capture_max_chars", default=512_000)
     # The live PluginContext always has `state`; the catalog validator's
     # recording context does not, so a missing one means memory-only receipts.
     try:
@@ -69,6 +73,15 @@ def register(ctx) -> None:
     else:
         store = profile_registry.ensure_context_store(profile)
     STORE = store
+
+    try:
+        store.configure_captures(
+            enabled=capture_enabled is not False,
+            ttl_seconds=capture_ttl_seconds,
+            max_chars=capture_max_chars,
+        )
+    except Exception:
+        pass
 
     state = getattr(ctx, "state", None)
     if state is not None:
@@ -106,6 +119,15 @@ def register(ctx) -> None:
         handler=tools.browser_get_context,
         description="Consume this turn's cached browser context once, using its opaque context_id.",
         emoji="📄",
+    )
+
+    ctx.register_tool(
+        name="browser_get_capture_chunk",
+        toolset="hermes-browser-extension",
+        schema=tools.SCHEMA_CAPTURE_CHUNK,
+        handler=tools.browser_get_capture_chunk,
+        description="Read one bounded chunk of this session's full captured page text; page forward with next_offset.",
+        emoji="📑",
     )
 
     ctx.register_tool(

@@ -31,6 +31,42 @@ SCHEMA_GET_CONTEXT = {
     },
 }
 
+SCHEMA_CAPTURE_CHUNK = {
+    "name": "browser_get_capture_chunk",
+    "description": (
+        "Read one bounded chunk of the full page text the extension captured for this session, "
+        "when the context notice says the page text was delivered cut. Repeatable: page forward "
+        "with offset=next_offset from the previous answer until has_more is false."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "capture_id": {
+                "type": "string",
+                "description": "Opaque capture ID supplied by the companion context notice.",
+                "minLength": 32,
+                "maxLength": 64,
+                "pattern": "^[a-f0-9]{32}$",
+            },
+            "offset": {
+                "type": "integer",
+                "description": "Character offset into the capture to read from (use next_offset from the previous chunk).",
+                "minimum": 0,
+                "default": 0,
+            },
+            "chunk_chars": {
+                "type": "integer",
+                "description": "Maximum characters to return (4000-64000, default 24000).",
+                "minimum": 4000,
+                "maximum": 64000,
+                "default": 24000,
+            },
+        },
+        "required": ["capture_id"],
+        "additionalProperties": False,
+    },
+}
+
 SCHEMA_CLEAR_CONTEXT = {
     "name": "browser_clear_context",
     "description": "Clear the cached browser context. The next extension prompt will re-populate it.",
