@@ -1,5 +1,14 @@
 # DEVLOG
 
+## 2026-11-16 — feat/capture: capture chunk-pull for long pages
+
+- Problem: pages longer than the full-depth page-text cap were cut before leaving the extension, and the agent had no way to read the rest. Fix goal: the agent pages through the full capture on demand, so it never answers with missing page data.
+- Design (plan in temp/chunk-pull-plan.md, ogent-reviewed go-with-changes; all five material findings processed): extractor returns the full processed page text (same normalize+redact pipeline, 512k-char bound) as captureText; the envelope carries a bounded capture block {id, totalChars, deliveredChars, chunkChars} (hash-excluded so reference turns stay cached); the delivered page text is derived as the exact head of the capture text so chunk offsets align by construction; captureText never serializes.
+- Plugin: new POST /api/plugins/hermes-browser-extension/capture route (byte-bounded, session header, plugin-issued 32-hex capture id, pending TTL 300s); adoption/rebinding fenced by principal+session on every turn naming the id (adopted TTL 1800s); browser_get_capture_chunk reads bounded 4k-64k chunks through the trusted pre_tool_call lease (one-shot per capture_id:offset:chunk_chars, repeatable reads); notice appends a byte-stable chunking instruction when a capture is bound. Config: capture_enabled / capture_ttl_seconds / capture_max_chars.
+- Extension: full-depth truncated pages upload the capture before the final consent read (the consent gate forbids awaits between its read and the send; upload is awaited earlier), reuse the plugin-issued id while the capture-text fingerprint is unchanged, and degrade to today's behavior on any failure or an older plugin (route listed in the plugin status payload is the version gate).
+- ogent round-1 resolutions honored: session-level fence (not turn tuple), lease-flow handler invariant, capture block outside the payload hash, upload in the main full-turn send path with plugin-issued ids, one shared text pipeline with prefix-exact delivery.
+- Tests: 12 new python cases (store, fence, TTLs, bounds, lease flow, notice, envelope adoption); JS protocol suite extended (capture block, hash exclusion, no-leak); client + wiring suites extended (upload bounds, plan gating, consent-gate placement). Suite: 5651 JS pass, 12 python pass. Known pre-existing failures unrelated to this work: review-queue race test (flaky, A/B-verified both sides), origin/main base-retains-records regression test (not wired into CI, fails on stashed tree too).
+
 ## 2026-11-16 — fix/context: page-text budget and visible truncation
 
 - Symptom: on long pages (Reddit comment threads) the full-depth snapshot stopped at 30,000 chars with a bare " [truncated]" marker, and source_receipt.truncation reported a clean turn because extractor-level clamping happened before the envelope budget state existed.
