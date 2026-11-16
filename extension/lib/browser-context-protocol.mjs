@@ -12,7 +12,7 @@ export const BROWSER_CONTEXT_TURN_BUDGETS = Object.freeze({
   humanInputChars: 6_000,
   instructionTransformChars: 6_000,
   responseStyleChars: 6_000,
-  pageTextChars: 30_000,
+  pageTextChars: 40_000,
   selectedTextChars: 6_000,
   transcriptChars: 6_000,
   attachmentTextChars: 4_000,
@@ -184,7 +184,7 @@ export function summarizeTabs(tabs = [], maxTabs = DEFAULT_BROWSER_CONTEXT_PROTO
 
 export function contextCharLimit(depth = 'normal') {
   if (depth === 'minimal') return 4_000;
-  if (depth === 'full') return 30_000;
+  if (depth === 'full') return 40_000;
   return 12_000;
 }
 
@@ -200,6 +200,7 @@ function normalizeExtractionMetadata(pageContext = {}) {
   const confidenceValue = Number(source?.confidence);
   const wordCountValue = Number(source?.wordCount);
   const redactionCountValue = Number(source?.redactionCount);
+  const originalCharsValue = Number(source?.originalChars);
   if (!schema && !version && !method) return null;
   return {
     schema,
@@ -209,6 +210,9 @@ function normalizeExtractionMetadata(pageContext = {}) {
     wordCount: Number.isFinite(wordCountValue) ? Math.max(0, Math.floor(wordCountValue)) : 0,
     truncated: Boolean(source?.truncated),
     redactionCount: Number.isFinite(redactionCountValue) ? Math.max(0, Math.floor(redactionCountValue)) : 0,
+    // Present only when the extractor reported the pre-clamp length; omitted
+    // otherwise so fixtures without it keep their exact metadata shape.
+    ...(Number.isFinite(originalCharsValue) && originalCharsValue > 0 ? { originalChars: Math.floor(originalCharsValue) } : {}),
   };
 }
 
@@ -422,7 +426,7 @@ export function browserContextPayloadHash({ activeTab = {}, selectedTabs = [], p
       ? clampText(redactSensitiveText(normalizeReadableWhitespace(pageContext?.selectedText || '')), 12_000)
       : '',
     pageText: mergedSettings.includePageText
-      ? clampText(redactSensitiveText(normalizeReadableWhitespace(pageContext?.text || '')), 20_000)
+      ? clampText(redactSensitiveText(normalizeReadableWhitespace(pageContext?.text || '')), contextCharLimit(mergedSettings.contextDepth))
       : '',
     youtubeTranscript: pageContext?.youtubeTranscript?.ok
       ? clampText(formatYoutubeTranscript(pageContext.youtubeTranscript, 20_000), 20_000)
@@ -631,6 +635,15 @@ export function buildBrowserContextReceipt({ context = {}, attachments = [], set
       value: `${countRedactions(context)}`,
     },
   );
+  if (extraction?.truncated && settings.includePageText !== false) {
+    const delivered = String(pageContext.text || '').length;
+    const original = Number(extraction.originalChars) || 0;
+    const omitted = original > delivered ? original - delivered : null;
+    items.push({
+      label: 'Page text truncated',
+      value: omitted == null ? 'yes — omitted amount unknown' : `${omitted.toLocaleString('en-US')} chars omitted`,
+    });
+  }
   return { title: 'What Hermes saw', items };
 }
 
@@ -679,6 +692,20 @@ function boundedStructuredValue(value, state, source, depth = 0) {
     output[key] = boundedStructuredValue(value[key], state, `${source}.${key}`, depth + 1);
   }
   return output;
+}
+
+// Extractor-level clamping happens before the envelope, so the budget state
+// never saw it and the receipt could claim a clean turn over a cut page.
+// Count what the extractor reported dropping (originalChars) or, when absent,
+// how far the raw text visibly exceeded the normalized page text.
+function recordExtractorPageTextTruncation(rawPageContext = {}, normalizedPage = {}, state) {
+  const extraction = normalizedPage?.extraction || {};
+  if (!extraction.truncated) return;
+  const delivered = String(normalizedPage?.text || '').length;
+  const original = Number(extraction.originalChars) || 0;
+  const rawLength = String(rawPageContext?.text || '').length;
+  const omitted = original > delivered ? original - delivered : Math.max(0, rawLength - delivered);
+  if (omitted > 0) recordTruncation(state, 'browser.page_text_extractor', omitted);
 }
 
 function recordBoundedSourceText(state, source, value, limit) {
@@ -882,7 +909,9 @@ function browserContextForTurn({ activeTab, tabs, selectedTabs, pageContext, con
   }
   recordMetadataNormalizationTruncation(pageContext, state);
   const payload = buildBrowserContextPayload({ activeTab, tabs, selectedTabs, pageContext, contextScope, attachments: [], settings });
-  return { delivery: 'full', payload: budgetBrowserPayload(payload, state) };
+  const budgetedPayload = budgetBrowserPayload(payload, state);
+  recordExtractorPageTextTruncation(pageContext, budgetedPayload.pageContext, state);
+  return { delivery: 'full', payload: budgetedPayload };
 }
 
 // The page view prepared for the turn's first action. Text arrives already

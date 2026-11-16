@@ -1,5 +1,12 @@
 # DEVLOG
 
+## 2026-11-16 — fix/context: page-text budget and visible truncation
+
+- Symptom: on long pages (Reddit comment threads) the full-depth snapshot stopped at 30,000 chars with a bare " [truncated]" marker, and source_receipt.truncation reported a clean turn because extractor-level clamping happened before the envelope budget state existed.
+- Root cause: the extractor clamps page text at TEXT_LIMITS.full = 30_000 (content.js + sidepanel.js scripting fallback), the envelope capped pageTextChars at the same 30,000, and the 48,000-char turn budget sat ~12K underused; the extractor's originalChars count was dropped when collectPageContext flattened extraction metadata.
+- Fix: full-depth page text now 40,000 chars end to end (content.js, sidepanel.js, contextCharLimit full, pageTextChars); originalChars survives into the envelope; extractor truncation is recorded in source_receipt.truncation.sources["browser.page_text_extractor"] and shown as "Page text truncated: N chars omitted" in the What Hermes saw receipt; browserContextPayloadHash page-text clamp now tracks contextCharLimit(depth) so a 40K delivered page can no longer collide into a stale reference delivery.
+- Tests: two new regression tests in tests/browser-context-protocol.test.mjs (budget use + receipt visibility); suite 5643 pass / 0 fail, check:js, check:contexts, check:content-runtime all green. The review-queue "simultaneous processes" test remains flaky both with and without this change (interleaved A/B confirmed; already noted as unrelated above).
+
 ## 2026-11-12 — fork and calm UI revamp, night 1
 
 - Hard-forked upstream at 10e87ba2 to evrenesat/hermes-browser-extension (public).

@@ -25092,7 +25092,7 @@ async function sendContentMessageWithInstallFallback(tabId, message, { frameId =
 }
 
 function collectPageContextWithSharedExtractor(options = {}) {
-  const TEXT_LIMITS = { minimal: 4_000, normal: 12_000, full: 30_000 };
+  const TEXT_LIMITS = { minimal: 4_000, normal: 12_000, full: 40_000 };
   const HermesContentExtractor = globalThis.HermesContentExtractor;
   if (!HermesContentExtractor?.collectPageContext) {
     return { ok: false, error: 'Hermes content extractor runtime is unavailable.', text: '', selectedText: '', meta: {} };

@@ -446,3 +446,65 @@ test('page text cannot close the untrusted-context block or forge a user request
   assert.match(prompt, /USER_REQUEST_START\nSummarize this\nUSER_REQUEST_END/);
   assert.match(prompt, /UNTRUSTED_BROWSER_CONTEXT_END$/);
 });
+test('full-depth page text uses the envelope page-text budget and reports extractor truncation', () => {
+  const originalChars = 45_000;
+  const envelope = buildBrowserTurnEnvelope({
+    humanInput: 'why?',
+    activeTab: { id: 7, title: 'Thread', url: 'https://old.reddit.com/r/LocalLLaMA/comments/abc/' },
+    tabs: [{ id: 7, active: true, title: 'Thread', url: 'https://old.reddit.com/r/LocalLLaMA/comments/abc/' }],
+    pageContext: {
+      text: 'x'.repeat(originalChars),
+      meta: {
+        extraction: {
+          schema: 'hermes.browser.extraction.v1',
+          version: '1.0.0',
+          method: 'candidate-reader',
+          confidence: 0.98,
+          wordCount: 7_500,
+          truncated: true,
+          redactionCount: 0,
+          originalChars,
+        },
+      },
+    },
+    settings: { ...BASE_SETTINGS, contextDepth: 'full' },
+  });
+  const page = envelope.browser_context.payload.pageContext;
+  assert.equal(page.text.length, BROWSER_CONTEXT_TURN_BUDGETS.pageTextChars);
+  assert.equal(page.extraction.truncated, true);
+  assert.equal(page.extraction.originalChars, originalChars);
+  assert.equal(envelope.source_receipt.truncation.any, true);
+  assert.equal(
+    envelope.source_receipt.truncation.sources['browser.page_text_extractor'],
+    originalChars - BROWSER_CONTEXT_TURN_BUDGETS.pageTextChars,
+  );
+  assert.ok(envelope.source_receipt.budgets.serialized_chars <= BROWSER_CONTEXT_TURN_BUDGETS.totalSerializedChars);
+});
+
+test('page-text truncation stays visible in the What Hermes saw receipt', () => {
+  const receipt = buildBrowserContextReceipt({
+    context: {
+      contextScope: { mode: 'follow-active' },
+      activeTab: { id: 7, title: 'Thread', url: 'https://old.reddit.com/r/LocalLLaMA/comments/abc/' },
+      pageContext: {
+        text: 'y'.repeat(40_000),
+        extraction: {
+          schema: 'hermes.browser.extraction.v1',
+          version: '1.0.0',
+          method: 'candidate-reader',
+          confidence: 0.98,
+          wordCount: 7_500,
+          truncated: true,
+          redactionCount: 0,
+          originalChars: 45_000,
+        },
+      },
+      tabs: [],
+    },
+    attachments: [],
+    settings: { includePageText: true, includeSelectedText: false },
+  });
+  const item = receipt.items.find((row) => row.label === 'Page text truncated');
+  assert.ok(item, 'receipt should surface page-text truncation');
+  assert.match(item.value, /5,000 chars omitted/);
+});

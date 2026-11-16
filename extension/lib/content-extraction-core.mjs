@@ -844,6 +844,7 @@ export function collectPageContext(document, options = {}) {
         method: extraction.method,
         confidence: extraction.confidence,
         wordCount: extraction.content?.wordCount || 0,
+        originalChars: Math.max(0, Math.floor(Number(extraction.content?.originalChars) || 0)),
         truncated: Boolean(extraction.content?.truncated),
         redactionCount: (extraction.privacy?.redactionCount || 0) + selected.count,
       },

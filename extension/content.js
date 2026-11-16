@@ -34,7 +34,7 @@
   const TEXT_LIMITS = {
     minimal: 4_000,
     normal: 12_000,
-    full: 30_000,
+    full: 40_000,
   };
 
   const PICK_STYLE_ID = 'hermes-element-pick-style';

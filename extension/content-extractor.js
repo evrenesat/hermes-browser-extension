@@ -1,5 +1,5 @@
 /* Generated from extension/lib/content-extraction-core.mjs, extension/lib/appearance-themes.mjs, extension/lib/site-adapters.mjs, extension/lib/inline-draft-policy.mjs, extension/lib/appearance-preferences.mjs, extension/lib/inline-assist-look.mjs, extension/lib/overlay-scrollbar.mjs, extension/lib/page-annotation-content.mjs. Do not edit directly. */
-/* extension/lib/content-extraction-core.mjs · SHA-256 62d0b33e7f417d7a */
+/* extension/lib/content-extraction-core.mjs · SHA-256 450d9ec35e2bb69b */
 (function hermesContentExtractorRuntime(hermesGlobal) {
   'use strict';
 
@@ -849,6 +849,7 @@ function collectPageContext(document, options = {}) {
         method: extraction.method,
         confidence: extraction.confidence,
         wordCount: extraction.content?.wordCount || 0,
+        originalChars: Math.max(0, Math.floor(Number(extraction.content?.originalChars) || 0)),
         truncated: Boolean(extraction.content?.truncated),
         redactionCount: (extraction.privacy?.redactionCount || 0) + selected.count,
       },
