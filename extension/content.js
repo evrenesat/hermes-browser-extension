@@ -229,6 +229,7 @@
     const pageContext = HermesContentExtractor.collectPageContext(document, {
       maxTextChars: Number(options.maxTextChars) > 0 ? Math.min(200_000, Number(options.maxTextChars)) : limit,
       maxSelectedTextChars: Math.min(limit, 8_000),
+      maxCaptureChars: Number(options.maxCaptureChars) > 0 ? Math.min(2_000_000, Number(options.maxCaptureChars)) : 0,
       selectedText: globalThis.getSelection?.().toString() || '',
       source: 'content-script',
       url: location.href,

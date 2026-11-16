@@ -735,6 +735,10 @@ export function extractPageContent(document, options = {}) {
   // controlled by the site. All extracted strings must be treated as
   // attacker-controlled and escaped/sanitized before any DOM rendering.
   const maxTextChars = boundedInteger(options.maxTextChars, DEFAULT_MAX_TEXT_CHARS, 16, 200_000);
+  // Capture chunking: bounded full text for the companion plugin's capture
+  // upload. Computed only when requested (0 = disabled) and only when the
+  // page text was actually cut.
+  const maxCaptureChars = boundedInteger(options.maxCaptureChars, 0, 0, 2_000_000);
   const defaultEnvelopeChars = Math.max(DEFAULT_MAX_ENVELOPE_CHARS, maxTextChars + 12_000);
   const maxEnvelopeChars = boundedInteger(options.maxEnvelopeChars, defaultEnvelopeChars, 4_000, 220_000);
   const maxStructureChars = Math.min(
@@ -805,11 +809,20 @@ export function extractPageContent(document, options = {}) {
       selected: best ? { tag: best.tag, hint: best.hint, score: best.score } : null,
     };
   }
-  return enforceExtractionEnvelopeBudget(result, maxEnvelopeChars);
+  const budgeted = enforceExtractionEnvelopeBudget(result, maxEnvelopeChars);
+  if (maxCaptureChars > 0 && clamped.truncated) {
+    const captureFull = normalizeReadableWhitespace(redactedText.text);
+    const captureText = captureFull.slice(0, maxCaptureChars);
+    if (captureText.length > clamped.text.length) {
+      budgeted.capture = { text: captureText, clipped: captureFull.length > maxCaptureChars };
+    }
+  }
+  return budgeted;
 }
 
 export function collectPageContext(document, options = {}) {
   const maxTextChars = boundedInteger(options.maxTextChars, DEFAULT_MAX_TEXT_CHARS, 16, 200_000);
+  const maxCaptureChars = boundedInteger(options.maxCaptureChars, 0, 0, 2_000_000);
   const maxSelectedTextChars = boundedInteger(options.maxSelectedTextChars, Math.min(maxTextChars, 8_000), 16, 20_000);
   const defaultEnvelopeChars = Math.max(DEFAULT_MAX_ENVELOPE_CHARS, maxTextChars + 12_000);
   const maxEnvelopeChars = boundedInteger(options.maxEnvelopeChars, defaultEnvelopeChars, 4_000, 220_000);
@@ -818,6 +831,7 @@ export function collectPageContext(document, options = {}) {
   const extraction = extractPageContent(document, {
     maxTextChars,
     maxEnvelopeChars,
+    maxCaptureChars,
     debug: Boolean(options.debug),
   });
   const metadata = extraction.metadata || {};
@@ -852,7 +866,13 @@ export function collectPageContext(document, options = {}) {
     extraction: extractionBridgeSummary(extraction),
     capturedAt: extraction.capturedAt || new Date().toISOString(),
   };
-  return enforceContextBudget(context, maxContextChars);
+  const budgeted = enforceContextBudget(context, maxContextChars);
+  if (extraction.capture?.text && extraction.capture.text.length > budgeted.text.length) {
+    budgeted.captureText = extraction.capture.text;
+    budgeted.captureTotalChars = extraction.capture.text.length;
+    budgeted.captureClipped = Boolean(extraction.capture.clipped);
+  }
+  return budgeted;
 }
 
 export const CONTENT_EXTRACTION_API = Object.freeze({

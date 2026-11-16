@@ -25102,6 +25102,7 @@ function collectPageContextWithSharedExtractor(options = {}) {
   const pageContext = HermesContentExtractor.collectPageContext(document, {
     maxTextChars: Number(options.maxTextChars) > 0 ? Math.min(200_000, Number(options.maxTextChars)) : limit,
     maxSelectedTextChars: Math.min(limit, 8_000),
+    maxCaptureChars: Number(options.maxCaptureChars) > 0 ? Math.min(2_000_000, Number(options.maxCaptureChars)) : 0,
     selectedText: globalThis.getSelection?.().toString() || '',
     source: 'scripting-fallback',
     url: location.href,
@@ -25186,6 +25187,9 @@ async function getPageContext(tab, options = {}) {
   const requestOptions = {
     depth: settings.contextDepth,
     maxTextChars: usesDashboardWsChatTransport() && settings.includePageText !== false && settings.contextDepth !== 'minimal' ? 200_000 : undefined,
+    // Capture chunking: only full depth carries the capture bound (mirrors
+    // the plugin-side canonical bound; the two bundles cannot share code).
+    maxCaptureChars: settings.contextDepth === 'full' && settings.includePageText !== false ? 512_000 : 0,
     explicitSiteCapture: Boolean(options.explicitSiteCapture) || (settings.gmailCaptureEnabled === true && isGmailThreadUrl(tab.url)),
     frameId: Number(options.frameId || 0),
   };

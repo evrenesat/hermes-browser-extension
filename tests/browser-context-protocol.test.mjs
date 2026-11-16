@@ -507,4 +507,95 @@ test('page-text truncation stays visible in the What Hermes saw receipt', () => 
   const item = receipt.items.find((row) => row.label === 'Page text truncated');
   assert.ok(item, 'receipt should surface page-text truncation');
   assert.match(item.value, /5,000 chars omitted/);
+});test('capture block: full capture text derives the delivered head and never serializes', () => {
+  const captureText = 'z'.repeat(45_000);
+  const envelope = buildBrowserTurnEnvelope({
+    humanInput: 'summarize the whole thread',
+    activeTab: { id: 7, title: 'Thread', url: 'https://old.reddit.com/r/LocalLLaMA/comments/abc/' },
+    tabs: [{ id: 7, active: true, title: 'Thread', url: 'https://old.reddit.com/r/LocalLLaMA/comments/abc/' }],
+    pageContext: {
+      text: 'z'.repeat(40_000) + ' [truncated]',
+      captureText,
+      capture: { id: 'ca' + 'p'.repeat(30), totalChars: 45_000, deliveredChars: 40_000, chunkChars: 24_000 },
+      meta: {
+        extraction: {
+          schema: 'hermes.browser.extraction.v1',
+          version: '1.0.0',
+          method: 'candidate-reader',
+          confidence: 0.98,
+          wordCount: 7_500,
+          truncated: true,
+          redactionCount: 0,
+          originalChars: 45_000,
+        },
+      },
+    },
+    settings: { ...BASE_SETTINGS, contextDepth: 'full' },
+  });
+  const page = envelope.browser_context.payload.pageContext;
+  assert.equal(page.text, 'z'.repeat(40_000));
+  assert.deepEqual(page.capture, {
+    id: 'ca' + 'p'.repeat(30),
+    totalChars: 45_000,
+    deliveredChars: 40_000,
+    chunkChars: 24_000,
+  });
+  assert.doesNotMatch(JSON.stringify(envelope), /captureText/);
+  assert.ok(envelope.source_receipt.budgets.serialized_chars <= BROWSER_CONTEXT_TURN_BUDGETS.totalSerializedChars);
+});
+
+test('capture block: no block when the page fits or the id is missing', () => {
+  const short = {
+    humanInput: 'hi',
+    activeTab: { id: 7, title: 'Page', url: 'https://example.com/' },
+    pageContext: { text: 'short page', captureText: 'short page', capture: { id: 'cap123', totalChars: 10, deliveredChars: 10, chunkChars: 24_000 } },
+    settings: { ...BASE_SETTINGS, contextDepth: 'full' },
+  };
+  const fitted = buildBrowserTurnEnvelope(short);
+  assert.equal(fitted.browser_context.payload.pageContext.capture, null);
+  assert.equal(fitted.browser_context.payload.pageContext.text, 'short page');
+
+  const noId = buildBrowserTurnEnvelope({
+    ...short,
+    pageContext: { text: 'q'.repeat(45_000), captureText: 'q'.repeat(45_000) },
+  });
+  assert.equal(noId.browser_context.payload.pageContext.capture, null);
+});
+
+test('capture block: excluded from the payload hash', () => {
+  const base = {
+    activeTab: { id: 1, title: 'Thread', url: 'https://old.reddit.com/r/LocalLLaMA/comments/abc/' },
+    selectedTabs: [],
+    pageContext: { text: 'w'.repeat(45_000), captureText: 'w'.repeat(45_000) },
+    settings: { ...BASE_SETTINGS, contextDepth: 'full' },
+  };
+  const withId = browserContextPayloadHash({
+    ...base,
+    pageContext: { ...base.pageContext, capture: { id: 'capture-one', totalChars: 45_000, deliveredChars: 40_000, chunkChars: 24_000 } },
+  });
+  const withOtherId = browserContextPayloadHash({
+    ...base,
+    pageContext: { ...base.pageContext, capture: { id: 'capture-two', totalChars: 45_000, deliveredChars: 40_000, chunkChars: 24_000 } },
+  });
+  const without = browserContextPayloadHash(base);
+  assert.equal(withId, withOtherId);
+  assert.equal(withId, without);
+});
+
+test('capture block: oversized capture text is bounded and long ids clamp', () => {
+  const envelope = buildBrowserTurnEnvelope({
+    humanInput: 'hi',
+    activeTab: { id: 7, title: 'Page', url: 'https://example.com/' },
+    pageContext: {
+      text: 'k'.repeat(45_000),
+      captureText: 'k'.repeat(600_000),
+      capture: { id: 'x'.repeat(200), totalChars: 600_000, deliveredChars: 40_000, chunkChars: 24_000 },
+    },
+    settings: { ...BASE_SETTINGS, contextDepth: 'full' },
+  });
+  const page = envelope.browser_context.payload.pageContext;
+  assert.equal(page.capture.id, 'x'.repeat(64));
+  assert.equal(page.capture.totalChars, 512_000);
+  assert.equal(page.text, 'k'.repeat(40_000));
+  assert.ok(envelope.source_receipt.budgets.serialized_chars <= BROWSER_CONTEXT_TURN_BUDGETS.totalSerializedChars);
 });

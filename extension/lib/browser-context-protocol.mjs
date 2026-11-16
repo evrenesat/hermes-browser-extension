@@ -31,7 +31,14 @@ export const BROWSER_CONTEXT_TURN_BUDGETS = Object.freeze({
   maxStructuredItems: 12,
   maxStructuredKeys: 12,
   maxStructuredDepth: 5,
+  captureIdChars: 64,
+  captureChunkChars: 24_000,
 });
+
+// Canonical bound for the full-page capture text the extractor may hand the
+// panel alongside the clamped page text. The extractor bundle duplicates this
+// number (the two bundles cannot import each other); keep them in sync.
+export const BROWSER_CONTEXT_CAPTURE_MAX_CHARS = 512_000;
 
 export const BROWSER_CONTEXT_PROTOCOL_SECURITY = Object.freeze({
   untrustedUiRendering: 'All Browser Context Protocol strings are untrusted UI data; render them with textContent or a narrowly reviewed escaping renderer at every UI sink.',
@@ -339,9 +346,30 @@ function normalizeAttachment(attachment = {}) {
   };
 }
 
+// Capture chunking: the extractor may hand the panel the full processed page
+// text (captureText) alongside plugin-issued capture metadata. The delivered
+// page text is derived as the exact head of that same processed string, so
+// chunk offsets line up by construction. captureText itself never enters the
+// serialized envelope; it travels to the companion plugin through its own
+// upload route.
+function normalizeCaptureBlock(pageContext = {}, captureProcessed = '', normalLimit = 0) {
+  const id = String(pageContext?.capture?.id || '');
+  if (!captureProcessed || captureProcessed.length <= normalLimit || !id) return null;
+  return {
+    id: id.slice(0, BROWSER_CONTEXT_TURN_BUDGETS.captureIdChars),
+    totalChars: captureProcessed.length,
+    deliveredChars: Math.min(captureProcessed.length, normalLimit),
+    chunkChars: BROWSER_CONTEXT_TURN_BUDGETS.captureChunkChars,
+  };
+}
+
 function normalizeProtocolPageContext(pageContext = {}, settings = DEFAULT_BROWSER_CONTEXT_PROTOCOL_SETTINGS) {
   const mergedSettings = protocolSettings(settings);
   const normalLimit = contextCharLimit(mergedSettings.contextDepth);
+  const captureTextRaw = mergedSettings.includePageText ? String(pageContext?.captureText || '') : '';
+  const captureProcessed = captureTextRaw
+    ? clampText(redactSensitiveText(normalizeReadableWhitespace(captureTextRaw)), BROWSER_CONTEXT_CAPTURE_MAX_CHARS + 32).slice(0, BROWSER_CONTEXT_CAPTURE_MAX_CHARS)
+    : '';
   return {
     restricted: Boolean(pageContext?.restricted),
     reason: String(pageContext?.reason || ''),
@@ -349,12 +377,15 @@ function normalizeProtocolPageContext(pageContext = {}, settings = DEFAULT_BROWS
       ? clampText(redactSensitiveText(normalizeReadableWhitespace(pageContext?.selectedText || '')), 12_000)
       : '',
     text: mergedSettings.includePageText
-      ? clampText(redactSensitiveText(normalizeReadableWhitespace(pageContext?.text || '')), normalLimit)
+      ? (captureProcessed
+        ? clampText(captureProcessed, normalLimit)
+        : clampText(redactSensitiveText(normalizeReadableWhitespace(pageContext?.text || '')), normalLimit))
       : '',
     youtubeTranscript: pageContext?.youtubeTranscript?.ok
       ? clampText(formatYoutubeTranscript(pageContext.youtubeTranscript, normalLimit), normalLimit)
       : (pageContext?.youtubeTranscript || pageContext?.transcript || ''),
-    extraction: { ...normalizeExtractionMetadata(pageContext), truncated: Boolean(normalizeExtractionMetadata(pageContext)?.truncated) || (mergedSettings.includePageText && String(pageContext?.text || '').length > normalLimit) },
+    extraction: { ...normalizeExtractionMetadata(pageContext), truncated: Boolean(normalizeExtractionMetadata(pageContext)?.truncated) || (mergedSettings.includePageText && (String(pageContext?.text || '').length > normalLimit || captureProcessed.length > normalLimit)) },
+    capture: normalizeCaptureBlock(pageContext, captureProcessed, normalLimit),
     siteAdapter: normalizeSiteAdapterMetadata(pageContext),
     meta: {
       description: String(pageContext?.meta?.description || ''),
@@ -860,6 +891,12 @@ function budgetBrowserPayload(payload, state) {
       text: boundedText(page.text || '', BROWSER_CONTEXT_TURN_BUDGETS.pageTextChars, state, 'browser.page_text'),
       youtubeTranscript: boundedText(transcript, BROWSER_CONTEXT_TURN_BUDGETS.transcriptChars, state, 'browser.transcript'),
       extraction: boundedStructuredValue(page.extraction || null, state, 'browser.extraction'),
+      capture: page.capture ? {
+        id: boundedText(page.capture.id || '', BROWSER_CONTEXT_TURN_BUDGETS.captureIdChars, state, 'browser.capture_id'),
+        totalChars: Number.isFinite(Number(page.capture.totalChars)) ? Math.max(0, Math.floor(Number(page.capture.totalChars))) : 0,
+        deliveredChars: Number.isFinite(Number(page.capture.deliveredChars)) ? Math.max(0, Math.floor(Number(page.capture.deliveredChars))) : 0,
+        chunkChars: Number.isFinite(Number(page.capture.chunkChars)) ? Math.max(0, Math.floor(Number(page.capture.chunkChars))) : 0,
+      } : null,
       siteAdapter: boundedStructuredValue(page.siteAdapter || null, state, 'browser.site_adapter'),
       meta: {
         description: boundedText(page.meta?.description || '', 800, state, 'browser.description'),

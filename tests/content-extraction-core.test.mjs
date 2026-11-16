@@ -335,3 +335,47 @@ test('aggregate extraction and bridge payloads stay within serialized budgets', 
   assert.ok(JSON.stringify(tightContext).length <= 8_000);
   assert.ok(tightContext.extraction.limits.serializedContextChars <= 8_000);
 });
+test('capture text: requested only, bounded, and aligned with the delivered page text', () => {
+  const paragraph = 'Readable thread comment with plenty of words. ';
+  const document = documentFor(`<!doctype html><html><body><article>
+    <h1>Long public thread</h1>
+    <p>${paragraph.repeat(2_000)}</p>
+  </article></body></html>`);
+
+  const without = collectPageContext(document, { maxTextChars: 4_000, maxContextChars: 12_000 });
+  assert.equal(without.captureText, undefined);
+
+  const withCapture = collectPageContext(document, {
+    maxTextChars: 4_000,
+    maxContextChars: 12_000,
+    maxCaptureChars: 30_000,
+  });
+  assert.ok(withCapture.captureText.length > withCapture.text.length, 'capture text must exceed the delivered text');
+  assert.ok(withCapture.captureText.length <= 30_000);
+  assert.equal(withCapture.captureClipped, true);
+  // The extractor-level marker is display garnish; the capture body is what
+  // the delivered text is cut from. The envelope layer derives the delivered
+  // text from the capture itself, where the alignment is exact.
+  const deliveredBody = withCapture.text.replace(/ \[truncated\]$/, '');
+  assert.equal(deliveredBody, withCapture.captureText.slice(0, deliveredBody.length), 'delivered body is the exact head of the capture');
+  assert.doesNotMatch(withCapture.captureText, /api_key|sk-/, 'capture text is redacted like page text');
+
+  const hugeBound = collectPageContext(document, {
+    maxTextChars: 4_000,
+    maxContextChars: 12_000,
+    maxCaptureChars: 2_000_000,
+  });
+  assert.equal(hugeBound.captureClipped, false, 'a bound above the text size leaves the capture unclipped');
+});
+
+test('capture text: redaction pipeline matches page text and secrets never survive', () => {
+  const document = documentFor(`<!doctype html><html><body><article>
+    <h1>Leaky thread</h1>
+    <p>Contact me at api_key=browser-secret-value for details. </p>
+    <p>${'More thread content follows here. '.repeat(400)}</p>
+  </article></body></html>`);
+  const context = collectPageContext(document, { maxTextChars: 300, maxContextChars: 2_000, maxCaptureChars: 20_000 });
+  assert.ok(context.captureText);
+  assert.doesNotMatch(context.captureText, /browser-secret-value/);
+  assert.match(context.captureText, /\[REDACTED_SECRET\]/);
+});
